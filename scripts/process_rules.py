@@ -1,79 +1,57 @@
 import requests
-import re
+import argparse
+import os
 
-# 配置源地址
+# 配置源
 SOURCES = {
     "privacy": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Privacy/Privacy.list",
     "adlite": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/AdvertisingLite/AdvertisingLite.list"
 }
 
-# 必须保留的关键字（覆盖主流及 2026 趋势）
-MUST_KEEP = [
-    'google', 'facebook', 'instagram', 'twitter', 'youtube', 'telegram', 'tiktok', # 社交/视频
-    'openai', 'chatgpt', 'anthropic', 'claude', 'gemini', 'deepseek', 'perplexity', # AI 类
-    'amazon', 'netflix', 'spotify', 'disney', 'apple', 'microsoft', # 生产力/娱乐
-    'taobao', 'tencent', 'alipay', 'bytedance', 'baidu', 'meituan', 'pinduoduo', 'jd.com', # 国内大厂
-    'xiaohongshu', 'bilibili', 'weibo', 'amap', 'douyin' # 国内主流
+# 2026 主流 App 关键字（用于高频置顶排序）
+HOT_DOMAINS = [
+    'apple.com', 'google.com', 'facebook.com', 'instagram.com', 'twitter.com', 'x.com',
+    'youtube.com', 'telegram.org', 'tiktok.com', 'openai.com', 'deepseek.com',
+    'tencent.com', 'alipay.com', 'taobao.com', 'byteimg.com', 'douyin.com'
 ]
 
-# 排除非目标区域（减少冗余）
-EXCLUDE_REGIONS = ['.ru', '.ir', '.vn', '.br', '.in'] 
-
-def fetch_and_clean(url):
+def fetch_rules(url):
     try:
-        content = requests.get(url, timeout=30).text
-        lines = content.split('\n')
-        # 仅保留有效的规则行
-        return [l for l in lines if l.startswith(('HOST', 'HOST-SUFFIX', 'HOST-KEYWORD'))]
-    except:
-        return []
+        r = requests.get(url, timeout=30)
+        return [l.strip() for l in r.text.split('\n') if l.startswith(('HOST', 'HOST-SUFFIX'))]
+    except: return []
 
-def compress_rules(rules):
-    """简单的字典树逻辑：如果有了 .example.com，就删掉 ads.example.com"""
+def optimize_rules(rules):
+    # 简单的字典树去重逻辑
     rules = sorted(list(set(rules)))
-    optimized = []
-    suffixes = set()
-    
-    # 先收集所有后缀
-    for r in rules:
-        if r.startswith('HOST-SUFFIX'):
-            suffixes.add(r.split(',')[1].strip())
-    
+    suffixes = {r.split(',')[1] for r in rules if r.startswith('HOST-SUFFIX')}
+    final = []
     for r in rules:
         if r.startswith('HOST,'):
-            domain = r.split(',')[1].strip()
-            # 如果当前域名的后缀已经在后缀集合里，则跳过此 HOST 规则
+            domain = r.split(',')[1]
             if any(domain.endswith("." + s) or domain == s for s in suffixes):
                 continue
-        optimized.append(r)
-    return optimized
+        final.append(r)
+    # 排序：高频域名排在前面，提升 QX 匹配速度
+    return sorted(final, key=lambda x: not any(hot in x for hot in HOT_DOMAINS))
 
 def main():
-    print("Fetching rules...")
-    raw_rules = fetch_and_clean(SOURCES["privacy"]) + fetch_and_clean(SOURCES["adlite"])
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--output_dir', default='dist')
+    args = parser.parse_args()
     
-    # 1. 过滤掉冷门区域域名
-    filtered = [r for r in raw_rules if not any(reg in r.lower() for reg in EXCLUDE_REGIONS)]
-    
-    # 2. 压缩去重
-    compressed = compress_rules(filtered)
-    
-    # 3. 生成 iOS 版 (全量主流)
-    # 保留包含 MUST_KEEP 关键字或原本就在列表中的高质量规则
-    mobile_rules = [r for r in compressed if any(k in r.lower() for k in MUST_KEEP) or len(r) < 40]
+    os.makedirs(args.output_dir, exist_ok=True)
+    raw = fetch_rules(SOURCES["privacy"]) + fetch_rules(SOURCES["adlite"])
+    optimized = optimize_rules(raw)
 
-    # 4. 生成 Mac 版 (精简掉纯移动端行为)
-    # 剔除仅在手机 App 出现的特定域名（示例：部分移动支付回调、极光推送等）
-    mobile_only = ['jpush', 'getui', 'mob.com', 'pinduoduo', 'pangle']
-    mac_rules = [r for r in mobile_rules if not any(m in r.lower() for m in mobile_only)]
+    # 分发手机版和电脑版（Mac 版剔除部分纯手机 App 埋点，减少开销）
+    with open(os.path.join(args.output_dir, "Mobile_Unified.list"), "w") as f:
+        f.write("# Mobile Unified Rules\n" + "\n".join(optimized))
 
-    # 5. 写入文件
-    with open("dist/Mobile_Unified.list", "w") as f:
-        f.write(f"# Unified Rules for iOS\n# Total: {len(mobile_rules)}\n" + "\n".join(mobile_rules))
-        
-    with open("dist/Mac_Unified.list", "w") as f:
-        f.write(f"# Unified Rules for macOS\n# Total: {len(mac_rules)}\n" + "\n".join(mac_rules))
-    print(f"Done! Mobile: {len(mobile_rules)}, Mac: {len(mac_rules)}")
+    # Mac 版可进一步精简（例如剔除极光推送、个推等移动端专用域名）
+    mac_optimized = [r for r in optimized if not any(kw in r for kw in ['jpush', 'getui', 'mob.com'])]
+    with open(os.path.join(args.output_dir, "Mac_Unified.list"), "w") as f:
+        f.write("# Mac Unified Rules\n" + "\n".join(mac_optimized))
 
 if __name__ == "__main__":
     main()

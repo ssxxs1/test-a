@@ -1,27 +1,42 @@
-name: QX Rules Processor
+name: Rules Production Deploy
 on:
   schedule:
-    - cron: '0 0 * * 1'
-  workflow_dispatch:
+    - cron: '0 0 * * 1' 
+  workflow_dispatch:  
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout dev code
+        uses: actions/checkout@v4
         with:
-          ref: rule  
+          ref: rule
+          path: dev_side
 
-      - name: Run Script
+      - name: Checkout production
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main_side
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: pip install requests
+
+      - name: Run Processor
         run: |
-          mkdir -p dist
-          python scripts/process_rules.py
+          mkdir -p main_side/dist
+          python dev_side/scripts/process_rules.py --output_dir main_side/dist
 
-      - name: Deploy to Rule Branch
+      - name: Commit and Push to Main
+        working-directory: ./main_side
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add dist/*.list
-          # 仅当有变化时才 commit
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto Update $(date +'%Y-%m-%d')" && git push origin rule)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Production Update $(date +'%Y-%m-%d')" && git push origin main)
