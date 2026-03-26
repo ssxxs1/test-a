@@ -172,4 +172,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+<<<<<<< HEAD
 .history/
+=======
+.history
+>>>>>>> rule
