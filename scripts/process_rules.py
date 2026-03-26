@@ -16,6 +16,12 @@ HOT_DOMAINS = [
     'youtube.com', 'telegram.org', 'tiktok.com', 'openai.com', 'deepseek.com',
     'tencent.com', 'alipay.com', 'taobao.com', 'byteimg.com', 'douyin.com'
 ]
+# 剔除列表：不常访问的地区和冗余服务（精简核心）
+DISCARD_LIST = [
+    '.ru', '.ir', '.vn', '.br', '.in', '.ua', '.tr', # 剔除非目标地区后缀
+    'tracking', 'telemetry', 'analytics', 'statistics', # 剔除过分细碎的埋点（已包含在主流规则中）
+    'metrics', 'logging', 'crashlytics'
+]
 
 def fetch_rules(url):
     try:
@@ -24,31 +30,47 @@ def fetch_rules(url):
         rules = []
         for line in r.text.split('\n'):
             line = line.strip()
-            if line.startswith(types):
-                parts = [p.strip() for p in line.split(',')]
-                if len(parts) >= 2:
-                    # 重新构造规则：类型,值,自定义策略名
-                    new_rule = f"{parts[0]},{parts[1]},{POLICY_NAME}"
-                    # 如果原始规则包含 no-resolve，则予以保留
-                    if "no-resolve" in line.lower():
-                        new_rule += ",no-resolve"
-                    rules.append(new_rule)
+            if not line.startswith(types):
+                continue
+            
+            # 逻辑精简：如果包含不常访问的后缀，直接丢弃
+            if any(d in line.lower() for d in DISCARD_LIST):
+                continue
+                
+            parts = [p.strip() for p in line.split(',')]
+            if len(parts) >= 2:
+                new_rule = f"{parts[0]},{parts[1]},{POLICY_NAME}"
+                if "no-resolve" in line.lower():
+                    new_rule += ",no-resolve"
+                rules.append(new_rule)
         return rules
     except: return []
 
-def optimize_rules(rules):
-    # 简单的字典树去重逻辑
-    rules = sorted(list(set(rules)))
+def aggressive_optimize(rules):
+    """激进优化：去重、后缀压缩、排序"""
+    rules = list(set(rules))
+    
+    # 提取所有后缀
     suffixes = {r.split(',')[1] for r in rules if r.startswith('HOST-SUFFIX')}
+    
     final = []
     for r in rules:
-        if r.startswith('HOST,'):
-            domain = r.split(',')[1]
-            if any(domain.endswith("." + s) or domain == s for s in suffixes):
+        parts = r.split(',')
+        rtype, rval = parts[0], parts[1]
+        
+        # 1. 后缀包含判定：如果已有后缀拦截，删除具体的 HOST 拦截
+        if rtype == 'HOST':
+            if any(rval.endswith("." + s) or rval == s for s in suffixes):
                 continue
+        
+        # 2. 长度过滤：剔除异常长的域名（通常是动态生成的广告位，命中率极低）
+        if len(rval) > 60:
+            continue
+            
         final.append(r)
-    # 排序：高频域名排在前面，提升 QX 匹配速度
-    return sorted(final, key=lambda x: not any(hot in x for hot in HOT_DOMAINS))
+
+    # 排序逻辑：将 HOT_DOMAINS 相关规则排在最前面
+    return sorted(final, key=lambda x: not any(hot in x.lower() for hot in HOT_DOMAINS))
 
 def generate_header(name, rules):
     counts = {
@@ -67,8 +89,6 @@ def generate_header(name, rules):
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     header = [
         f"# NAME: {name}",
-        f"# AUTHOR: blackmatrix7",
-        f"# REPO: https://github.com/blackmatrix7/ios_rule_script",
         f"# UPDATED: {now}",
         f"# HOST: {counts['HOST']}",
         f"# HOST-KEYWORD: {counts['HOST-KEYWORD']}",
@@ -83,21 +103,25 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--output_dir', default='dist')
     args = parser.parse_args()
-    
     os.makedirs(args.output_dir, exist_ok=True)
+
+    print("Fetching and Pruning...")
     raw = fetch_rules(SOURCES["privacy"]) + fetch_rules(SOURCES["adlite"])
-    optimized = optimize_rules(raw)
+    optimized = aggressive_optimize(raw)
 
-    # 分发手机版和电脑版
+    # 手机版：精简后的全量
     with open(os.path.join(args.output_dir, "Mobile_Unified.list"), "w") as f:
-        header = generate_header("Advertising", optimized)
-        f.write(header + "\n".join(optimized))
+        f.write(generate_header("Mobile_Unified", optimized) + "\n".join(optimized))
 
-    # Mac 版可进一步精简
-    mac_optimized = [r for r in optimized if not any(kw in r for kw in ['jpush', 'getui', 'mob.com'])]
+    # Mac 版：更激进的精简（仅保留主流域名相关的拦截）
+    # 逻辑：对于 Mac，如果不属于 HOT_DOMAINS 且不是后缀匹配，则剔除
+    mac_rules = [r for r in optimized if any(h in r.lower() for h in HOT_DOMAINS) or r.startswith('HOST-SUFFIX')]
+    
     with open(os.path.join(args.output_dir, "Mac_Unified.list"), "w") as f:
-        header = generate_header("Advertising (Mac)", mac_optimized)
-        f.write(header + "\n".join(mac_optimized))
+        f.write(generate_header("Mac_Unified", mac_rules) + "\n".join(mac_rules))
+    
+    print(f"Success! Mobile: {len(optimized)}, Mac: {len(mac_rules)}")
+
 
 if __name__ == "__main__":
     main()
