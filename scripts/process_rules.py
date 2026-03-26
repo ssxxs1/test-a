@@ -1,8 +1,10 @@
 import requests
 import argparse
 import os
+from datetime import datetime
 
-# 配置源
+# 配置项
+POLICY_NAME = "Advertising"
 SOURCES = {
     "privacy": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Privacy/Privacy.list",
     "adlite": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/AdvertisingLite/AdvertisingLite.list"
@@ -18,7 +20,20 @@ HOT_DOMAINS = [
 def fetch_rules(url):
     try:
         r = requests.get(url, timeout=30)
-        return [l.strip() for l in r.text.split('\n') if l.startswith(('HOST', 'HOST-SUFFIX'))]
+        types = ('HOST', 'HOST-SUFFIX', 'HOST-KEYWORD', 'IP-CIDR', 'IP6-CIDR')
+        rules = []
+        for line in r.text.split('\n'):
+            line = line.strip()
+            if line.startswith(types):
+                parts = [p.strip() for p in line.split(',')]
+                if len(parts) >= 2:
+                    # 重新构造规则：类型,值,自定义策略名
+                    new_rule = f"{parts[0]},{parts[1]},{POLICY_NAME}"
+                    # 如果原始规则包含 no-resolve，则予以保留
+                    if "no-resolve" in line.lower():
+                        new_rule += ",no-resolve"
+                    rules.append(new_rule)
+        return rules
     except: return []
 
 def optimize_rules(rules):
@@ -35,6 +50,35 @@ def optimize_rules(rules):
     # 排序：高频域名排在前面，提升 QX 匹配速度
     return sorted(final, key=lambda x: not any(hot in x for hot in HOT_DOMAINS))
 
+def generate_header(name, rules):
+    counts = {
+        'HOST': 0,
+        'HOST-KEYWORD': 0,
+        'HOST-SUFFIX': 0,
+        'IP-CIDR': 0,
+        'IP6-CIDR': 0
+    }
+    for r in rules:
+        for t in counts.keys():
+            if r.startswith(t + ','):
+                counts[t] += 1
+                break
+    
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    header = [
+        f"# NAME: {name}",
+        f"# AUTHOR: blackmatrix7",
+        f"# REPO: https://github.com/blackmatrix7/ios_rule_script",
+        f"# UPDATED: {now}",
+        f"# HOST: {counts['HOST']}",
+        f"# HOST-KEYWORD: {counts['HOST-KEYWORD']}",
+        f"# HOST-SUFFIX: {counts['HOST-SUFFIX']}",
+        f"# IP-CIDR: {counts['IP-CIDR']}",
+        f"# IP6-CIDR: {counts['IP6-CIDR']}",
+        f"# TOTAL: {len(rules)}"
+    ]
+    return "\n".join(header) + "\n"
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--output_dir', default='dist')
@@ -44,14 +88,16 @@ def main():
     raw = fetch_rules(SOURCES["privacy"]) + fetch_rules(SOURCES["adlite"])
     optimized = optimize_rules(raw)
 
-    # 分发手机版和电脑版（Mac 版剔除部分纯手机 App 埋点，减少开销）
+    # 分发手机版和电脑版
     with open(os.path.join(args.output_dir, "Mobile_Unified.list"), "w") as f:
-        f.write("# Mobile Unified Rules\n" + "\n".join(optimized))
+        header = generate_header("Advertising", optimized)
+        f.write(header + "\n".join(optimized))
 
-    # Mac 版可进一步精简（例如剔除极光推送、个推等移动端专用域名）
+    # Mac 版可进一步精简
     mac_optimized = [r for r in optimized if not any(kw in r for kw in ['jpush', 'getui', 'mob.com'])]
     with open(os.path.join(args.output_dir, "Mac_Unified.list"), "w") as f:
-        f.write("# Mac Unified Rules\n" + "\n".join(mac_optimized))
+        header = generate_header("Advertising (Mac)", mac_optimized)
+        f.write(header + "\n".join(mac_optimized))
 
 if __name__ == "__main__":
     main()

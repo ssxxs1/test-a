@@ -10,17 +10,8 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout dev code
-        uses: actions/checkout@v4
-        with:
-          ref: rule
-          path: dev_side
-
       - name: Checkout production
         uses: actions/checkout@v4
-        with:
-          ref: main
-          path: main_side
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -32,13 +23,12 @@ jobs:
 
       - name: Run Processor
         run: |
-          mkdir -p main_side/dist
-          python dev_side/scripts/process_rules.py --output_dir main_side/dist
+          mkdir -p dist
+          python scripts/process_rules.py --output_dir dist
 
       - name: Commit and Push to Main
-        working-directory: ./main_side
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           git add dist/*.list
           git diff --staged --quiet || (git commit -m "Production Update $(date +'%Y-%m-%d')" && git push origin main)
