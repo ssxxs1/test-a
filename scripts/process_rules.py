@@ -1,13 +1,27 @@
 import requests
 import argparse
 import os
+import sys
 from datetime import datetime
+import tempfile
+import shutil
 
 # 配置项
 POLICY_NAME = "Advertising"
 SOURCES = {
     "privacy": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Privacy/Privacy.list",
     "adlite": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/AdvertisingLite/AdvertisingLite.list"
+}
+
+# 规则优先级
+RULE_PRIORITY = {
+    'HOST': 1,
+    'HOST-SUFFIX': 2,
+    'HOST-KEYWORD': 3,
+    'GEOIP': 4,
+    'IP-CIDR': 4,
+    'IP6-CIDR': 4,
+    'USER-AGENT': 5,
 }
 
 # 核心保留：主流互联网厂商域名
@@ -20,39 +34,41 @@ HOT_DOMAINS = [
     'doubleclick.net', 'googleads', 'googletagmanager', 'app-measurement'
 ]
 
-# 允许保留的主流 TLD（包含香港、日本、新加坡、美国、台湾等）
+# 允许保留的主流 TLD
 ALLOWED_TLD = (
     '.com', '.cn', '.net', '.org', '.tv', '.me', '.io', '.cc', 
     '.hk', '.jp', '.sg', '.us', '.tw', '.edu', '.gov'
 )
 
-# 核心广告关键词（白名单模式）
+# 核心广告关键词
 CORE_AD_KEYWORDS = ['ad', 'track', 'log', 'stat', 'api', 'analytics', 'report', 'metrics']
 
 def fetch_rules(url):
+    """流式获取规则，失败返回 None 以触发熔断保护"""
+    types = tuple(RULE_PRIORITY.keys())
+    rules = []
     try:
-        r = requests.get(url, timeout=30)
-        types = ('HOST', 'HOST-SUFFIX', 'HOST-KEYWORD', 'IP-CIDR', 'IP6-CIDR')
-        rules = []
-        for line in r.text.split('\n'):
-            line = line.strip()
-            if not line.startswith(types):
-                continue
-            
-            parts = [p.strip() for p in line.split(',')]
-            if len(parts) >= 2:
-                # 重新构造规则：统一使用自定义策略名
-                new_rule = f"{parts[0]},{parts[1]},{POLICY_NAME}"
-                if "no-resolve" in line.lower():
-                    new_rule += ",no-resolve"
-                rules.append(new_rule)
+        with requests.get(url, timeout=30, stream=True) as r:
+            r.raise_for_status()
+            for line in r.iter_lines(decode_unicode=True):
+                if not line: continue
+                line = line.strip()
+                if not line.startswith(types):
+                    continue
+                
+                parts = [p.strip() for p in line.split(',')]
+                if len(parts) >= 2:
+                    new_rule = f"{parts[0]},{parts[1]},{POLICY_NAME}"
+                    if "no-resolve" in line.lower():
+                        new_rule += ",no-resolve"
+                    rules.append(new_rule)
         return rules
-    except: return []
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching {url}: {e}", file=sys.stderr)
+        return None
 
 def extreme_optimize(rules, is_mac=False):
-    """
-    极度精简逻辑：仅保留高频、核心规则
-    """
+    """精简逻辑并按要求排序"""
     rules = list(set(rules))
     suffixes = {r.split(',')[1] for r in rules if r.startswith('HOST-SUFFIX')}
     
@@ -62,75 +78,110 @@ def extreme_optimize(rules, is_mac=False):
         rtype, rval = parts[0], parts[1]
         rval_lower = rval.lower()
         
-        # 1. 基础过滤：后缀名必须在主流 TLD 内
-        if not rval_lower.endswith(ALLOWED_TLD):
-            continue
-            
-        # 2. 长度极限过滤：超过 35 字符的通常不具代表性
-        if len(rval) > 35:
-            continue
+        if not rval_lower.endswith(ALLOWED_TLD): continue
+        if len(rval) > 35: continue
 
-        # 3. 冗余过滤
         if rtype == 'HOST':
             if any(rval_lower.endswith("." + s) or rval_lower == s for s in suffixes):
                 continue
         
-        # 4. 内容过滤：精准打击核心
         is_hot = any(hot in rval_lower for hot in HOT_DOMAINS)
         is_ad_kw = any(kw in rval_lower for kw in CORE_AD_KEYWORDS)
         
         if is_mac:
-            # Mac 版更严格：必须是主流厂商，或者是非常明显的 ad 后缀
-            if not is_hot:
-                if not (is_ad_kw and rtype == 'HOST-SUFFIX'):
-                    continue
+            if not is_hot and not (is_ad_kw and rtype == 'HOST-SUFFIX'):
+                continue
         else:
-            # 手机版：保留主流厂商规则 + 包含核心关键词的规则
             if not (is_hot or is_ad_kw):
                 continue
-
         final.append(r)
 
-    # 排序：高频优先
-    return sorted(final, key=lambda x: not any(hot in x.lower() for hot in HOT_DOMAINS))
+    def sort_key(rule):
+        rtype = rule.split(',')[0]
+        priority = RULE_PRIORITY.get(rtype, 99)
+        return (priority, rule.lower())
 
-def generate_header(name, rules):
-    counts = {
-        'HOST': 0, 'HOST-KEYWORD': 0, 'HOST-SUFFIX': 0, 'IP-CIDR': 0, 'IP6-CIDR': 0
-    }
+    return sorted(final, key=sort_key)
+
+def generate_header(name, rules, source_counts=None):
+    counts = {t: 0 for t in RULE_PRIORITY.keys()}
     for r in rules:
-        for t in counts.keys():
-            if r.startswith(t + ','):
-                counts[t] += 1
-                break
+        rtype = r.split(',')[0]
+        if rtype in counts:
+            counts[rtype] += 1
+            
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     header = [
         f"# NAME: {name}", f"# UPDATED: {now}",
-        f"# HOST: {counts['HOST']}", f"# HOST-KEYWORD: {counts['HOST-KEYWORD']}",
-        f"# HOST-SUFFIX: {counts['HOST-SUFFIX']}", f"# IP-CIDR: {counts['IP-CIDR']}",
-        f"# IP6-CIDR: {counts['IP6-CIDR']}", f"# TOTAL: {len(rules)}"
+        f"# HOST: {counts.get('HOST', 0)}", 
+        f"# HOST-SUFFIX: {counts.get('HOST-SUFFIX', 0)}",
+        f"# HOST-KEYWORD: {counts.get('HOST-KEYWORD', 0)}",
+        f"# IP-CIDR: {counts.get('IP-CIDR', 0) + counts.get('IP6-CIDR', 0)}",
+        f"# TOTAL: {len(rules)}"
     ]
+    
+    # 动态展示所有数据源的保留条数
+    if source_counts:
+        for s_key in SOURCES.keys():
+            count = source_counts.get(s_key, 0)
+            header.append(f"# RETAINED-{s_key.upper()}: {count}")
+        
     return "\n".join(header) + "\n"
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--output_dir', default='dist')
     args = parser.parse_args()
-    os.makedirs(args.output_dir, exist_ok=True)
+
+    output_dir = os.path.abspath(args.output_dir)
+    if not output_dir.startswith(os.getcwd()):
+        print(f"Error: Output directory {output_dir} is outside of current workspace.")
+        sys.exit(1)
+    os.makedirs(output_dir, exist_ok=True)
 
     print("Fetching raw data...")
-    raw = fetch_rules(SOURCES["privacy"]) + fetch_rules(SOURCES["adlite"])
+    source_rules = {}
+    all_raw = []
+    for name, url in SOURCES.items():
+        data = fetch_rules(url)
+        if data is None:
+            print(f"CRITICAL: Failed to fetch {name}. Aborting.")
+            sys.exit(1)
+        source_rules[name] = set(data)
+        all_raw.extend(data)
     
-    print("Optimizing...")
-    mobile = extreme_optimize(raw, is_mac=False)
-    with open(os.path.join(args.output_dir, "Mobile_Unified.list"), "w") as f:
-        f.write(generate_header("Mobile_Unified", mobile) + "\n".join(mobile))
+    if not all_raw:
+        sys.exit(1)
 
-    mac = extreme_optimize(raw, is_mac=True)
-    with open(os.path.join(args.output_dir, "Mac_Unified.list"), "w") as f:
-        f.write(generate_header("Mac_Unified", mac) + "\n".join(mac))
+    print("Optimizing and Sorting...")
     
-    print(f"Success! Mobile: {len(mobile)}, Mac: {len(mac)}")
+    files_to_write = {
+        "Mobile_Unified.list": extreme_optimize(all_raw, is_mac=False),
+        "Mac_Unified.list": extreme_optimize(all_raw, is_mac=True)
+    }
+
+    for filename, optimized_rules in files_to_write.items():
+        filepath = os.path.join(output_dir, filename)
+        
+        source_counts = {}
+        for s_name, s_set in source_rules.items():
+            source_counts[s_name] = sum(1 for r in optimized_rules if r in s_set)
+
+        fd, temp_path = tempfile.mkstemp(dir=output_dir, text=True)
+        try:
+            with os.fdopen(fd, 'w') as tf:
+                tf.write(generate_header(filename.split('.')[0], optimized_rules, source_counts))
+                tf.write("\n".join(optimized_rules))
+            
+            shutil.move(temp_path, filepath)
+            print(f"Saved {filename}: {len(optimized_rules)} rules")
+        except Exception as e:
+            print(f"Error saving {filename}: {e}")
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            sys.exit(1)
+
+    print("Success!")
 
 if __name__ == "__main__":
     main()
