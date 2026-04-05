@@ -2,7 +2,12 @@ name: Rules Production Deploy
 on:
   schedule:
     - cron: '0 0 * * 1' 
-  workflow_dispatch:  
+  workflow_dispatch:
+    inputs:
+      force_update:
+        description: 'Force a full update (bypass cache)'
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -24,7 +29,7 @@ jobs:
       - name: Run Processor
         run: |
           mkdir -p dist
-          python scripts/process_rules.py --output_dir dist
+          python scripts/process_rules.py --output_dir dist ${{ github.event.inputs.force_update == 'true' && '--force' || '' }}
 
       - name: Commit and Push to Main
         run: |

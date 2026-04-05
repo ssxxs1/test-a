@@ -7,6 +7,7 @@ import tempfile
 import shutil
 import re
 import json
+from concurrent.futures import ThreadPoolExecutor
 
 # 配置项
 POLICY_NAME = "Advertising"
@@ -81,9 +82,23 @@ def fetch_rules(url):
         return None, None
 
 def extreme_optimize(rules, is_mac=False):
-    """精简逻辑并按要求排序"""
+    """极度精简算法：嵌套后缀去重与正则加速匹配"""
+    # 1. 初步清理并去重
     rules = list(set(rules))
-    suffixes = {r.split(',')[1] for r in rules if r.startswith('HOST-SUFFIX')}
+    
+    # 2. 提取并排序后缀 (从短到长，用于覆盖检测)
+    raw_suffixes = sorted({r.split(',')[1] for r in rules if r.startswith('HOST-SUFFIX')}, key=len)
+    
+    # 3. 嵌套后缀去重 (例如 google.com 覆盖 ads.google.com)
+    final_suffixes = []
+    for s in raw_suffixes:
+        if not any(s.endswith("." + fs) for fs in final_suffixes):
+            final_suffixes.append(s)
+    
+    suffix_set = set(final_suffixes)
+    
+    # 4. 正则预编译关键词过滤
+    ad_pattern = re.compile('|'.join(CORE_AD_KEYWORDS), re.I)
     
     final = []
     for r in rules:
@@ -94,12 +109,17 @@ def extreme_optimize(rules, is_mac=False):
         if not rval_lower.endswith(ALLOWED_TLD): continue
         if len(rval) > 35: continue
 
+        # HOST 去重 (已被后缀覆盖)
         if rtype == 'HOST':
-            if any(rval_lower.endswith("." + s) or rval_lower == s for s in suffixes):
+            if any(rval_lower.endswith("." + s) or rval_lower == s for s in suffix_set):
                 continue
         
+        # 嵌套后缀去重 (剔除冗余后缀)
+        if rtype == 'HOST-SUFFIX' and rval not in suffix_set:
+            continue
+        
         is_hot = any(hot in rval_lower for hot in HOT_DOMAINS)
-        is_ad_kw = any(kw in rval_lower for kw in CORE_AD_KEYWORDS)
+        is_ad_kw = bool(ad_pattern.search(rval_lower))
         
         if is_mac:
             if not is_hot and not (is_ad_kw and rtype == 'HOST-SUFFIX'):
@@ -191,6 +211,7 @@ class RuleCache:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--output_dir', default='dist')
+    parser.add_argument('--force', action='store_true', help='Force a full update (bypass cache)')
     args = parser.parse_args()
 
     output_dir = os.path.abspath(args.output_dir)
@@ -201,12 +222,19 @@ def main():
 
     cache = RuleCache(os.path.join(os.getcwd(), CACHE_FILE))
     
-    print("Fetching raw data...")
+    print(f"Fetching raw data (Parallel)... {'[FORCE MODE]' if args.force else ''}")
     source_rules = {}
     source_totals = {}
+    
+    def fetch_task(name_url):
+        name, url = name_url
+        return name, fetch_rules(url)
+
+    with ThreadPoolExecutor(max_workers=len(SOURCES)) as executor:
+        results = list(executor.map(fetch_task, SOURCES.items()))
+
     all_raw = []
-    for name, url in SOURCES.items():
-        data, total = fetch_rules(url)
+    for name, (data, total) in results:
         if data is None:
             print(f"CRITICAL: Failed to fetch {name}. Aborting.")
             sys.exit(1)
@@ -214,8 +242,8 @@ def main():
         source_totals[name] = total
         all_raw.extend(data)
     
-    # 缓存检查
-    is_forced = cache.data.get("consecutive_unchanged_days", 0) >= 30
+    # 缓存检查 (增加 --force 支持)
+    is_forced = args.force or cache.data.get("consecutive_unchanged_days", 0) >= 30
     if cache.should_skip(source_totals) and not is_forced:
         print(f"Skipping: All sources unchanged and within 30 days ({cache.data.get('consecutive_unchanged_days')} days).")
         cache.update(source_totals, is_changed=False)
@@ -226,7 +254,7 @@ def main():
 
     print("Optimizing and Sorting...")
     if is_forced:
-        print("Forced update: 30 days limit reached.")
+        print("Update triggered: Force mode or 30 days limit reached.")
     
     files_to_write = {
         "Mobile_Unified.list": extreme_optimize(all_raw, is_mac=False),
