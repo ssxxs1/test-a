@@ -5,6 +5,8 @@ import sys
 from datetime import datetime
 import tempfile
 import shutil
+import re
+import json
 
 # 配置项
 POLICY_NAME = "Advertising"
@@ -27,7 +29,7 @@ RULE_PRIORITY = {
 # 核心保留：主流互联网厂商域名
 HOT_DOMAINS = [
     'apple.com', 'google.com', 'facebook.com', 'instagram.com', 'twitter.com', 'x.com',
-    'youtube.com', 'telegram.org', 'tiktok.com', 'openai.com', 'deepseek.com',
+    'youtube.com', 'telegram.org', 'tiktok.com', 'openai.com', 'deepseek.com', 'spotify.com',
     'tencent.com', 'alipay.com', 'taobao.com', 'byteimg.com', 'douyin.com',
     'baidu.com', 'weibo.com', 'jd.com', 'meituan.com', 'xiaohongshu.com',
     'bilibili.com', 'zhihu.com', 'iqiyi.com', 'youku.com', 'netease.com',
@@ -44,15 +46,23 @@ ALLOWED_TLD = (
 CORE_AD_KEYWORDS = ['ad', 'track', 'log', 'stat', 'api', 'analytics', 'report', 'metrics']
 
 def fetch_rules(url):
-    """流式获取规则，失败返回 None 以触发熔断保护"""
+    """流式获取规则，提取 TOTAL 字段，失败返回 None"""
     types = tuple(RULE_PRIORITY.keys())
     rules = []
+    total_in_header = None
     try:
-        with requests.get(url, timeout=30, stream=True) as r:
+        with requests.get(url, timeout=30, stream=True, verify=False) as r:
             r.raise_for_status()
             for line in r.iter_lines(decode_unicode=True):
                 if not line: continue
                 line = line.strip()
+                
+                # 提取 # TOTAL: 数字
+                if line.startswith("# TOTAL:"):
+                    match = re.search(r'# TOTAL:\s*(\d+)', line)
+                    if match:
+                        total_in_header = int(match.group(1))
+                
                 if not line.startswith(types):
                     continue
                 
@@ -62,10 +72,13 @@ def fetch_rules(url):
                     if "no-resolve" in line.lower():
                         new_rule += ",no-resolve"
                     rules.append(new_rule)
-        return rules
+        
+        # 如果 Header 里没有 TOTAL，则使用列表长度
+        final_total = total_in_header if total_in_header is not None else len(rules)
+        return rules, final_total
     except requests.exceptions.RequestException as e:
         print(f"Error fetching {url}: {e}", file=sys.stderr)
-        return None
+        return None, None
 
 def extreme_optimize(rules, is_mac=False):
     """精简逻辑并按要求排序"""
@@ -128,6 +141,53 @@ def generate_header(name, rules, source_counts=None):
         
     return "\n".join(header) + "\n"
 
+CACHE_FILE = ".rule_cache.json"
+
+class RuleCache:
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.data = self._load()
+
+    def _load(self):
+        if os.path.exists(self.file_path):
+            try:
+                with open(self.file_path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except:
+                pass
+        return {"sources": {}, "consecutive_unchanged_days": 0, "last_run_date": None}
+
+    def save(self):
+        with open(self.file_path, 'w', encoding='utf-8') as f:
+            json.dump(self.data, f, indent=2, ensure_ascii=False)
+
+    def should_skip(self, current_totals):
+        today = datetime.now().strftime('%Y-%m-%d')
+        
+        # 检查是否满 30 天
+        if self.data.get("consecutive_unchanged_days", 0) >= 30:
+            return False
+
+        # 检查所有 source 是否一致
+        for name, total in current_totals.items():
+            prev = self.data["sources"].get(name, {}).get("last_total")
+            if prev != total:
+                return False
+        
+        return True
+
+    def update(self, current_totals, is_changed):
+        today = datetime.now().strftime('%Y-%m-%d')
+        if not is_changed:
+            self.data["consecutive_unchanged_days"] = self.data.get("consecutive_unchanged_days", 0) + 1
+        else:
+            self.data["consecutive_unchanged_days"] = 0
+            
+        self.data["last_run_date"] = today
+        for name, total in current_totals.items():
+            self.data["sources"][name] = {"last_total": total, "updated_at": today}
+        self.save()
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--output_dir', default='dist')
@@ -139,21 +199,34 @@ def main():
         sys.exit(1)
     os.makedirs(output_dir, exist_ok=True)
 
+    cache = RuleCache(os.path.join(os.getcwd(), CACHE_FILE))
+    
     print("Fetching raw data...")
     source_rules = {}
+    source_totals = {}
     all_raw = []
     for name, url in SOURCES.items():
-        data = fetch_rules(url)
+        data, total = fetch_rules(url)
         if data is None:
             print(f"CRITICAL: Failed to fetch {name}. Aborting.")
             sys.exit(1)
         source_rules[name] = set(data)
+        source_totals[name] = total
         all_raw.extend(data)
     
+    # 缓存检查
+    is_forced = cache.data.get("consecutive_unchanged_days", 0) >= 30
+    if cache.should_skip(source_totals) and not is_forced:
+        print(f"Skipping: All sources unchanged and within 30 days ({cache.data.get('consecutive_unchanged_days')} days).")
+        cache.update(source_totals, is_changed=False)
+        return
+
     if not all_raw:
         sys.exit(1)
 
     print("Optimizing and Sorting...")
+    if is_forced:
+        print("Forced update: 30 days limit reached.")
     
     files_to_write = {
         "Mobile_Unified.list": extreme_optimize(all_raw, is_mac=False),
@@ -181,6 +254,7 @@ def main():
                 os.remove(temp_path)
             sys.exit(1)
 
+    cache.update(source_totals, is_changed=True)
     print("Success!")
 
 if __name__ == "__main__":
