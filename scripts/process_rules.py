@@ -51,7 +51,7 @@ def fetch_rules(url):
     rules = []
     total_in_header = None
     try:
-        with requests.get(url, timeout=30, stream=True, verify=False) as r:
+        with requests.get(url, timeout=30, stream=True) as r:
             r.raise_for_status()
             for line in r.iter_lines(decode_unicode=True):
                 if not line: continue
@@ -141,7 +141,7 @@ def generate_header(name, rules, source_counts=None):
         
     return "\n".join(header) + "\n"
 
-CACHE_FILE = ".rule_cache.json"
+CACHE_FILE = "scripts/rule_cache.json"
 
 class RuleCache:
     def __init__(self, file_path):
