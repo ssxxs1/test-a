@@ -1,12 +1,12 @@
 # NAME: Mobile_Unified
-# UPDATED: 2026-03-30 01:23:35
+# UPDATED: 2026-04-05 02:56:43
 # HOST: 3120
-# HOST-SUFFIX: 9073
+# HOST-SUFFIX: 9076
 # HOST-KEYWORD: 62
 # IP-CIDR: 0
-# TOTAL: 12255
-# RETAINED-PRIVACY: 6857
-# RETAINED-ADLITE: 5398
+# TOTAL: 12258
+# RETAINED-PRIVACY: 6858
+# RETAINED-ADLITE: 5400
 HOST,0024aadd.com,Advertising
 HOST,0127.adsame.com,Advertising
 HOST,0374adc8c6a6a56.com,Advertising
@@ -7600,7 +7600,9 @@ HOST-SUFFIX,pistyll.bleacherreport.com,Advertising
 HOST-SUFFIX,pix.eads.com,Advertising
 HOST-SUFFIX,pixel-static.spotify.com,Advertising
 HOST-SUFFIX,pixel-tracker.com,Advertising
+HOST-SUFFIX,pixel.byspotify.com,Advertising
 HOST-SUFFIX,pixel.facebook.com,Advertising
+HOST-SUFFIX,pixel.spotify.com,Advertising
 HOST-SUFFIX,pixel.tapad.com,Advertising
 HOST-SUFFIX,pixel.wetracked.io,Advertising
 HOST-SUFFIX,pjstat.com,Advertising
@@ -11972,6 +11974,7 @@ HOST-SUFFIX,webanalytics.logitechg.com,Advertising
 HOST-SUFFIX,webanalytics.logitechg.com.cn,Advertising
 HOST-SUFFIX,webanalyticsssl.websense.com,Advertising
 HOST-SUFFIX,webapi.3cx.com,Advertising
+HOST-SUFFIX,weblb-wg.gslb.spotify.com,Advertising
 HOST-SUFFIX,weblog.coupang.com,Advertising
 HOST-SUFFIX,weblog.flyasiana.com,Advertising
 HOST-SUFFIX,weblog.strawberrynet.com,Advertising
