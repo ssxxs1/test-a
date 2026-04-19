@@ -46,6 +46,7 @@ ALLOWED_TLD = (
 # 核心广告关键词
 CORE_AD_KEYWORDS = ['ad', 'track', 'log', 'stat', 'api', 'analytics', 'report', 'metrics']
 
+
 def fetch_rules(url):
     """流式获取规则，提取 TOTAL 字段，失败返回 None"""
     types = tuple(RULE_PRIORITY.keys())
