@@ -180,18 +180,30 @@ def generate_header(name, rules, source_counts=None):
 
 
 def generate_clash_yaml(name, rules, source_counts=None):
+    # 计算各类型统计
+    counts = {t: 0 for t in RULE_PRIORITY.keys()}
+    for r in rules:
+        rtype = r.split(',')[0]
+        if rtype in counts:
+            counts[rtype] += 1
+
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     yaml_lines = [
-        f"# NAME: {name}",
-        f"# UPDATED: {now}",
+        f'# NAME: {name}',
+        f'# UPDATED: {now}',
+        f'# DOMAIN: {counts.get("HOST", 0)}',
+        f'# DOMAIN-SUFFIX: {counts.get("HOST-SUFFIX", 0)}',
+        f'# DOMAIN-KEYWORD: {counts.get("HOST-KEYWORD", 0)}',
+        f'# IP-CIDR: {counts.get("IP-CIDR", 0) + counts.get("IP6-CIDR", 0)}',
+        f'# TOTAL: {len(rules)}'
     ]
 
     if source_counts:
         for s_key in SOURCES.keys():
             count = source_counts.get(s_key, 0)
-            yaml_lines.append(f"# RETAINED-{s_key.upper()}: {count}")
+            yaml_lines.append(f'# RETAINED-{s_key.upper()}: {count}')
 
-    yaml_lines.append("payload:")
+    yaml_lines.append('payload:')
 
     clash_rules = []
     for r in rules:
@@ -202,14 +214,17 @@ def generate_clash_yaml(name, rules, source_counts=None):
         if not clash_type:
             continue
 
-        rule_str = f"{clash_type},{rval}"
+        rule_str = f'{clash_type},{rval}'
         # IP类规则默认增加 no-resolve，或者如果原始规则包含 no-resolve
-        if "IP-CIDR" in rtype or "no-resolve" in r.lower():
-            if "no-resolve" not in rule_str.lower():
-                rule_str += ",no-resolve"
-        clash_rules.append(f"  - '{rule_str}'")
+        if 'IP-CIDR' in rtype or 'no-resolve' in r.lower():
+            if 'no-resolve' not in rule_str.lower():
+                rule_str += ',no-resolve'
+        
+        # 不使用引号包裹
+        clash_rules.append(f'  - {rule_str}')
 
-    return "\n".join(yaml_lines + clash_rules) + "\n"
+    return '\n'.join(yaml_lines + clash_rules) + '\n'
+
 
 
 CACHE_FILE = "scripts/rule_cache.json"
