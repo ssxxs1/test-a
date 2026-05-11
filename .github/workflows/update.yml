@@ -35,5 +35,5 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add dist/*.list scripts/rule_cache.json
+          git add dist/*.list dist/*.yaml scripts/rule_cache.json
           git diff --staged --quiet || (git commit -m "Production Update and Cache Sync $(date +'%Y-%m-%d')" && git push origin main)
