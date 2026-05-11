@@ -27,6 +27,17 @@ RULE_PRIORITY = {
     'USER-AGENT': 5,
 }
 
+# QX 到 Clash 规则转换映射
+QX_TO_CLASH = {
+    'HOST': 'DOMAIN',
+    'HOST-SUFFIX': 'DOMAIN-SUFFIX',
+    'HOST-KEYWORD': 'DOMAIN-KEYWORD',
+    'IP-CIDR': 'IP-CIDR',
+    'IP6-CIDR': 'IP-CIDR6',
+    'GEOIP': 'GEOIP',
+    'USER-AGENT': None  # Clash rule-provider 不支持 USER-AGENT
+}
+
 # 核心保留：主流互联网厂商域名
 HOT_DOMAINS = [
     'apple.com', 'google.com', 'facebook.com', 'instagram.com', 'twitter.com', 'x.com',
@@ -39,7 +50,7 @@ HOT_DOMAINS = [
 
 # 允许保留的主流 TLD
 ALLOWED_TLD = (
-    '.com', '.cn', '.net', '.org', '.tv', '.me', '.io', '.cc', 
+    '.com', '.cn', '.net', '.org', '.tv', '.me', '.io', '.cc',
     '.hk', '.jp', '.sg', '.us', '.tw', '.edu', '.gov'
 )
 
@@ -56,25 +67,26 @@ def fetch_rules(url):
         with requests.get(url, timeout=30, stream=True) as r:
             r.raise_for_status()
             for line in r.iter_lines(decode_unicode=True):
-                if not line: continue
+                if not line:
+                    continue
                 line = line.strip()
-                
+
                 # 提取 # TOTAL: 数字
                 if line.startswith("# TOTAL:"):
                     match = re.search(r'# TOTAL:\s*(\d+)', line)
                     if match:
                         total_in_header = int(match.group(1))
-                
+
                 if not line.startswith(types):
                     continue
-                
+
                 parts = [p.strip() for p in line.split(',')]
                 if len(parts) >= 2:
                     new_rule = f"{parts[0]},{parts[1]},{POLICY_NAME}"
                     if "no-resolve" in line.lower():
                         new_rule += ",no-resolve"
                     rules.append(new_rule)
-        
+
         # 如果 Header 里没有 TOTAL，则使用列表长度
         final_total = total_in_header if total_in_header is not None else len(rules)
         return rules, final_total
@@ -82,46 +94,49 @@ def fetch_rules(url):
         print(f"Error fetching {url}: {e}", file=sys.stderr)
         return None, None
 
+
 def extreme_optimize(rules, is_mac=False):
     """极度精简算法：嵌套后缀去重与正则加速匹配"""
     # 1. 初步清理并去重
     rules = list(set(rules))
-    
+
     # 2. 提取并排序后缀 (从短到长，用于覆盖检测)
     raw_suffixes = sorted({r.split(',')[1] for r in rules if r.startswith('HOST-SUFFIX')}, key=len)
-    
+
     # 3. 嵌套后缀去重 (例如 google.com 覆盖 ads.google.com)
     final_suffixes = []
     for s in raw_suffixes:
         if not any(s.endswith("." + fs) for fs in final_suffixes):
             final_suffixes.append(s)
-    
+
     suffix_set = set(final_suffixes)
-    
+
     # 4. 正则预编译关键词过滤
     ad_pattern = re.compile('|'.join(CORE_AD_KEYWORDS), re.I)
-    
+
     final = []
     for r in rules:
         parts = r.split(',')
         rtype, rval = parts[0], parts[1]
         rval_lower = rval.lower()
-        
-        if not rval_lower.endswith(ALLOWED_TLD): continue
-        if len(rval) > 35: continue
+
+        if not rval_lower.endswith(ALLOWED_TLD):
+            continue
+        if len(rval) > 35:
+            continue
 
         # HOST 去重 (已被后缀覆盖)
         if rtype == 'HOST':
             if any(rval_lower.endswith("." + s) or rval_lower == s for s in suffix_set):
                 continue
-        
+
         # 嵌套后缀去重 (剔除冗余后缀)
         if rtype == 'HOST-SUFFIX' and rval not in suffix_set:
             continue
-        
+
         is_hot = any(hot in rval_lower for hot in HOT_DOMAINS)
         is_ad_kw = bool(ad_pattern.search(rval_lower))
-        
+
         if is_mac:
             if not is_hot and not (is_ad_kw and rtype == 'HOST-SUFFIX'):
                 continue
@@ -137,32 +152,68 @@ def extreme_optimize(rules, is_mac=False):
 
     return sorted(final, key=sort_key)
 
+
 def generate_header(name, rules, source_counts=None):
     counts = {t: 0 for t in RULE_PRIORITY.keys()}
     for r in rules:
         rtype = r.split(',')[0]
         if rtype in counts:
             counts[rtype] += 1
-            
+
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     header = [
         f"# NAME: {name}", f"# UPDATED: {now}",
-        f"# HOST: {counts.get('HOST', 0)}", 
+        f"# HOST: {counts.get('HOST', 0)}",
         f"# HOST-SUFFIX: {counts.get('HOST-SUFFIX', 0)}",
         f"# HOST-KEYWORD: {counts.get('HOST-KEYWORD', 0)}",
         f"# IP-CIDR: {counts.get('IP-CIDR', 0) + counts.get('IP6-CIDR', 0)}",
         f"# TOTAL: {len(rules)}"
     ]
-    
+
     # 动态展示所有数据源的保留条数
     if source_counts:
         for s_key in SOURCES.keys():
             count = source_counts.get(s_key, 0)
             header.append(f"# RETAINED-{s_key.upper()}: {count}")
-        
+
     return "\n".join(header) + "\n"
 
+
+def generate_clash_yaml(name, rules, source_counts=None):
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    yaml_lines = [
+        f"# NAME: {name}",
+        f"# UPDATED: {now}",
+    ]
+
+    if source_counts:
+        for s_key in SOURCES.keys():
+            count = source_counts.get(s_key, 0)
+            yaml_lines.append(f"# RETAINED-{s_key.upper()}: {count}")
+
+    yaml_lines.append("payload:")
+
+    clash_rules = []
+    for r in rules:
+        parts = r.split(',')
+        rtype = parts[0]
+        rval = parts[1]
+        clash_type = QX_TO_CLASH.get(rtype)
+        if not clash_type:
+            continue
+
+        rule_str = f"{clash_type},{rval}"
+        # IP类规则默认增加 no-resolve，或者如果原始规则包含 no-resolve
+        if "IP-CIDR" in rtype or "no-resolve" in r.lower():
+            if "no-resolve" not in rule_str.lower():
+                rule_str += ",no-resolve"
+        clash_rules.append(f"  - '{rule_str}'")
+
+    return "\n".join(yaml_lines + clash_rules) + "\n"
+
+
 CACHE_FILE = "scripts/rule_cache.json"
+
 
 class RuleCache:
     def __init__(self, file_path):
@@ -184,7 +235,7 @@ class RuleCache:
 
     def should_skip(self, current_totals):
         today = datetime.now().strftime('%Y-%m-%d')
-        
+
         # 检查是否满 30 天
         if self.data.get("consecutive_unchanged_days", 0) >= 30:
             return False
@@ -194,7 +245,7 @@ class RuleCache:
             prev = self.data["sources"].get(name, {}).get("last_total")
             if prev != total:
                 return False
-        
+
         return True
 
     def update(self, current_totals, is_changed):
@@ -203,11 +254,12 @@ class RuleCache:
             self.data["consecutive_unchanged_days"] = self.data.get("consecutive_unchanged_days", 0) + 1
         else:
             self.data["consecutive_unchanged_days"] = 0
-            
+
         self.data["last_run_date"] = today
         for name, total in current_totals.items():
             self.data["sources"][name] = {"last_total": total, "updated_at": today}
         self.save()
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -222,11 +274,11 @@ def main():
     os.makedirs(output_dir, exist_ok=True)
 
     cache = RuleCache(os.path.join(os.getcwd(), CACHE_FILE))
-    
+
     print(f"Fetching raw data (Parallel)... {'[FORCE MODE]' if args.force else ''}")
     source_rules = {}
     source_totals = {}
-    
+
     def fetch_task(name_url):
         name, url = name_url
         return name, fetch_rules(url)
@@ -242,7 +294,7 @@ def main():
         source_rules[name] = set(data)
         source_totals[name] = total
         all_raw.extend(data)
-    
+
     # 缓存检查 (增加 --force 支持)
     is_forced = args.force or cache.data.get("consecutive_unchanged_days", 0) >= 30
     if cache.should_skip(source_totals) and not is_forced:
@@ -256,27 +308,37 @@ def main():
     print("Optimizing and Sorting...")
     if is_forced:
         print("Update triggered: Force mode or 30 days limit reached.")
-    
-    files_to_write = {
-        "Mobile_Unified.list": extreme_optimize(all_raw, is_mac=False),
-        "Mac_Unified.list": extreme_optimize(all_raw, is_mac=True)
-    }
 
-    for filename, optimized_rules in files_to_write.items():
+    optimized_mobile = extreme_optimize(all_raw, is_mac=False)
+    optimized_mac = extreme_optimize(all_raw, is_mac=True)
+
+    # Clash 采用合集 (去重)
+    unified_rules = sorted(list(set(optimized_mobile + optimized_mac)))
+
+    outputs = [
+        ("Mobile_Unified.list", optimized_mobile, "qx"),
+        ("Mac_Unified.list", optimized_mac, "qx"),
+        ("Clash_Unified.yaml", unified_rules, "clash")
+    ]
+
+    for filename, rules, fmt in outputs:
         filepath = os.path.join(output_dir, filename)
-        
+
         source_counts = {}
         for s_name, s_set in source_rules.items():
-            source_counts[s_name] = sum(1 for r in optimized_rules if r in s_set)
+            source_counts[s_name] = sum(1 for r in rules if r in s_set)
 
         fd, temp_path = tempfile.mkstemp(dir=output_dir, text=True)
         try:
             with os.fdopen(fd, 'w') as tf:
-                tf.write(generate_header(filename.split('.')[0], optimized_rules, source_counts))
-                tf.write("\n".join(optimized_rules))
-            
+                if fmt == "qx":
+                    tf.write(generate_header(filename.split('.')[0], rules, source_counts))
+                    tf.write("\n".join(rules))
+                else:
+                    tf.write(generate_clash_yaml(filename.split('.')[0], rules, source_counts))
+
             shutil.move(temp_path, filepath)
-            print(f"Saved {filename}: {len(optimized_rules)} rules")
+            print(f"Saved {filename}: {len(rules)} rules")
         except Exception as e:
             print(f"Error saving {filename}: {e}")
             if os.path.exists(temp_path):
@@ -285,6 +347,7 @@ def main():
 
     cache.update(source_totals, is_changed=True)
     print("Success!")
+
 
 if __name__ == "__main__":
     main()
