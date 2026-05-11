@@ -64,7 +64,7 @@ def fetch_rules(url):
     rules = []
     total_in_header = None
     try:
-        with requests.get(url, timeout=30, stream=True) as r:
+        with requests.get(url, timeout=30, stream=True, verify=False) as r:
             r.raise_for_status()
             for line in r.iter_lines(decode_unicode=True):
                 if not line:
