@@ -1,11 +1,11 @@
 name: Rules Production Deploy
 on:
   schedule:
-    - cron: '0 0 * * 1' 
+    - cron: "0 0 * * 1"
   workflow_dispatch:
     inputs:
       force_update:
-        description: 'Force a full update (bypass cache)'
+        description: "Force a full update (bypass cache)"
         type: boolean
         default: false
 
@@ -21,7 +21,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: "3.10"
 
       - name: Install Dependencies
         run: pip install requests

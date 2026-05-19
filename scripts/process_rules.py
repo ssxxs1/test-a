@@ -249,10 +249,8 @@ class RuleCache:
             json.dump(self.data, f, indent=2, ensure_ascii=False)
 
     def should_skip(self, current_totals):
-        today = datetime.now().strftime('%Y-%m-%d')
-
-        # 检查是否满 30 天
-        if self.data.get("consecutive_unchanged_days", 0) >= 30:
+        # 检查是否满 4 天 (强制刷新一次)
+        if self.data.get("consecutive_unchanged_days", 0) >= 4:
             return False
 
         # 检查所有 source 是否一致
@@ -310,10 +308,12 @@ def main():
         source_totals[name] = total
         all_raw.extend(data)
 
-    # 缓存检查 (增加 --force 支持)
-    is_forced = args.force or cache.data.get("consecutive_unchanged_days", 0) >= 30
-    if cache.should_skip(source_totals) and not is_forced:
-        print(f"Skipping: All sources unchanged and within 30 days ({cache.data.get('consecutive_unchanged_days')} days).")
+    # 缓存检查判定逻辑
+    is_forced = args.force or cache.data.get("consecutive_unchanged_days", 0) >= 4
+    
+    # 只有在非强制模式且 cache 建议跳过时才跳过
+    if not is_forced and cache.should_skip(source_totals):
+        print(f"Skipping: All sources unchanged and within 4 days ({cache.data.get('consecutive_unchanged_days')} days).")
         cache.update(source_totals, is_changed=False)
         return
 
@@ -322,7 +322,7 @@ def main():
 
     print("Optimizing and Sorting...")
     if is_forced:
-        print("Update triggered: Force mode or 30 days limit reached.")
+        print(f"Update triggered: {'Force mode' if args.force else '4 days limit reached'}.")
 
     optimized_mobile = extreme_optimize(all_raw, is_mac=False)
     optimized_mac = extreme_optimize(all_raw, is_mac=True)
@@ -360,6 +360,7 @@ def main():
                 os.remove(temp_path)
             sys.exit(1)
 
+    # 强制更新或有变化时，重置计数器
     cache.update(source_totals, is_changed=True)
     print("Success!")
 
