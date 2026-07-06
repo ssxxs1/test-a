@@ -2,13 +2,13 @@
   "sources": {
     "privacy": {
       "last_total": 39936,
-      "updated_at": "2026-06-29"
+      "updated_at": "2026-07-06"
     },
     "adlite": {
       "last_total": 38066,
-      "updated_at": "2026-06-29"
+      "updated_at": "2026-07-06"
     }
   },
-  "consecutive_unchanged_days": 1,
-  "last_run_date": "2026-06-29"
+  "consecutive_unchanged_days": 2,
+  "last_run_date": "2026-07-06"
 }
