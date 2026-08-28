@@ -1,5 +1,5 @@
 # NAME: Mac_Unified
-# UPDATED: 2026-07-27 01:56:28
+# UPDATED: 2026-08-28 09:14:07
 # HOST: 498
 # HOST-SUFFIX: 9028
 # HOST-KEYWORD: 20
@@ -7,6 +7,7 @@
 # TOTAL: 9546
 # RETAINED-PRIVACY: 6832
 # RETAINED-ADLITE: 2714
+# RETAINED-BLOCKDNS: 0
 HOST,11nux.com,Advertising
 HOST,2p9fyvx.com,Advertising
 HOST,3redlightfix.com,Advertising

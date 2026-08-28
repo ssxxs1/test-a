@@ -2,13 +2,17 @@
   "sources": {
     "privacy": {
       "last_total": 39936,
-      "updated_at": "2026-08-24"
+      "updated_at": "2026-08-28"
     },
     "adlite": {
       "last_total": 38066,
-      "updated_at": "2026-08-24"
+      "updated_at": "2026-08-28"
+    },
+    "BlockDNS": {
+      "last_total": 28,
+      "updated_at": "2026-08-28"
     }
   },
-  "consecutive_unchanged_days": 4,
-  "last_run_date": "2026-08-24"
+  "consecutive_unchanged_days": 0,
+  "last_run_date": "2026-08-28"
 }
