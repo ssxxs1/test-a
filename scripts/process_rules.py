@@ -7,7 +7,12 @@ import tempfile
 import shutil
 import re
 import json
+import ipaddress
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
+import urllib3
+
+urllib3.disable_warnings()
 
 # 配置项
 POLICY_NAME = "Advertising"
@@ -16,16 +21,33 @@ SOURCES = {
     "adlite": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/AdvertisingLite/AdvertisingLite.list",
     "BlockDNS": "https://github.com/VirgilClyne/GetSomeFries/raw/main/ruleset/HTTPDNS.Block.list"
 }
+# 直通源白名单：豁免 TLD/关键词过滤，保留所有域名与 IP
+PASSTHROUGH_SOURCES = {"BlockDNS"}
 
 # 规则优先级
 RULE_PRIORITY = {
     'HOST': 1,
     'HOST-SUFFIX': 2,
     'HOST-KEYWORD': 3,
-    'GEOIP': 4,
     'IP-CIDR': 4,
     'IP6-CIDR': 4,
-    'USER-AGENT': 5,
+    'GEOIP': 5,
+    'USER-AGENT': 6,
+}
+
+# 外部输入规则类型映射到内部标准 QX 格式
+INBOUND_TYPE_MAP = {
+    'DOMAIN': 'HOST',
+    'DOMAIN-SUFFIX': 'HOST-SUFFIX',
+    'DOMAIN-KEYWORD': 'HOST-KEYWORD',
+    'HOST': 'HOST',
+    'HOST-SUFFIX': 'HOST-SUFFIX',
+    'HOST-KEYWORD': 'HOST-KEYWORD',
+    'IP-CIDR': 'IP-CIDR',
+    'IP-CIDR6': 'IP6-CIDR',
+    'IP6-CIDR': 'IP6-CIDR',
+    'GEOIP': 'GEOIP',
+    'USER-AGENT': 'USER-AGENT',
 }
 
 # QX 到 Clash 规则转换映射
@@ -39,7 +61,23 @@ QX_TO_CLASH = {
     'USER-AGENT': None  # Clash rule-provider 不支持 USER-AGENT
 }
 
-# 核心保留：主流互联网厂商域名
+# 多级顶级域名定义（用于主域提取）
+MULTI_PART_TLDS = (
+    '.com.cn', '.net.cn', '.org.cn', '.edu.cn', '.gov.cn',
+    '.co.jp', '.ne.jp', '.co.uk', '.org.uk', '.com.tw', '.org.tw',
+    '.com.hk', '.org.hk', '.com.sg'
+)
+
+# 允许保留的主流 TLD
+ALLOWED_TLD = (
+    '.com', '.cn', '.net', '.org', '.tv', '.me', '.io', '.cc',
+    '.hk', '.jp', '.sg', '.us', '.tw', '.edu', '.gov', '.vip', '.top', '.xyz'
+)
+
+# 核心广告关键词
+CORE_AD_KEYWORDS = ['ad', 'track', 'log', 'stat', 'api', 'analytics', 'report', 'metrics']
+
+# 核心保留：主流互联网厂商域名白名单/关键特征
 HOT_DOMAINS = [
     'apple.com', 'google.com', 'facebook.com', 'instagram.com', 'twitter.com', 'x.com',
     'youtube.com', 'telegram.org', 'tiktok.com', 'openai.com', 'deepseek.com', 'spotify.com',
@@ -49,46 +87,139 @@ HOT_DOMAINS = [
     'doubleclick.net', 'googleads', 'googletagmanager', 'app-measurement'
 ]
 
-# 允许保留的主流 TLD
-ALLOWED_TLD = (
-    '.com', '.cn', '.net', '.org', '.tv', '.me', '.io', '.cc',
-    '.hk', '.jp', '.sg', '.us', '.tw', '.edu', '.gov'
-)
+# 移动端核心广告 SDK / 联盟 / 超级 App 开屏追踪高频特征
+CORE_MOBILE_AD_NETWORKS = [
+    # 顶级移动广告联盟 (穿山甲 / 优量汇 / 百度联盟 / 快手联盟)
+    'pangle.io', 'pangolin-sdk', 'toblog.ctobsnssdk.com', 'ad.toutiao.com', 'dm.bytedance.com',
+    'gdt.qq.com', 'e.qq.com', 'pgdt.gtimg.cn', 'adsmind.gdt.qq.com', 'ad.qq.com', 'mi.gdt.qq.com',
+    'pos.baidu.com', 'cpro.baidustatic.com', 'mobads.baidu.com', 'mobads-logs.baidu.com', 'als.baidu.com',
+    'e.kuaishou.com', 'ad.kuaishou.com', 'open.e.kuaishou.com',
+    # 阿里妈妈 / TANX / 百川 / 营销联盟
+    'tanx.com', 'alimama.com', 'adash.m.taobao.com', 'adashbc.m.taobao.com', 'adash.man.aliyuncs.com',
+    'munion.com', 'mmstat.com', 'aliapp.org',
+    # 移动聚合广告 SDK
+    'sigmob.cn', 'mintegral.com', 'mbridge.com', 'adtiming.com', 'unityads.unity3d.com',
+    'applovin.com', 'adcolony.com', 'ironsrc.com', 'vungle.com', 'inmobi.com', 'admob.com',
+    'chartboost.com', 'fyber.com', 'tapjoy.com', 'smaato.net', 'pubmatic.com', 'rubiconproject.com',
+    'doubleclick.net', 'googleads', 'googlesyndication.com', 'google-analytics.com', 'app-measurement.com',
+    # 国内主流统计 / 埋点 / 营销推送 SDK
+    'umeng.com', 'umengcloud.com', 'jpush.cn', 'jpush.io', 'jiguang.cn',
+    'getui.com', 'igexin.com', 'sensorsdata.cn', 'zhugeio.com', 'talkingdata.net',
+    'growingio.com', 'track.uc.cn',
+    # 头部 App 移动端开屏 / 遥测 / 广告特征
+    'aedns.weixin.qq.com', 'beacon.qq.com', 'oth.eve.mdt.qq.com', 'adfilter.imtt.qq.com',
+    'sdkapp.uve.weibo.com', 'wbapp.uve.weibo.com', 'ad.weibo.com', 'biz.weibo.com',
+    'cm.bilibili.com', 'data.bilibili.com', 'loc-api.bilibili.com',
+    'analytics.meituan.net', 'log.meituan.com', 'report.meituan.com',
+    'log.snssdk.com', 'mon.snssdk.com', 'ichannel.snssdk.com'
+]
 
-# 核心广告关键词
-CORE_AD_KEYWORDS = ['ad', 'track', 'log', 'stat', 'api', 'analytics', 'report', 'metrics']
+# 受保护的主域（禁止整域向上折叠为 HOST-SUFFIX，防止误杀大厂全量基础服务）
+PROTECTED_ETLD1 = {
+    'qq.com', 'tencent.com', 'gtimg.cn', 'gtimg.com', 'qpic.cn', 'qlogo.cn',
+    'baidu.com', 'baidupcs.com', 'bdimg.com', 'bdstatic.com',
+    'alibaba.com', 'aliyun.com', 'alicdn.com', 'taobao.com', 'alipay.com', 'tmall.com', 'tbcdn.cn',
+    'bytedance.com', 'byteimg.com', 'douyin.com', 'snssdk.com', 'toutiao.com', 'pstatp.com',
+    'kuaishou.com', 'yximgs.com', 'kwai.com',
+    'bilibili.com', 'bilivideo.com', 'hdslb.com',
+    'meituan.com', 'meituan.net', 'dianping.com',
+    'jd.com', '360buy.com', '360buyimg.com',
+    'weibo.com', 'sina.com.cn', 'sina.cn', 'sinaimg.cn',
+    'xiaohongshu.com', 'xhscdn.com',
+    'zhihu.com', 'zhimg.com',
+    '163.com', '126.net', 'netease.com',
+    'iqiyi.com', 'qiyi.com', 'youku.com',
+    'apple.com', 'icloud.com', 'mzstatic.com',
+    'google.com', 'googleapis.com', 'gstatic.com', 'youtube.com', 'googlevideo.com',
+    'microsoft.com', 'azure.com', 'windows.com', 'office.com', 'live.com',
+    'github.com', 'githubusercontent.com', 'github.io', 'gitlab.com',
+    'amazon.com', 'aws.amazon.com', 'cloudflare.com', 'fastly.net',
+    'telegram.org', 'twitter.com', 'x.com', 'facebook.com', 'instagram.com',
+    'spotify.com', 'netflix.com', 'openai.com'
+}
+
+
+def get_etld1(domain: str) -> str:
+    """提取二级主域 (eTLD+1)"""
+    domain = domain.lower().strip('.')
+    for mptld in MULTI_PART_TLDS:
+        if domain.endswith(mptld):
+            parts = domain[:-len(mptld)].split('.')
+            if parts:
+                return f"{parts[-1]}{mptld}"
+            return domain
+    parts = domain.split('.')
+    if len(parts) >= 2:
+        return f"{parts[-2]}.{parts[-1]}"
+    return domain
+
+
+def collapse_ip_rules(ip_rule_list):
+    """智能合并 IPv4 / IPv6 CIDR 子网规则"""
+    v4_nets = []
+    v6_nets = []
+    other_rules = []
+
+    for r in ip_rule_list:
+        parts = r.split(',')
+        rval = parts[1]
+        try:
+            net = ipaddress.ip_network(rval, strict=False)
+            if isinstance(net, ipaddress.IPv4Network):
+                v4_nets.append(net)
+            elif isinstance(net, ipaddress.IPv6Network):
+                v6_nets.append(net)
+            else:
+                other_rules.append(r)
+        except Exception:
+            other_rules.append(r)
+
+    collapsed_v4 = [f"IP-CIDR,{net},{POLICY_NAME}" for net in ipaddress.collapse_addresses(v4_nets)]
+    collapsed_v6 = [f"IP6-CIDR,{net},{POLICY_NAME}" for net in ipaddress.collapse_addresses(v6_nets)]
+    return sorted(list(set(collapsed_v4 + collapsed_v6 + other_rules)))
 
 
 def fetch_rules(url):
-    """流式获取规则，提取 TOTAL 字段，失败返回 None"""
-    types = tuple(RULE_PRIORITY.keys())
+    """获取规则，兼容 Surge/Clash/QX 多种语法并标准化，提取 TOTAL 字段，失败返回 None"""
     rules = []
     total_in_header = None
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    }
     try:
-        with requests.get(url, timeout=30, stream=True, verify=False) as r:
-            r.raise_for_status()
-            for line in r.iter_lines(decode_unicode=True):
-                if not line:
-                    continue
-                line = line.strip()
+        r = requests.get(url, headers=headers, timeout=(10, 30), verify=False)
+        r.raise_for_status()
+        for line in r.text.splitlines():
+            if not line:
+                continue
+            line = line.strip()
 
-                # 提取 # TOTAL: 数字
-                if line.startswith("# TOTAL:"):
-                    match = re.search(r'# TOTAL:\s*(\d+)', line)
-                    if match:
-                        total_in_header = int(match.group(1))
+            # 提取 # TOTAL: 数字
+            if line.startswith("# TOTAL:"):
+                match = re.search(r'# TOTAL:\s*(\d+)', line)
+                if match:
+                    total_in_header = int(match.group(1))
 
-                if not line.startswith(types):
-                    continue
+            # 忽略纯注释或非规则行
+            if line.startswith(('#', '//', '!', ';')):
+                continue
 
-                parts = [p.strip() for p in line.split(',')]
-                if len(parts) >= 2:
-                    new_rule = f"{parts[0]},{parts[1]},{POLICY_NAME}"
-                    if "no-resolve" in line.lower():
-                        new_rule += ",no-resolve"
-                    rules.append(new_rule)
+            parts = [p.strip() for p in line.split(',')]
+            if len(parts) < 2:
+                continue
 
-        # 如果 Header 里没有 TOTAL，则使用列表长度
+            raw_type = parts[0].upper()
+            if raw_type not in INBOUND_TYPE_MAP:
+                continue
+
+            canonical_type = INBOUND_TYPE_MAP[raw_type]
+            rval = parts[1]
+
+            new_rule = f"{canonical_type},{rval},{POLICY_NAME}"
+            if "no-resolve" in line.lower():
+                new_rule += ",no-resolve"
+            rules.append(new_rule)
+
         final_total = total_in_header if total_in_header is not None else len(rules)
         return rules, final_total
     except requests.exceptions.RequestException as e:
@@ -96,62 +227,135 @@ def fetch_rules(url):
         return None, None
 
 
-def extreme_optimize(rules, is_mac=False):
-    """极度精简算法：嵌套后缀去重与正则加速匹配"""
-    # 1. 初步清理并去重
-    rules = list(set(rules))
+def is_domain_covered_by_suffix(domain: str, suffix_set: set) -> bool:
+    """O(k) 复杂度判断域名是否命中后缀集合（k 为点号分段数，极速哈希匹配）"""
+    d = domain.lower().strip('.')
+    if d in suffix_set:
+        return True
+    parts = d.split('.')
+    for i in range(1, len(parts)):
+        parent = '.'.join(parts[i:])
+        if parent in suffix_set:
+            return True
+    return False
 
-    # 2. 提取并排序后缀 (从短到长，用于覆盖检测)
-    raw_suffixes = sorted({r.split(',')[1] for r in rules if r.startswith('HOST-SUFFIX')}, key=len)
 
-    # 3. 嵌套后缀去重 (例如 google.com 覆盖 ads.google.com)
-    final_suffixes = []
-    for s in raw_suffixes:
-        if not any(s.endswith("." + fs) for fs in final_suffixes):
-            final_suffixes.append(s)
+def smart_optimize(regular_rules, passthrough_rules=None, is_mac=False):
+    """
+    智能精炼算法（零误伤安全模型）：
+    1. IP-CIDR 子网智能聚合
+    2. 严格按原始粒度处理（绝不随意将普通主域折叠为 HOST-SUFFIX，严防误杀大厂主站与多租户 CDN）
+    3. 嵌套后缀覆盖去重 (Suffix Reduction: HOST-SUFFIX 覆盖子域名，HOST 已被 HOST-SUFFIX 覆盖则精简)
+    4. 平台按需分层：
+       - Mobile (极速开屏版): 核心 SDK + 头部 App 广告 + HTTPDNS + 高置信度 HOST-SUFFIX + 核心 HOST
+       - Mac (全量 Web 版): 包含全量 Web 规则与长尾追踪
+    """
+    if passthrough_rules is None:
+        passthrough_rules = []
 
-    suffix_set = set(final_suffixes)
+    # 1. 拆分 IP 与 域名规则
+    ip_prefixes = ('IP-CIDR,', 'IP6-CIDR,', 'GEOIP,')
+    all_ip_raw = [r for r in (regular_rules + passthrough_rules) if r.startswith(ip_prefixes)]
+    collapsed_ip_rules = collapse_ip_rules(all_ip_raw)
 
-    # 4. 正则预编译关键词过滤
+    regular_domains = [r for r in regular_rules if not r.startswith(ip_prefixes)]
+    passthrough_domains = [r for r in passthrough_rules if not r.startswith(ip_prefixes)]
+
+    # 2. 收集原始 HOST 与 HOST-SUFFIX 规则
+    host_rules = set()
+    suffix_rules = set()
+    other_rules = set()
+
+    for r in (regular_domains + passthrough_domains):
+        parts = r.split(',')
+        rtype, rval = parts[0], parts[1].lower()
+        if rtype == 'HOST':
+            host_rules.add(r)
+        elif rtype == 'HOST-SUFFIX':
+            suffix_rules.add(rval)
+        else:
+            other_rules.add(r)
+
+    # 3. 嵌套后缀覆盖去重 (短后缀覆盖长后缀，如 ads.google.com 覆盖 sub.ads.google.com)
+    sorted_suffixes = sorted(suffix_rules, key=len)
+    suffix_set = set()
+    for s in sorted_suffixes:
+        s_lower = s.lower().strip('.')
+        if is_domain_covered_by_suffix(s_lower, suffix_set):
+            continue
+        suffix_set.add(s_lower)
+
+    # 4. 预编译正则与核心模式
     ad_pattern = re.compile('|'.join(CORE_AD_KEYWORDS), re.I)
 
-    final = []
-    for r in rules:
+    final_rules = set()
+
+    # 4.1 直通源域名规则全量保留（仅做后缀覆盖去重）
+    for r in passthrough_domains:
         parts = r.split(',')
-        rtype, rval = parts[0], parts[1]
-        rval_lower = rval.lower()
-
-        if not rval_lower.endswith(ALLOWED_TLD):
-            continue
-        if len(rval) > 35:
-            continue
-
-        # HOST 去重 (已被后缀覆盖)
+        rtype, rval = parts[0], parts[1].lower()
         if rtype == 'HOST':
-            if any(rval_lower.endswith("." + s) or rval_lower == s for s in suffix_set):
+            if is_domain_covered_by_suffix(rval, suffix_set):
                 continue
+            final_rules.add(r)
+        elif rtype == 'HOST-SUFFIX':
+            if rval in suffix_set:
+                final_rules.add(f"HOST-SUFFIX,{rval},{POLICY_NAME}")
+        else:
+            final_rules.add(r)
 
-        # 嵌套后缀去重 (剔除冗余后缀)
-        if rtype == 'HOST-SUFFIX' and rval not in suffix_set:
+    # 4.2 处理 HOST-SUFFIX 规则
+    for s in suffix_set:
+        s_lower = s.lower()
+        if not s_lower.endswith(ALLOWED_TLD) or len(s) > 35:
             continue
 
-        is_hot = any(hot in rval_lower for hot in HOT_DOMAINS)
-        is_ad_kw = bool(ad_pattern.search(rval_lower))
+        is_hot = any(hot in s_lower for hot in HOT_DOMAINS)
+        is_mobile_core = any(net in s_lower for net in CORE_MOBILE_AD_NETWORKS)
+        is_ad_kw = bool(ad_pattern.search(s_lower))
+
+        rule_str = f"HOST-SUFFIX,{s},{POLICY_NAME}"
+        if is_mac:
+            if is_hot or is_mobile_core or is_ad_kw:
+                final_rules.add(rule_str)
+        else:
+            # Mobile 端：保留核心移动 SDK、热门厂商或长度 <= 28 且命中广告词的高置信度后缀
+            if is_mobile_core or is_hot or (is_ad_kw and len(s) <= 28):
+                final_rules.add(rule_str)
+
+    # 4.3 处理单点 HOST 规则
+    for r in host_rules:
+        parts = r.split(',')
+        rval = parts[1].lower()
+        # 如果已被上游本身的 HOST-SUFFIX 覆盖，直接去重
+        if is_domain_covered_by_suffix(rval, suffix_set):
+            continue
+        if not rval.endswith(ALLOWED_TLD) or len(rval) > 35:
+            continue
+
+        is_hot = any(hot in rval for hot in HOT_DOMAINS)
+        is_mobile_core = any(net in rval for net in CORE_MOBILE_AD_NETWORKS)
+        is_ad_kw = bool(ad_pattern.search(rval))
 
         if is_mac:
-            if not is_hot and not (is_ad_kw and rtype == 'HOST-SUFFIX'):
-                continue
+            # Mac 端：保留核心大厂或命中广告关键词的单点域名
+            if is_hot or is_mobile_core or is_ad_kw:
+                final_rules.add(r)
         else:
-            if not (is_hot or is_ad_kw):
-                continue
-        final.append(r)
+            # Mobile 端（极速黄金集）：只保留命中核心移动广告联盟 SDK 或头部 App 特征的 HOST
+            if is_mobile_core or is_hot:
+                final_rules.add(r)
 
+    # 4.4 加入合并后的 IP-CIDR 规则
+    final_rules.update(collapsed_ip_rules)
+
+    # 5. 按优先级与字典序排序
     def sort_key(rule):
         rtype = rule.split(',')[0]
         priority = RULE_PRIORITY.get(rtype, 99)
         return (priority, rule.lower())
 
-    return sorted(final, key=sort_key)
+    return sorted(list(final_rules), key=sort_key)
 
 
 def generate_header(name, rules, source_counts=None):
@@ -181,7 +385,6 @@ def generate_header(name, rules, source_counts=None):
 
 
 def generate_clash_yaml(name, rules, source_counts=None):
-    # 计算各类型统计
     counts = {t: 0 for t in RULE_PRIORITY.keys()}
     for r in rules:
         rtype = r.split(',')[0]
@@ -216,12 +419,10 @@ def generate_clash_yaml(name, rules, source_counts=None):
             continue
 
         rule_str = f'{clash_type},{rval}'
-        # IP类规则默认增加 no-resolve，或者如果原始规则包含 no-resolve
-        if 'IP-CIDR' in rtype or 'no-resolve' in r.lower():
+        if 'IP' in clash_type or 'IP-CIDR' in rtype or 'no-resolve' in r.lower():
             if 'no-resolve' not in rule_str.lower():
                 rule_str += ',no-resolve'
 
-        # 不使用引号包裹
         clash_rules.append(f'  - {rule_str}')
 
     return '\n'.join(yaml_lines + clash_rules) + '\n'
@@ -282,13 +483,13 @@ def main():
 
     output_dir = os.path.abspath(args.output_dir)
     if not output_dir.startswith(os.getcwd()):
-        print(f"Error: Output directory {output_dir} is outside of current workspace.")
+        print(f"Error: Output directory {output_dir} is outside of current workspace.", file=sys.stderr)
         sys.exit(1)
     os.makedirs(output_dir, exist_ok=True)
 
     cache = RuleCache(os.path.join(os.getcwd(), CACHE_FILE))
 
-    print(f"Fetching raw data (Parallel)... {'[FORCE MODE]' if args.force else ''}")
+    print(f"Fetching raw data (Parallel)... {'[FORCE MODE]' if args.force else ''}", flush=True)
     source_rules = {}
     source_totals = {}
 
@@ -300,35 +501,44 @@ def main():
         results = list(executor.map(fetch_task, SOURCES.items()))
 
     all_raw = []
+    passthrough_raw = []
+    regular_raw = []
     for name, (data, total) in results:
         if data is None:
-            print(f"CRITICAL: Failed to fetch {name}. Aborting.")
+            print(f"CRITICAL: Failed to fetch {name}. Aborting.", file=sys.stderr)
             sys.exit(1)
         source_rules[name] = set(data)
         source_totals[name] = total
         all_raw.extend(data)
+        if name in PASSTHROUGH_SOURCES:
+            passthrough_raw.extend(data)
+        else:
+            regular_raw.extend(data)
 
     # 缓存检查判定逻辑
     is_forced = args.force or cache.data.get("consecutive_unchanged_days", 0) >= 4
 
     # 只有在非强制模式且 cache 建议跳过时才跳过
     if not is_forced and cache.should_skip(source_totals):
-        print(f"Skipping: All sources unchanged and within 4 days ({cache.data.get('consecutive_unchanged_days')} days).")
+        print(f"Skipping: All sources unchanged and within 4 days ({cache.data.get('consecutive_unchanged_days')} days).", flush=True)
         cache.update(source_totals, is_changed=False)
         return
 
     if not all_raw:
         sys.exit(1)
 
-    print("Optimizing and Sorting...")
+    print("Optimizing and Sorting...", flush=True)
     if is_forced:
-        print(f"Update triggered: {'Force mode' if args.force else '4 days limit reached'}.")
+        print(f"Update triggered: {'Force mode' if args.force else '4 days limit reached'}.", flush=True)
 
-    optimized_mobile = extreme_optimize(all_raw, is_mac=False)
-    optimized_mac = extreme_optimize(all_raw, is_mac=True)
+    optimized_mobile = smart_optimize(regular_raw, passthrough_raw, is_mac=False)
+    optimized_mac = smart_optimize(regular_raw, passthrough_raw, is_mac=True)
 
     # Clash 采用合集 (去重)
-    unified_rules = sorted(list(set(optimized_mobile + optimized_mac)))
+    unified_rules = sorted(
+        list(set(optimized_mobile + optimized_mac)),
+        key=lambda r: (RULE_PRIORITY.get(r.split(',')[0], 99), r.lower())
+    )
 
     outputs = [
         ("Mobile_Unified.list", optimized_mobile, "qx"),
@@ -353,16 +563,16 @@ def main():
                     tf.write(generate_clash_yaml(filename.split('.')[0], rules, source_counts))
 
             shutil.move(temp_path, filepath)
-            print(f"Saved {filename}: {len(rules)} rules")
+            print(f"Saved {filename}: {len(rules)} rules", flush=True)
         except Exception as e:
-            print(f"Error saving {filename}: {e}")
+            print(f"Error saving {filename}: {e}", file=sys.stderr)
             if os.path.exists(temp_path):
                 os.remove(temp_path)
             sys.exit(1)
 
     # 强制更新或有变化时，重置计数器
     cache.update(source_totals, is_changed=True)
-    print("Success!")
+    print("Success!", flush=True)
 
 
 if __name__ == "__main__":

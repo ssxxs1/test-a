@@ -172,3 +172,13 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 .history
+
+# Sensitive files and backups
+*.bak
+*.backup
+*.bck
+*.key
+*.pem
+*.db
+*.sqlite
+*.sql
