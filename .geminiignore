@@ -1,0 +1,17 @@
+# 输出的规则文件（自动生成）
+dist/
+
+# Python 缓存
+__pycache__/
+*.pyc
+.pytest_cache/
+scripts/rule_cache.json
+
+# 日志
+*.log
+
+# 历史记录
+.history/
+
+# 系统文件
+.DS_Store

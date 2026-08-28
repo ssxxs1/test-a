@@ -13,7 +13,8 @@ from concurrent.futures import ThreadPoolExecutor
 POLICY_NAME = "Advertising"
 SOURCES = {
     "privacy": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Privacy/Privacy.list",
-    "adlite": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/AdvertisingLite/AdvertisingLite.list"
+    "adlite": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/AdvertisingLite/AdvertisingLite.list",
+    "BlockDNS": "https://github.com/VirgilClyne/GetSomeFries/raw/main/ruleset/HTTPDNS.Block.list"
 }
 
 # 规则优先级
@@ -219,12 +220,11 @@ def generate_clash_yaml(name, rules, source_counts=None):
         if 'IP-CIDR' in rtype or 'no-resolve' in r.lower():
             if 'no-resolve' not in rule_str.lower():
                 rule_str += ',no-resolve'
-        
+
         # 不使用引号包裹
         clash_rules.append(f'  - {rule_str}')
 
     return '\n'.join(yaml_lines + clash_rules) + '\n'
-
 
 
 CACHE_FILE = "scripts/rule_cache.json"
@@ -310,7 +310,7 @@ def main():
 
     # 缓存检查判定逻辑
     is_forced = args.force or cache.data.get("consecutive_unchanged_days", 0) >= 4
-    
+
     # 只有在非强制模式且 cache 建议跳过时才跳过
     if not is_forced and cache.should_skip(source_totals):
         print(f"Skipping: All sources unchanged and within 4 days ({cache.data.get('consecutive_unchanged_days')} days).")
