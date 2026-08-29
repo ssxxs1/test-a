@@ -261,22 +261,31 @@ def smart_optimize(regular_rules, passthrough_rules=None, is_mac=False):
     regular_domains = [r for r in regular_rules if not r.startswith(ip_prefixes)]
     passthrough_domains = [r for r in passthrough_rules if not r.startswith(ip_prefixes)]
 
-    # 2. 收集原始 HOST 与 HOST-SUFFIX 规则
+    # 2. 分离提取常规规则中的 HOST 与 HOST-SUFFIX
     host_rules = set()
     suffix_rules = set()
     other_rules = set()
 
-    for r in (regular_domains + passthrough_domains):
+    for r in regular_domains:
         parts = r.split(',')
         rtype, rval = parts[0], parts[1].lower()
         if rtype == 'HOST':
-            host_rules.add(r)
+            host_rules.add(rval)
         elif rtype == 'HOST-SUFFIX':
             suffix_rules.add(rval)
         else:
             other_rules.add(r)
 
-    # 3. 嵌套后缀覆盖去重 (短后缀覆盖长后缀，如 ads.google.com 覆盖 sub.ads.google.com)
+    # 激进特性 1：【安全白名单外的主域无差别向上折叠】 (Aggressive eTLD+1 Folding)
+    kept_hosts = set()
+    for h in host_rules:
+        etld1 = get_etld1(h)
+        if etld1 in PROTECTED_ETLD1:
+            kept_hosts.add(h)  # 受保护大厂基础设施，保持精确单点拦截，防误杀
+        else:
+            suffix_rules.add(etld1) # 激进提权至后缀拦截
+
+    # 3. 嵌套后缀无情去重 (O(1) 级联查找)
     sorted_suffixes = sorted(suffix_rules, key=len)
     suffix_set = set()
     for s in sorted_suffixes:
@@ -285,49 +294,50 @@ def smart_optimize(regular_rules, passthrough_rules=None, is_mac=False):
             continue
         suffix_set.add(s_lower)
 
-    # 4. 预编译正则与核心模式
+    # 4. 预编译特征库
     ad_pattern = re.compile('|'.join(CORE_AD_KEYWORDS), re.I)
 
     final_rules = set()
 
-    # 4.1 直通源域名规则全量保留（仅做后缀覆盖去重）
+    for r in other_rules:
+        final_rules.add(r)
+
+    # 4.1 直通源绝对豁免权
     for r in passthrough_domains:
         parts = r.split(',')
         rtype, rval = parts[0], parts[1].lower()
         if rtype == 'HOST':
-            if is_domain_covered_by_suffix(rval, suffix_set):
-                continue
-            final_rules.add(r)
+            if not is_domain_covered_by_suffix(rval, suffix_set):
+                final_rules.add(r)
         elif rtype == 'HOST-SUFFIX':
-            if rval in suffix_set:
+            if not is_domain_covered_by_suffix(rval, suffix_set):
                 final_rules.add(f"HOST-SUFFIX,{rval},{POLICY_NAME}")
+                suffix_set.add(rval)
         else:
             final_rules.add(r)
 
-    # 4.2 处理 HOST-SUFFIX 规则
+    # 4.2 处理超级精炼后的 HOST-SUFFIX
     for s in suffix_set:
-        s_lower = s.lower()
-        if not s_lower.endswith(ALLOWED_TLD) or len(s) > 35:
+        if not s.endswith(ALLOWED_TLD) or len(s) > 35:
             continue
 
-        is_hot = any(hot in s_lower for hot in HOT_DOMAINS)
-        is_mobile_core = any(net in s_lower for net in CORE_MOBILE_AD_NETWORKS)
-        is_ad_kw = bool(ad_pattern.search(s_lower))
+        is_hot = any(hot in s for hot in HOT_DOMAINS)
+        is_mobile_core = any(net in s for net in CORE_MOBILE_AD_NETWORKS)
+        is_ad_kw = bool(ad_pattern.search(s))
 
         rule_str = f"HOST-SUFFIX,{s},{POLICY_NAME}"
+        
         if is_mac:
+            # Mac 端：长尾广告保留，但依赖激进折叠已大幅缩减体积
             if is_hot or is_mobile_core or is_ad_kw:
                 final_rules.add(rule_str)
         else:
-            # Mobile 端：保留核心移动 SDK、热门厂商或长度 <= 28 且命中广告词的高置信度后缀
-            if is_mobile_core or is_hot or (is_ad_kw and len(s) <= 28):
+            # 激进特性 2：【Mobile 极简模式】
+            if is_mobile_core or is_hot or (is_ad_kw and len(s) <= 16):
                 final_rules.add(rule_str)
 
-    # 4.3 处理单点 HOST 规则
-    for r in host_rules:
-        parts = r.split(',')
-        rval = parts[1].lower()
-        # 如果已被上游本身的 HOST-SUFFIX 覆盖，直接去重
+    # 4.3 处理幸存的高敏单点 HOST (仅限于 PROTECTED_ETLD1 内部的子域)
+    for rval in kept_hosts:
         if is_domain_covered_by_suffix(rval, suffix_set):
             continue
         if not rval.endswith(ALLOWED_TLD) or len(rval) > 35:
@@ -337,14 +347,13 @@ def smart_optimize(regular_rules, passthrough_rules=None, is_mac=False):
         is_mobile_core = any(net in rval for net in CORE_MOBILE_AD_NETWORKS)
         is_ad_kw = bool(ad_pattern.search(rval))
 
+        rule_str = f"HOST,{rval},{POLICY_NAME}"
         if is_mac:
-            # Mac 端：保留核心大厂或命中广告关键词的单点域名
             if is_hot or is_mobile_core or is_ad_kw:
-                final_rules.add(r)
+                final_rules.add(rule_str)
         else:
-            # Mobile 端（极速黄金集）：只保留命中核心移动广告联盟 SDK 或头部 App 特征的 HOST
             if is_mobile_core or is_hot:
-                final_rules.add(r)
+                final_rules.add(rule_str)
 
     # 4.4 加入合并后的 IP-CIDR 规则
     final_rules.update(collapsed_ip_rules)
