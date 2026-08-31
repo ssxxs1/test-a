@@ -69,6 +69,23 @@ def normalize_ip(value: str, expected_version: int) -> tuple[str | None, str | N
     return str(network), None
 
 
+def structural_random_reasons(value: str, policy: dict) -> list[str]:
+    """Return deterministic generated-label indicators without matching arbitrary substrings."""
+    reasons: list[str] = []
+    if is_ip_literal(value):
+        return reasons
+    for label in value.split("."):
+        length = len(label)
+        digits = sum(char.isdigit() for char in label)
+        if length >= policy["numeric_label_min_length"] and label.isdigit():
+            reasons.append("long_numeric_label")
+        elif length >= policy["hex_label_min_length"] and re.fullmatch(r"[0-9a-f]+", label):
+            reasons.append("long_hex_label")
+        elif length >= policy["mixed_label_min_length"] and digits / length >= policy["mixed_label_min_digit_ratio"] and re.fullmatch(r"[a-z0-9]+", label):
+            reasons.append("digit_heavy_alphanumeric_label")
+    return reasons
+
+
 def format_rule(rule: Rule, policy: str) -> str:
     fields = [rule.rule_type, rule.value, policy]
     if "no-resolve" in rule.modifiers:

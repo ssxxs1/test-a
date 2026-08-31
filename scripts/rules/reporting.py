@@ -9,7 +9,7 @@ from pathlib import Path
 from .models import Rule, SourceResult
 from .normalize import format_rule
 from .parse import records_json
-from .pipeline import TYPE_ORDER
+from .pipeline import TYPE_ORDER, profile_summary
 
 CLASH_TYPES = {"HOST": "DOMAIN", "HOST-SUFFIX": "DOMAIN-SUFFIX", "HOST-KEYWORD": "DOMAIN-KEYWORD", "IP-CIDR": "IP-CIDR", "IP6-CIDR": "IP-CIDR6", "GEOIP": "GEOIP"}
 
@@ -59,8 +59,17 @@ def write_outputs(directory: Path, profiles: dict[str, list[Rule]], results: lis
     safety = Counter(record.reason for result in results for record in result.records if record.reason)
     source_summary = {result.source.source_id: {"candidate_lines": result.candidate_lines, "parsed_rules": result.parsed_rules, "rejections": result.rejection_counts, "canonical_events_hash": result.canonical_events_hash, "raw_content_hash": result.raw_content_hash} for result in results}
     output_counts = {name: dict(counts(rules)) | {"TOTAL": len(rules)} for name, rules in profiles.items()}
+    selection_summary = profile_summary(results, profiles, policy)
+    dns_rules = {record.rule for result in results if result.source.role == "dns_bypass" for record in result.records if record.rule}
+    dns_retained = {name: len(dns_rules & set(rules)) for name, rules in profiles.items()}
     report = ["# Rule Processing Report", "", "## Output rules", ""]
-    for name, summary in output_counts.items(): report.append(f"- `{name}`: {summary['TOTAL']} rules — " + ", ".join(f"{k}={v}" for k, v in sorted(summary.items()) if k != "TOTAL"))
+    for name, summary in output_counts.items():
+        selection = selection_summary[name]
+        report.append(f"- `{name}`: {summary['TOTAL']}/{selection['limit']} rules; reserved DNS={selection['reserved']}; eligible={selection['eligible']}; cap-excluded={selection.get('cap_exhausted', 0)}")
+        report.append("  - " + ", ".join(f"{k}={v}" for k, v in sorted(summary.items()) if k != "TOTAL"))
+    report.extend(["", "## BlockDNS passthrough", ""])
+    report.append(f"- Normalized source rules: {len(dns_rules)}")
+    for name, retained in dns_retained.items(): report.append(f"- `{name}` retained: {retained}/{len(dns_rules)}")
     report.extend(["", "## Sources", ""])
     for name, summary in source_summary.items(): report.append(f"- `{name}`: candidates={summary['candidate_lines']}, parsed={summary['parsed_rules']}, canonical={summary['canonical_events_hash']}")
     report.extend(["", "## Safety rejections", ""] + [f"- `{reason}`: {count}" for reason, count in sorted(safety.items())])

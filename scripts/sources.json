@@ -1,5 +1,5 @@
 {
-  "sources_version": 1,
+  "sources_version": 2,
   "sources": [
     {
       "id": "privacy",
@@ -7,7 +7,7 @@
       "role": "tracking",
       "tier": "trusted",
       "participates_in_consensus": true,
-      "allowed_hosts": ["raw.githubusercontent.com"],
+      "allowed_hosts": ["raw.githubusercontent.com", "cdn.jsdelivr.net"],
       "max_bytes": 12000000,
       "max_rules": 100000
     },
@@ -17,7 +17,7 @@
       "role": "advertising",
       "tier": "trusted",
       "participates_in_consensus": true,
-      "allowed_hosts": ["raw.githubusercontent.com"],
+      "allowed_hosts": ["raw.githubusercontent.com", "cdn.jsdelivr.net"],
       "max_bytes": 12000000,
       "max_rules": 100000
     },
@@ -27,7 +27,7 @@
       "role": "dns_bypass",
       "tier": "passthrough",
       "participates_in_consensus": false,
-      "allowed_hosts": ["github.com", "raw.githubusercontent.com"],
+      "allowed_hosts": ["github.com", "raw.githubusercontent.com", "cdn.jsdelivr.net"],
       "max_bytes": 1000000,
       "max_rules": 10000
     }
