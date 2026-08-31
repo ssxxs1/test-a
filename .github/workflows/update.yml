@@ -124,3 +124,16 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add dist/
           git diff --staged --quiet || (git commit -m "Production rules update $(date -u +%F)" && git push origin main)
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: rules-${{ github.run_id }}
+          name: Rules ${{ github.run_id }}
+          files: |
+            dist/Clash_Unified.yaml
+            dist/QX_Universal.list
+            dist/QX_Compact.list
+            dist/manifest.json
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
