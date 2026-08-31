@@ -46,11 +46,9 @@ def write_outputs(directory: Path, profiles: dict[str, list[Rule]], results: lis
     directory.mkdir(parents=True, exist_ok=True)
     policy_name = policy["qx_policy"]
     files = {
-        "Mac_Unified.list": qx_text("Mac_Unified", profiles["mac"], policy_name),
-        "Mobile_Unified.list": qx_text("Mobile_Unified", profiles["mobile"], policy_name),
-        "Clash_Unified.yaml": clash_text("Clash_Unified", profiles["mac"]),
-        "Mobile_Lite.list": qx_text("Mobile_Lite", profiles["lite"], policy_name),
-        "Clash_Lite.yaml": clash_text("Clash_Lite", profiles["lite"]),
+        "QX_Universal.list": qx_text("QX_Universal", profiles["qx_universal"], policy_name),
+        "QX_Compact.list": qx_text("QX_Compact", profiles["qx_compact"], policy_name),
+        "Clash_Unified.yaml": clash_text("Clash_Unified", profiles["clash_full"]),
     }
     record_lines = []
     for result in results:
@@ -65,7 +63,7 @@ def write_outputs(directory: Path, profiles: dict[str, list[Rule]], results: lis
     report = ["# Rule Processing Report", "", "## Output rules", ""]
     for name, summary in output_counts.items():
         selection = selection_summary[name]
-        report.append(f"- `{name}`: {summary['TOTAL']}/{selection['limit']} rules; reserved DNS={selection['reserved']}; eligible={selection['eligible']}; cap-excluded={selection.get('cap_exhausted', 0)}")
+        report.append(f"- `{name}`: actual={summary['TOTAL']}, target={selection['target']}, max={selection['max']}; reserved DNS={selection['reserved']}; eligible={selection['eligible']}")
         report.append("  - " + ", ".join(f"{k}={v}" for k, v in sorted(summary.items()) if k != "TOTAL"))
     report.extend(["", "## BlockDNS passthrough", ""])
     report.append(f"- Normalized source rules: {len(dns_rules)}")
@@ -75,7 +73,7 @@ def write_outputs(directory: Path, profiles: dict[str, list[Rule]], results: lis
     report.extend(["", "## Safety rejections", ""] + [f"- `{reason}`: {count}" for reason, count in sorted(safety.items())])
     if approval: report.extend(["", "## Manual approval", "", f"- {approval['reason']}"])
     files["Rule_Report.md"] = "\n".join(report) + "\n"
-    baseline_data = {"identity": identity, "outputs": output_counts, "source_summary": source_summary, "safety_rejections": dict(safety), "root_suffixes": sorted(rule.value for rule in profiles["mac"] if rule.rule_type == "HOST-SUFFIX" and rule.value.count(".") == 1), "approval": approval}
+    baseline_data = {"identity": identity, "outputs": output_counts, "source_summary": source_summary, "safety_rejections": dict(safety), "root_suffixes": sorted(rule.value for rule in profiles["clash_full"] if rule.rule_type == "HOST-SUFFIX" and rule.value.count(".") == 1), "approval": approval}
     files["rule_baseline.json"] = json.dumps(baseline_data, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
     for name, text in files.items(): (directory / name).write_text(text, encoding="utf-8")
     manifest = {"built_at": datetime.now(timezone.utc).isoformat(), "identity": identity, "files": {name: _sha((directory / name).read_bytes()) for name in sorted(files)}, "managed_files": sorted([*files, "manifest.json"]), "baseline_exists": baseline is not None}

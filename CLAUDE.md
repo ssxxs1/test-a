@@ -2,31 +2,29 @@
 
 ## 项目概述
 
-Python 规则处理项目。它从多个受信任的上游规则源拉取 Quantumult X / Surge / Clash 风格规则，经过安全规范化、PSL 校验、来源血缘记录和分层选择，生成供 Quantumult X、Clash、mihomo 使用的 Stable 与 Lite 规则集。
+Python 规则处理项目。从受信任上游拉取 QX / Surge / Clash 风格规则，经安全规范化、PSL 校验、结构随机域名筛选、规则血缘记录和按使用场景选择后，输出 Clash/mihomo 与 Quantumult X 规则。
 
 ## 技术栈
 
 - Python 3.10+
-- 依赖：`requests`、`tldextract`（固定于 `requirements.txt`）
+- 固定依赖：`requests`、`tldextract`
 - 测试：标准库 `unittest`
 - 自动化：GitHub Actions
 
-## 目录结构
+## 输出文件
 
 ```text
-test-a/
-├── scripts/
-│   ├── process_rules.py       # CLI 入口及处理器版本
-│   ├── rule_policy.json       # 分层准入、关键词、护栏策略
-│   ├── sources.json           # 上游来源与下载信任边界
-│   └── rules/                 # 解析、规范化、下载、选择、报告、护栏模块
-├── dist/                      # 完全由处理器管理的发布产物
-├── tests/                     # 离线 unittest 测试与 fixtures
-├── requirements.txt
-└── .github/workflows/
-    ├── ci.yml                 # 离线 CI
-    └── update.yml             # Preview 与受控发布
+dist/
+├── Clash_Unified.yaml  # 完整 Clash/mihomo 规则集；目标 12k，最大 20k
+├── QX_Universal.list   # 桌面/通用 QX；目标 10k，最大 20k
+├── QX_Compact.list     # 移动 QX；目标 2k，最大 5k
+├── Rule_Report.md
+├── rule_decisions.jsonl
+├── rule_baseline.json
+└── manifest.json
 ```
+
+`QX_Universal` 与 `QX_Compact` 不要求互相包含，但两者必须是 `Clash_Unified` 的子集。旧的 `Mac_Unified.list`、`Mobile_Unified.list`、`Mobile_Lite.list`、`Clash_Lite.yaml` 不再生成。
 
 ## 常用命令
 
@@ -34,33 +32,36 @@ test-a/
 python -m pip install -r requirements.txt
 python -m unittest discover -s tests -v
 
-# 生成候选到 preview-dist/，不覆盖 dist/
+# 构建候选到 preview-dist/，不改动 dist/
 python scripts/process_rules.py --preview-only --force
-
-# 常规生成；仅在已有受管 baseline 时替换 dist/
-python scripts/process_rules.py
 ```
 
-## 安全与规则处理原则
+## 安全与处理原则
 
-1. 所有上游下载都使用 TLS 校验；仅允许来源配置中的 HTTPS 主机、最大三跳重定向和受限响应体积。任一启用来源失败即不发布。
-2. 输入类型统一到内部规则模型，并保留每条规则的来源、行号、原始文本和处理决定。
-3. 域名先 IDNA/Punycode 规范化，再用固定、离线 `tldextract` PSL（ICANN + Private Domains）校验。
-4. **绝不**将 `HOST` 自动提升为 `HOST-SUFFIX`。只有最终保留的原生 `HOST-SUFFIX` 才能覆盖其子规则。
-5. 值等于 PSL public/private suffix 根的域名型规则会被拒绝，例如 `blogspot.com`、`github.io`。
-6. Stable 保留结构安全、格式有效的原生规则；Mobile Stable 只移除不在 allowlist 的 `HOST-KEYWORD`；Lite 只收录高置信度 SDK/端点、DNS 绕过直通规则或两常规来源完全一致的规则。
-7. IP/CIDR 不合并相邻网段；仅做保守重复/包含去重，并保留 `no-resolve` 语义。
-8. Clash 不支持 `USER-AGENT`：渲染时排除并在文件头和报告中如实统计。
+1. 上游下载使用 TLS 校验、受限 HTTPS 主机、最多三次重定向、响应大小上限与有限重试；任一来源失败则不发布。
+2. 域名先做 IDNA/Punycode 规范化，再用固定离线 PSL（ICANN + Private Domains）校验；拒绝 public/private suffix 根。
+3. 不会将上游 `HOST` 自动扩大成 `HOST-SUFFIX`；仅当同一输出中已选中原生 suffix 时才可覆盖子规则。
+4. 删除长纯数字、长十六进制与高数字比例的结构随机域名；BlockDNS、显式 catalog 和完全双源共识是受控例外。
+5. 广告/追踪分类只匹配完整 DNS label，不能用任意子串推断。例如 `ads.example.com` 可匹配 `ads`，`myads.example.com`、`adobe.example.com` 不会匹配。
+6. BlockDNS 原生 HOST/HOST-SUFFIX/CIDR 在三个输出中完整保留，不被普通 suffix 覆盖去重删除。
 
-## 修改来源与策略
+## 策略配置
 
-- 修改 URL、角色、跳转主机或下载上限：编辑 `scripts/sources.json` 并递增 `sources_version`。
-- 修改 Lite allowlist、关键词规则、GEOIP 或发布护栏：编辑 `scripts/rule_policy.json` 并递增 `policy_version`。
-- 每个 Lite allowlist 条目须包含稳定 ID、`exact`/`suffix` 匹配方式、类别、说明和证据。
-- 策略/来源/处理器版本变动必须走 GitHub Actions 的 Preview → 审阅 artifact → `initialize_baseline` 流程，不能由定时任务自动接受。
+- `scripts/sources.json`：来源 URL、角色、允许主机、下载上限、共识资格。
+- `scripts/rule_policy.json`：输出 target/max、结构随机阈值、完整 label 分类与 evidence catalog。
 
-## 发布产物与审计
+Catalog 使用平台标签：
 
-`dist/` 包含规则文件、`Rule_Report.md`、完整 `rule_decisions.jsonl`、`rule_baseline.json` 和 `manifest.json`。不要手动编辑或放置额外文件；`manifest.json` 定义受管输出，发布时会阻止删除未知文件。
+```json
+{
+  "platforms": ["web", "mobile", "shared"],
+  "lite_enabled": true
+}
+```
 
-旧的 `scripts/rule_cache.json` 为遗留文件，处理器不再读取或更新它。构建身份由来源 canonical hash、策略/来源配置、依赖身份和处理器版本共同决定；只有全部不变时才跳过重建。
+- `web`：Clash 与 QX Universal；
+- `mobile`：Clash 与 QX Compact；
+- `shared`：三个输出；
+- Compact 还要求 `lite_enabled: true`。
+
+修改 policy 或 sources 配置时必须递增对应版本号，并走 Preview → 审阅 → initialize baseline 的发布流程。

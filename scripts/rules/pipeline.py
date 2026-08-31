@@ -1,193 +1,123 @@
 from __future__ import annotations
 
-import hashlib
 import ipaddress
-import re
-from collections import Counter, defaultdict
+from collections import defaultdict
 
 from .config import policy_items
 from .models import Rule, SourceRecord, SourceResult
 from .normalize import covered_by_suffix, structural_random_reasons
 
 TYPE_ORDER = {"HOST": 1, "HOST-SUFFIX": 2, "HOST-KEYWORD": 3, "IP-CIDR": 4, "IP6-CIDR": 5, "GEOIP": 6, "USER-AGENT": 7}
+PROFILES = ("clash_full", "qx_universal", "qx_compact")
 
 
-def _matches(value: str, item) -> bool:
+def _matches(value, item):
     return value == item.value if item.match == "exact" else value == item.value or value.endswith("." + item.value)
 
 
-def _items_for_profile(policy: dict, profile: str):
-    return [item for item in policy_items(policy, "domain_evidence_catalog") if profile in next(raw["profiles"] for raw in policy["domain_evidence_catalog"] if raw["id"] == item.item_id)]
-
-
-def _dedupe_records(results: list[SourceResult]) -> dict[Rule, list[SourceRecord]]:
-    grouped: dict[Rule, list[SourceRecord]] = defaultdict(list)
-    consensus_sources = {result.source.source_id for result in results if result.source.participates_in_consensus}
+def _group(results):
+    grouped = defaultdict(list)
+    consensus = {x.source.source_id for x in results if x.source.participates_in_consensus}
     for result in results:
         for record in result.records:
             if record.rule:
                 grouped[record.rule].append(record)
     for records in grouped.values():
-        consensus = sorted({record.source for record in records} & consensus_sources)
+        sources = sorted({r.source for r in records} & consensus)
         for record in records:
-            record.consensus_sources = consensus
+            record.consensus_sources = sources
     return grouped
 
 
-def _is_dns(records: list[SourceRecord], sources: dict) -> bool:
-    return any(sources[record.source].role == "dns_bypass" for record in records)
-
-
-def _label_tokens(rule: Rule, tokens: set[str], patterns: list[re.Pattern]) -> list[str]:
-    if rule.rule_type not in {"HOST", "HOST-SUFFIX"}:
-        return []
-    return sorted(label for label in set(rule.value.split(".")) if label in tokens or any(pattern.fullmatch(label) for pattern in patterns))
-
-
-def _catalog_matches(rule: Rule, items) -> list[str]:
-    if rule.rule_type not in {"HOST", "HOST-SUFFIX"}:
-        return []
-    return [item.item_id for item in items if _matches(rule.value, item)]
-
-
-def _random_reasons(rule: Rule, policy: dict) -> list[str]:
-    return structural_random_reasons(rule.value, policy["random_domain_policy"]) if rule.rule_type in {"HOST", "HOST-SUFFIX"} else []
-
-
-def _cidr_reduce(rules: set[Rule], reserved: set[Rule]) -> set[Rule]:
+def _reduce(rules, reserved):
     result = set(rules)
-    for rule in sorted(rules, key=lambda r: (r.rule_type, r.value, tuple(sorted(r.modifiers)))):
-        if rule.rule_type not in {"IP-CIDR", "IP6-CIDR"} or rule in reserved:
+    suffixes = {r.value for r in result if r.rule_type == "HOST-SUFFIX"}
+    for rule in sorted(result, key=lambda r: (TYPE_ORDER[r.rule_type], r.value)):
+        if rule in reserved or rule.rule_type not in {"HOST", "HOST-SUFFIX"}:
             continue
-        network = ipaddress.ip_network(rule.value)
+        cover = covered_by_suffix(rule.value, suffixes - ({rule.value} if rule.rule_type == "HOST-SUFFIX" else set()))
+        if cover:
+            result.discard(rule)
+    for rule in sorted(list(result), key=lambda r: (r.rule_type, r.value, tuple(r.modifiers))):
+        if rule in reserved or rule.rule_type not in {"IP-CIDR", "IP6-CIDR"}:
+            continue
+        net = ipaddress.ip_network(rule.value)
         for parent in result:
             if parent is rule or parent.rule_type != rule.rule_type or parent.modifiers != rule.modifiers:
                 continue
-            if network.subnet_of(ipaddress.ip_network(parent.value)) and network != ipaddress.ip_network(parent.value):
-                result.discard(rule)
-                break
-    # Exact CIDR conflicts: prefer no-resolve, except a reserved variant always remains.
-    for rule in list(result):
-        if rule.rule_type not in {"IP-CIDR", "IP6-CIDR"} or rule in reserved:
-            continue
-        preferred = Rule(rule.rule_type, rule.value, frozenset({"no-resolve"}))
-        if preferred in result and "no-resolve" not in rule.modifiers and preferred not in reserved:
-            result.discard(rule)
+            if net != ipaddress.ip_network(parent.value) and net.subnet_of(ipaddress.ip_network(parent.value)):
+                result.discard(rule); break
     return result
 
 
-def _suffix_reduce(rules: set[Rule], reserved: set[Rule]) -> tuple[set[Rule], dict[Rule, str]]:
-    suffixes = {rule.value for rule in rules if rule.rule_type == "HOST-SUFFIX"}
-    result = set(rules)
-    covered: dict[Rule, str] = {}
-    for rule in sorted(rules, key=lambda r: (TYPE_ORDER.get(r.rule_type, 99), r.value)):
-        if rule in reserved or rule.rule_type not in {"HOST", "HOST-SUFFIX"}:
-            continue
-        candidate_suffixes = suffixes - ({rule.value} if rule.rule_type == "HOST-SUFFIX" else set())
-        cover = covered_by_suffix(rule.value, candidate_suffixes)
-        if cover:
-            result.discard(rule)
-            covered[rule] = cover
-    return result, covered
+def _catalog_data(rule, raw_catalog):
+    matched = []
+    for item in raw_catalog:
+        if rule.rule_type in {"HOST", "HOST-SUFFIX"} and (rule.value == item["value"] or item["match"] == "suffix" and rule.value.endswith("." + item["value"])):
+            matched.append(item)
+    platforms = set().union(*(set(x["platforms"]) for x in matched)) if matched else set()
+    return matched, platforms, any(x["lite_enabled"] for x in matched)
 
 
-def _select_profile(name: str, grouped: dict[Rule, list[SourceRecord]], sources: dict, policy: dict) -> tuple[list[Rule], dict[Rule, str], dict[str, int]]:
+def _select(name, grouped, sources, policy):
     limit = policy["profile_limits"][name]
-    catalog = _items_for_profile(policy, name)
-    keyword_items = policy_items(policy, "keyword_allowlist")
-    geo_ok = {str(value).upper() for value in policy.get("mobile_geoip_allowlist", [])}
-    tokens = set(policy.get("admission_label_tokens", []))
-    patterns = [re.compile(pattern) for pattern in policy.get("admission_label_patterns", [])]
-    reserved: set[Rule] = set()
-    ranked: list[tuple[tuple, Rule]] = []
-    reasons: dict[Rule, str] = {}
-    funnel: Counter[str] = Counter()
-
+    raw_catalog = policy["domain_evidence_catalog"]
+    web_labels, mobile_labels = set(policy["web_label_categories"]), set(policy["mobile_sdk_labels"])
+    reserved, candidates, reasons = set(), [], {}
     for rule, records in grouped.items():
-        dns = _is_dns(records, sources)
-        consensus = len(records[0].consensus_sources) >= 2
-        random = _random_reasons(rule, policy)
-        matched_catalog = _catalog_matches(rule, catalog)
-        labels = _label_tokens(rule, tokens, patterns)
-        keyword = rule.rule_type in {"HOST-KEYWORD", "USER-AGENT"} and any(rule.value == item.value for item in keyword_items)
-        geo = rule.rule_type == "GEOIP" and rule.value in geo_ok
+        dns = any(sources[r.source].role == "dns_bypass" for r in records)
         if dns and rule.rule_type in {"HOST", "HOST-SUFFIX", "IP-CIDR", "IP6-CIDR"}:
-            reserved.add(rule)
-            reasons[rule] = "dns_passthrough_reserved"
-            funnel["dns_passthrough"] += 1
-            continue
-        if random and not (matched_catalog or consensus):
-            reasons[rule] = "structural_random_unexceptioned:" + ",".join(random)
-            funnel["structural_random"] += 1
-            continue
-        if rule.rule_type in {"IP-CIDR", "IP6-CIDR"}:
-            eligible = consensus or bool(matched_catalog)
-        elif rule.rule_type == "GEOIP":
-            eligible = geo
-        elif rule.rule_type in {"HOST-KEYWORD", "USER-AGENT"}:
-            eligible = keyword
-        else:
-            # Label categories are full DNS-label matches (never arbitrary substrings).
-            # They provide the aggressive-but-bounded QX/DNS complement the profiles need.
-            eligible = bool(matched_catalog or consensus or labels)
-        if not eligible:
-            reasons[rule] = "no_catalog_consensus_or_label_category"
-            funnel["no_evidence"] += 1
-            continue
-        strength = 4 if matched_catalog else 3 if consensus else 2 if labels else 1
-        specificity = max((item.match == "exact" for item in catalog if item.item_id in matched_catalog), default=False)
-        score = (-strength, -int(specificity), -len(labels), TYPE_ORDER[rule.rule_type], rule.value, tuple(sorted(rule.modifiers)))
-        ranked.append((score, rule))
-        reasons[rule] = "catalog:" + ",".join(matched_catalog) if matched_catalog else "consensus" if consensus else "label_category:" + ",".join(labels)
-        funnel["eligible"] += 1
-
-    if len(reserved) > limit:
-        raise ValueError(f"{name}: DNS passthrough reserves {len(reserved)} rules above limit {limit}")
+            reserved.add(rule); reasons[rule] = "dns_passthrough"; continue
+        catalog, platforms, lite = _catalog_data(rule, raw_catalog)
+        labels = set(rule.value.split(".")) if rule.rule_type in {"HOST", "HOST-SUFFIX"} else set()
+        random = structural_random_reasons(rule.value, policy["random_domain_policy"]) if labels else []
+        consensus = len(records[0].consensus_sources) >= 2
+        if random and not (catalog or consensus): reasons[rule] = "structural_random"; continue
+        if name == "clash_full": eligible = bool(catalog or labels & web_labels or labels & mobile_labels or consensus)
+        elif name == "qx_universal": eligible = bool(platforms & {"web", "shared"} or labels & web_labels)
+        else: eligible = bool((platforms & {"mobile", "shared"} and lite) or labels & mobile_labels)
+        if not eligible: reasons[rule] = "platform_excluded"; continue
+        strength = 3 if catalog else 2 if consensus else 1
+        candidates.append(((-strength, TYPE_ORDER[rule.rule_type], rule.value, tuple(sorted(rule.modifiers))), rule))
+        reasons[rule] = "catalog" if catalog else "exact_label"
+    if len(reserved) > limit["max"]: raise ValueError(f"{name} DNS reservation exceeds max")
     selected = set(reserved)
-    for _, rule in sorted(ranked):
-        if len(selected) >= limit:
-            reasons[rule] = "profile_cap_exhausted"
-            funnel["cap_exhausted"] += 1
-            continue
+    for _, rule in sorted(candidates):
+        if len(selected) >= limit["target"]:
+            reasons[rule] = "target_excluded"; continue
         selected.add(rule)
-    selected = _cidr_reduce(selected, reserved)
-    selected, covered = _suffix_reduce(selected, reserved)
-    for rule, suffix in covered.items():
-        reasons[rule] = "covered_by_selected_native_suffix:" + suffix
-        funnel["covered"] += 1
-    funnel["reserved"] = len(reserved)
-    funnel["selected"] = len(selected)
-    return sorted(selected, key=lambda r: (TYPE_ORDER[r.rule_type], r.value, tuple(sorted(r.modifiers)))), reasons, dict(funnel)
+    selected = _reduce(selected, reserved)
+    return sorted(selected, key=lambda r: (TYPE_ORDER[r.rule_type], r.value, tuple(sorted(r.modifiers)))), reasons, {"target": limit["target"], "max": limit["max"], "reserved": len(reserved), "eligible": len(candidates)}
 
 
-def build_profiles(results: list[SourceResult], policy: dict) -> tuple[dict[str, list[Rule]], dict[Rule, tuple[str, str | None]]]:
-    grouped = _dedupe_records(results)
-    sources = {result.source.source_id: result.source for result in results}
-    profiles: dict[str, list[Rule]] = {}
-    profile_reasons: dict[str, dict[Rule, str]] = {}
-    for name in ("mac", "mobile", "lite"):
-        profiles[name], profile_reasons[name], _ = _select_profile(name, grouped, sources, policy)
-    final_sets = {name: set(rules) for name, rules in profiles.items()}
-    decisions: dict[Rule, tuple[str, str | None]] = {}
+def build_profiles(results, policy):
+    grouped = _group(results); sources = {r.source.source_id: r.source for r in results}
+    profiles, reasons, summaries = {}, {}, {}
+    profiles["clash_full"], reasons["clash_full"], summaries["clash_full"] = _select("clash_full", grouped, sources, policy)
+    for name in ("qx_universal", "qx_compact"):
+        profiles[name], reasons[name], summaries[name] = _select(name, grouped, sources, policy)
+    clash = set(profiles["clash_full"])
+    for name in ("qx_universal", "qx_compact"):
+        clash.update(profiles[name])
+    if len(clash) > policy["profile_limits"]["clash_full"]["max"]:
+        raise ValueError("clash_full exceeds max after required QX containment")
+    qx_reserved = set(profiles["qx_universal"]) | set(profiles["qx_compact"])
+    dns_reserved = {rule for rule, records in grouped.items() if any(sources[r.source].role == "dns_bypass" for r in records)}
+    profiles["clash_full"] = sorted(_reduce(clash, qx_reserved | dns_reserved), key=lambda r: (TYPE_ORDER[r.rule_type], r.value, tuple(sorted(r.modifiers))))
+    clash = set(profiles["clash_full"])
+    for name in ("qx_universal", "qx_compact"):
+        missing = set(profiles[name]) - clash
+        if missing: raise ValueError(f"{name} is not contained by clash_full: {next(iter(missing))}")
+    for name in PROFILES:
+        if len(profiles[name]) > policy["profile_limits"][name]["max"]: raise ValueError(f"{name} exceeds max")
+    decisions = {}
     for rule, records in grouped.items():
         for record in records:
-            for name, output_name in (("mac", "stable"), ("mobile", "mobile_stable"), ("lite", "lite")):
-                reason = profile_reasons[name].get(rule, "not_selected")
-                record.decisions[output_name] = "kept" if rule in final_sets[name] else reason
-                if reason.startswith("covered_by_selected_native_suffix"):
-                    record.covered_by = reason.split(":", 1)[1]
-            if rule not in final_sets["mac"]:
-                decisions[rule] = ("dropped", profile_reasons["mac"].get(rule))
-            else:
-                decisions[rule] = ("kept", None)
+            for name in PROFILES: record.decisions[name] = "kept" if rule in profiles[name] else reasons[name].get(rule, "not_selected")
+        decisions[rule] = ("kept", None) if rule in clash else ("dropped", reasons["clash_full"].get(rule))
     return profiles, decisions
 
 
-def profile_summary(results: list[SourceResult], profiles: dict[str, list[Rule]], policy: dict) -> dict:
-    grouped = _dedupe_records(results)
-    sources = {result.source.source_id: result.source for result in results}
-    summaries = {}
-    for name in ("mac", "mobile", "lite"):
-        _, _, funnel = _select_profile(name, grouped, sources, policy)
-        summaries[name] = funnel | {"limit": policy["profile_limits"][name]}
-    return summaries
+def profile_summary(results, profiles, policy):
+    grouped = _group(results); sources = {r.source.source_id: r.source for r in results}
+    return {name: _select(name, grouped, sources, policy)[2] for name in PROFILES}
