@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ipaddress
+import re
 from collections import defaultdict
 
 from .config import policy_items
@@ -63,31 +64,62 @@ def _select(name, grouped, sources, policy):
     limit = policy["profile_limits"][name]
     raw_catalog = policy["domain_evidence_catalog"]
     web_labels, mobile_labels = set(policy["web_label_categories"]), set(policy["mobile_sdk_labels"])
-    reserved, candidates, reasons = set(), [], {}
+    excluded_labels = set(policy["label_pattern_exclusions"])
+    web_patterns = [re.compile(value) for value in policy["web_label_patterns"]]
+    compact_patterns = [re.compile(value) for value in policy["compact_label_patterns"]]
+    reserved, candidates, reasons, tier_counts = set(), {1: [], 2: [], 3: []}, {}, defaultdict(int)
+    tier3 = policy["tier3_policy"]
     for rule, records in grouped.items():
         dns = any(sources[r.source].role == "dns_bypass" for r in records)
+        if rule.rule_type == "HOST-KEYWORD":
+            reasons[rule] = "keyword_not_admissible"
+            continue
         if dns and rule.rule_type in {"HOST", "HOST-SUFFIX", "IP-CIDR", "IP6-CIDR"}:
-            reserved.add(rule); reasons[rule] = "dns_passthrough"; continue
+            reserved.add(rule); reasons[rule] = "tier1_dns_passthrough"; continue
         catalog, platforms, lite = _catalog_data(rule, raw_catalog)
         labels = set(rule.value.split(".")) if rule.rule_type in {"HOST", "HOST-SUFFIX"} else set()
+        pattern_web = {label for label in labels if label not in excluded_labels and any(pattern.fullmatch(label) for pattern in web_patterns)}
+        pattern_compact = {label for label in labels if label not in excluded_labels and any(pattern.fullmatch(label) for pattern in compact_patterns)}
         random = structural_random_reasons(rule.value, policy["random_domain_policy"]) if labels else []
         consensus = len(records[0].consensus_sources) >= 2
         if random and not (catalog or consensus): reasons[rule] = "structural_random"; continue
-        if name == "clash_full": eligible = bool(catalog or labels & web_labels or labels & mobile_labels or consensus)
-        elif name == "qx_universal": eligible = bool(platforms & {"web", "shared"} or labels & web_labels)
-        else: eligible = bool((platforms & {"mobile", "shared"} and lite) or labels & mobile_labels)
-        if not eligible: reasons[rule] = "platform_excluded"; continue
-        strength = 3 if catalog else 2 if consensus else 1
-        candidates.append(((-strength, TYPE_ORDER[rule.rule_type], rule.value, tuple(sorted(rule.modifiers))), rule))
-        reasons[rule] = "catalog" if catalog else "exact_label"
+        tier = None
+        if catalog:
+            compatible = name == "clash_full" or (name == "qx_universal" and platforms & {"web", "shared"}) or (name == "qx_compact" and platforms & {"mobile", "shared"} and lite)
+            if compatible:
+                tier = 1
+        elif name == "clash_full" and (labels & web_labels or labels & mobile_labels or pattern_web or consensus):
+            tier = 2
+        elif name == "qx_universal" and (labels & web_labels or pattern_web):
+            tier = 2
+        elif name == "qx_compact" and (labels & mobile_labels or pattern_compact):
+            tier = 2
+        if tier is None and name in tier3["enabled_profiles"] and rule.rule_type in {"HOST", "HOST-SUFFIX"}:
+            owner = next((platform for domain, platform in tier3["owner_platforms"].items() if rule.value == domain or rule.value.endswith("." + domain)), None)
+            evidence = labels & set(tier3["label_vocabulary"])
+            blocked = labels & set(tier3["excluded_labels"])
+            profile_ok = name == "clash_full" or owner == "web"
+            if owner and evidence and not blocked and profile_ok:
+                tier = 3
+        if tier is None:
+            reasons[rule] = "platform_or_evidence_excluded"
+            continue
+        strength = 4 - tier
+        candidates[tier].append(((-strength, TYPE_ORDER[rule.rule_type], rule.value, tuple(sorted(rule.modifiers))), rule))
+        reasons[rule] = f"tier{tier}:catalog" if tier == 1 else f"tier{tier}:label_or_evidence"
+        tier_counts[f"tier{tier}_eligible"] += 1
     if len(reserved) > limit["max"]: raise ValueError(f"{name} DNS reservation exceeds max")
     selected = set(reserved)
-    for _, rule in sorted(candidates):
-        if len(selected) >= limit["target"]:
-            reasons[rule] = "target_excluded"; continue
-        selected.add(rule)
+    for tier in (1, 2, 3):
+        for _, rule in sorted(candidates[tier]):
+            if len(selected) >= limit["target"]:
+                reasons[rule] = f"target_excluded_tier{tier}"
+                continue
+            selected.add(rule)
+            tier_counts[f"tier{tier}_selected"] += 1
     selected = _reduce(selected, reserved)
-    return sorted(selected, key=lambda r: (TYPE_ORDER[r.rule_type], r.value, tuple(sorted(r.modifiers)))), reasons, {"target": limit["target"], "max": limit["max"], "reserved": len(reserved), "eligible": len(candidates)}
+    summary = {"target": limit["target"], "max": limit["max"], "reserved": len(reserved), "eligible": sum(len(items) for items in candidates.values())}
+    return sorted(selected, key=lambda r: (TYPE_ORDER[r.rule_type], r.value, tuple(sorted(r.modifiers)))), reasons, summary | dict(tier_counts)
 
 
 def build_profiles(results, policy):

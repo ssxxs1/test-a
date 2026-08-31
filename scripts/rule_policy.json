@@ -1,5 +1,5 @@
 {
-  "policy_version": 3,
+  "policy_version": 5,
   "qx_policy": "Advertising",
   "profile_limits": {
     "clash_full": {
@@ -71,7 +71,10 @@
       "platforms": [
         "mobile"
       ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "sdk-pangle",
+      "priority": 800
     },
     {
       "id": "sdk-tanx",
@@ -83,7 +86,10 @@
       "platforms": [
         "mobile"
       ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "sdk-tanx",
+      "priority": 800
     },
     {
       "id": "sdk-alimama",
@@ -95,7 +101,10 @@
       "platforms": [
         "mobile"
       ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "sdk-alimama",
+      "priority": 800
     },
     {
       "id": "sdk-sigmob",
@@ -107,7 +116,10 @@
       "platforms": [
         "mobile"
       ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "sdk-sigmob",
+      "priority": 800
     },
     {
       "id": "sdk-mintegral",
@@ -119,7 +131,10 @@
       "platforms": [
         "mobile"
       ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "sdk-mintegral",
+      "priority": 800
     },
     {
       "id": "sdk-mbridge",
@@ -131,7 +146,10 @@
       "platforms": [
         "mobile"
       ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "sdk-mbridge",
+      "priority": 800
     },
     {
       "id": "sdk-applovin",
@@ -143,7 +161,10 @@
       "platforms": [
         "shared"
       ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "sdk-applovin",
+      "priority": 800
     },
     {
       "id": "sdk-unityads",
@@ -155,7 +176,10 @@
       "platforms": [
         "mobile"
       ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "sdk-unityads",
+      "priority": 800
     },
     {
       "id": "sdk-adcolony",
@@ -167,7 +191,10 @@
       "platforms": [
         "shared"
       ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "sdk-adcolony",
+      "priority": 800
     },
     {
       "id": "sdk-ironsrc",
@@ -179,7 +206,10 @@
       "platforms": [
         "shared"
       ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "sdk-ironsrc",
+      "priority": 800
     },
     {
       "id": "sdk-vungle",
@@ -191,7 +221,10 @@
       "platforms": [
         "shared"
       ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "sdk-vungle",
+      "priority": 800
     },
     {
       "id": "sdk-inmobi",
@@ -203,7 +236,10 @@
       "platforms": [
         "shared"
       ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "sdk-inmobi",
+      "priority": 800
     },
     {
       "id": "sdk-admob",
@@ -215,7 +251,10 @@
       "platforms": [
         "shared"
       ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "sdk-admob",
+      "priority": 800
     },
     {
       "id": "sdk-doubleclick",
@@ -227,7 +266,10 @@
       "platforms": [
         "web"
       ],
-      "lite_enabled": false
+      "lite_enabled": false,
+      "provider": "third_party",
+      "product": "sdk-doubleclick",
+      "priority": 800
     },
     {
       "id": "sdk-googlesyndication",
@@ -239,7 +281,10 @@
       "platforms": [
         "web"
       ],
-      "lite_enabled": false
+      "lite_enabled": false,
+      "provider": "third_party",
+      "product": "sdk-googlesyndication",
+      "priority": 800
     },
     {
       "id": "sdk-umeng",
@@ -251,7 +296,10 @@
       "platforms": [
         "mobile"
       ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "sdk-umeng",
+      "priority": 800
     },
     {
       "id": "sdk-sensorsdata",
@@ -263,7 +311,10 @@
       "platforms": [
         "mobile"
       ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "sdk-sensorsdata",
+      "priority": 800
     },
     {
       "id": "sdk-talkingdata",
@@ -275,7 +326,10 @@
       "platforms": [
         "mobile"
       ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "sdk-talkingdata",
+      "priority": 800
     },
     {
       "id": "sdk-jpush",
@@ -287,19 +341,10 @@
       "platforms": [
         "mobile"
       ],
-      "lite_enabled": true
-    },
-    {
-      "id": "endpoint-beacon-qq",
-      "value": "beacon.qq.com",
-      "match": "exact",
-      "category": "telemetry",
-      "note": "腾讯遥测端点。",
-      "evidence": "人工审核：现有上游规则",
-      "platforms": [
-        "mobile"
-      ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "sdk-jpush",
+      "priority": 800
     },
     {
       "id": "endpoint-aedns-weixin",
@@ -311,7 +356,655 @@
       "platforms": [
         "mobile"
       ],
-      "lite_enabled": true
+      "lite_enabled": true,
+      "provider": "third_party",
+      "product": "endpoint-aedns-weixin",
+      "priority": 800
+    },
+    {
+      "id": "tencent-gdt-gdt-qq-com",
+      "value": "gdt.qq.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "tencent/gdt 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "tencent",
+      "product": "gdt",
+      "priority": 900
+    },
+    {
+      "id": "tencent-gdt-v2-gdt-qq-com",
+      "value": "v2.gdt.qq.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "tencent/gdt 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "tencent",
+      "product": "gdt",
+      "priority": 900
+    },
+    {
+      "id": "tencent-gdt-vr-gdt-qq-com",
+      "value": "vr.gdt.qq.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "tencent/gdt 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "tencent",
+      "product": "gdt",
+      "priority": 900
+    },
+    {
+      "id": "tencent-gdt-xs-gdt-qq-com",
+      "value": "xs.gdt.qq.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "tencent/gdt 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "tencent",
+      "product": "gdt",
+      "priority": 900
+    },
+    {
+      "id": "tencent-telemetry-beacon-qq-com",
+      "value": "beacon.qq.com",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "tencent/telemetry 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "shared"
+      ],
+      "lite_enabled": true,
+      "provider": "tencent",
+      "product": "telemetry",
+      "priority": 900
+    },
+    {
+      "id": "tencent-telemetry-galileotelemetry-tencent-com",
+      "value": "galileotelemetry.tencent.com",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "tencent/telemetry 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "tencent",
+      "product": "telemetry",
+      "priority": 900
+    },
+    {
+      "id": "tencent-telemetry-mtrace-qq-com",
+      "value": "mtrace.qq.com",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "tencent/telemetry 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "tencent",
+      "product": "telemetry",
+      "priority": 900
+    },
+    {
+      "id": "tencent-telemetry-stat-y-qq-com",
+      "value": "stat.y.qq.com",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "tencent/telemetry 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "tencent",
+      "product": "telemetry",
+      "priority": 900
+    },
+    {
+      "id": "tencent-telemetry-trace-qq-com",
+      "value": "trace.qq.com",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "tencent/telemetry 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "tencent",
+      "product": "telemetry",
+      "priority": 900
+    },
+    {
+      "id": "alibaba-alimama-mmstat-com",
+      "value": "mmstat.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "alibaba/alimama 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "alibaba",
+      "product": "alimama",
+      "priority": 900
+    },
+    {
+      "id": "alibaba-taobao-adashbc-m-taobao-com",
+      "value": "adashbc.m.taobao.com",
+      "match": "exact",
+      "category": "ad_tracking",
+      "note": "alibaba/taobao 上游已收录的具体 ad_tracking endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "alibaba",
+      "product": "taobao",
+      "priority": 900
+    },
+    {
+      "id": "alibaba-taobao-adashx-m-taobao-com",
+      "value": "adashx.m.taobao.com",
+      "match": "exact",
+      "category": "ad_tracking",
+      "note": "alibaba/taobao 上游已收录的具体 ad_tracking endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "alibaba",
+      "product": "taobao",
+      "priority": 900
+    },
+    {
+      "id": "alibaba-taobao-simba-m-taobao-com",
+      "value": "simba.m.taobao.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "alibaba/taobao 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "alibaba",
+      "product": "taobao",
+      "priority": 900
+    },
+    {
+      "id": "alibaba-taobao-mclick-simba-taobao-com",
+      "value": "mclick.simba.taobao.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "alibaba/taobao 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "alibaba",
+      "product": "taobao",
+      "priority": 900
+    },
+    {
+      "id": "alibaba-alipay-collect-alipay-com",
+      "value": "collect.alipay.com",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "alibaba/alipay 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "alibaba",
+      "product": "alipay",
+      "priority": 900
+    },
+    {
+      "id": "bytedance-toutiao-dsp-toutiao-com",
+      "value": "dsp.toutiao.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "bytedance/toutiao 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "bytedance",
+      "product": "toutiao",
+      "priority": 900
+    },
+    {
+      "id": "bytedance-toutiao-track-toutiao-com",
+      "value": "track.toutiao.com",
+      "match": "exact",
+      "category": "tracking",
+      "note": "bytedance/toutiao 上游已收录的具体 tracking endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "bytedance",
+      "product": "toutiao",
+      "priority": 900
+    },
+    {
+      "id": "bytedance-snssdk-log-snssdk-com",
+      "value": "log.snssdk.com",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "bytedance/snssdk 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "bytedance",
+      "product": "snssdk",
+      "priority": 900
+    },
+    {
+      "id": "bytedance-snssdk-xlog-snssdk-com",
+      "value": "xlog.snssdk.com",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "bytedance/snssdk 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "bytedance",
+      "product": "snssdk",
+      "priority": 900
+    },
+    {
+      "id": "bytedance-snssdk-mon-snssdk-com",
+      "value": "mon.snssdk.com",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "bytedance/snssdk 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "bytedance",
+      "product": "snssdk",
+      "priority": 900
+    },
+    {
+      "id": "baidu-union-cpro-baidu-com",
+      "value": "cpro.baidu.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "baidu/union 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "baidu",
+      "product": "union",
+      "priority": 900
+    },
+    {
+      "id": "baidu-union-duclick-baidu-com",
+      "value": "duclick.baidu.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "baidu/union 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "baidu",
+      "product": "union",
+      "priority": 900
+    },
+    {
+      "id": "baidu-union-eclick-baidu-com",
+      "value": "eclick.baidu.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "baidu/union 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "baidu",
+      "product": "union",
+      "priority": 900
+    },
+    {
+      "id": "baidu-union-nsclick-baidu-com",
+      "value": "nsclick.baidu.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "baidu/union 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "baidu",
+      "product": "union",
+      "priority": 900
+    },
+    {
+      "id": "baidu-mobads-mobads-logs-baidu-com",
+      "value": "mobads-logs.baidu.com",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "baidu/mobads 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "baidu",
+      "product": "mobads",
+      "priority": 900
+    },
+    {
+      "id": "baidu-analytics-mtj-baidu-com",
+      "value": "mtj.baidu.com",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "baidu/analytics 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "baidu",
+      "product": "analytics",
+      "priority": 900
+    },
+    {
+      "id": "baidu-analytics-tongji-baidu-com",
+      "value": "tongji.baidu.com",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "baidu/analytics 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "baidu",
+      "product": "analytics",
+      "priority": 900
+    },
+    {
+      "id": "bilibili-bilibili-cm-track-biligame-bilibili-com",
+      "value": "cm.track.biligame.bilibili.com",
+      "match": "exact",
+      "category": "tracking",
+      "note": "bilibili/bilibili 上游已收录的具体 tracking endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "bilibili",
+      "product": "bilibili",
+      "priority": 900
+    },
+    {
+      "id": "bilibili-bilibili-cm-adcommon-bilibili-com",
+      "value": "cm.adcommon.bilibili.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "bilibili/bilibili 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "bilibili",
+      "product": "bilibili",
+      "priority": 900
+    },
+    {
+      "id": "xiaohongshu-xiaohongshu-apm-track-xiaohongshu-com",
+      "value": "apm-track.xiaohongshu.com",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "xiaohongshu/xiaohongshu 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "xiaohongshu",
+      "product": "xiaohongshu",
+      "priority": 900
+    },
+    {
+      "id": "xiaohongshu-xiaohongshu-t-ads-xiaohongshu-com",
+      "value": "t-ads.xiaohongshu.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "xiaohongshu/xiaohongshu 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "xiaohongshu",
+      "product": "xiaohongshu",
+      "priority": 900
+    },
+    {
+      "id": "kuaishou-kuaishou-web-trace-ksapisrv-com",
+      "value": "web-trace.ksapisrv.com",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "kuaishou/kuaishou 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "kuaishou",
+      "product": "kuaishou",
+      "priority": 900
+    },
+    {
+      "id": "kuaishou-kuaishou-wlog-kuaishou-com",
+      "value": "wlog.kuaishou.com",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "kuaishou/kuaishou 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "kuaishou",
+      "product": "kuaishou",
+      "priority": 900
+    },
+    {
+      "id": "youku-youku-ad-api-mobile-youku-com",
+      "value": "ad.api.mobile.youku.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "youku/youku 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "youku",
+      "product": "youku",
+      "priority": 900
+    },
+    {
+      "id": "youku-youku-ad-mobile-youku-com",
+      "value": "ad.mobile.youku.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "youku/youku 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "youku",
+      "product": "youku",
+      "priority": 900
+    },
+    {
+      "id": "youku-youku-yk-ssp-ad-youku-com",
+      "value": "yk-ssp.ad.youku.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "youku/youku 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "youku",
+      "product": "youku",
+      "priority": 900
+    },
+    {
+      "id": "iqiyi-iqiyi-ad-m-iqiyi-com",
+      "value": "ad.m.iqiyi.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "iqiyi/iqiyi 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "iqiyi",
+      "product": "iqiyi",
+      "priority": 900
+    },
+    {
+      "id": "iqiyi-iqiyi-tracker-sns-iqiyi-com",
+      "value": "tracker.sns.iqiyi.com",
+      "match": "exact",
+      "category": "tracking",
+      "note": "iqiyi/iqiyi 上游已收录的具体 tracking endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "iqiyi",
+      "product": "iqiyi",
+      "priority": 900
+    },
+    {
+      "id": "netease-netease-analytics-126-net",
+      "value": "analytics.126.net",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "netease/netease 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "netease",
+      "product": "netease",
+      "priority": 900
+    },
+    {
+      "id": "netease-netease-analytics-ws-126-net",
+      "value": "analytics.ws.126.net",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "netease/netease 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "netease",
+      "product": "netease",
+      "priority": 900
+    },
+    {
+      "id": "meituan-meituan-report-meituan-com",
+      "value": "report.meituan.com",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "meituan/meituan 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "meituan",
+      "product": "meituan",
+      "priority": 900
+    },
+    {
+      "id": "meituan-meituan-wmlog-meituan-com",
+      "value": "wmlog.meituan.com",
+      "match": "exact",
+      "category": "telemetry",
+      "note": "meituan/meituan 上游已收录的具体 telemetry endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "mobile"
+      ],
+      "lite_enabled": true,
+      "provider": "meituan",
+      "product": "meituan",
+      "priority": 900
+    },
+    {
+      "id": "jd-jd-ads-union-jd-com",
+      "value": "ads.union.jd.com",
+      "match": "exact",
+      "category": "ad_delivery",
+      "note": "jd/jd 上游已收录的具体 ad_delivery endpoint。",
+      "evidence": "reviewed_source_rule: privacy/adlite preview",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "jd",
+      "product": "jd",
+      "priority": 900
     }
   ],
   "mobile_geoip_allowlist": [],
@@ -358,5 +1051,112 @@
     "jpush",
     "getui",
     "igexin"
-  ]
+  ],
+  "web_label_patterns": [
+    "^ad(?:s|x)?(?:[0-9]+|[-_]?(?:server|service|serving|network|exchange|tech|manager|system|form|mob|sdk|unit|slot|delivery|click|proxy|track|log|stat|img|api))?$",
+    "^(?:tracker|tracking)(?:[-_]?(?:api|sdk|server|service|pixel|log|stat|event))?$",
+    "^(?:analytics?|metrics?)(?:[-_]?(?:api|sdk|server|service|log|event))?$",
+    "^(?:pixel|beacon)(?:[-_]?(?:api|sdk|server|service|log|event))?$"
+  ],
+  "compact_label_patterns": [
+    "^(?:tracker|tracking)(?:[-_]?(?:api|sdk|server|service|pixel|log|stat|event))?$",
+    "^(?:analytics?|metrics?)(?:[-_]?(?:api|sdk|server|service|log|event))?$",
+    "^(?:pixel|beacon)(?:[-_]?(?:api|sdk|server|service|log|event))?$"
+  ],
+  "label_pattern_exclusions": [
+    "adobe",
+    "adidas",
+    "administrator",
+    "admin",
+    "myads",
+    "trackingservice"
+  ],
+  "tier3_policy": {
+    "enabled_profiles": [
+      "clash_full",
+      "qx_universal"
+    ],
+    "label_vocabulary": [
+      "ad",
+      "ads",
+      "adserver",
+      "adservice",
+      "advertising",
+      "adash",
+      "adscdn",
+      "adclick",
+      "adlog",
+      "adtrack",
+      "adtrace",
+      "nativeadv",
+      "ssp",
+      "dsp",
+      "cpro",
+      "simba",
+      "analytics",
+      "beacon",
+      "eventlog",
+      "report",
+      "reportlog",
+      "trace",
+      "tracker",
+      "tracking",
+      "stat",
+      "statis",
+      "tongji",
+      "mtj",
+      "apm",
+      "mta"
+    ],
+    "owner_platforms": {
+      "qq.com": "mobile",
+      "tencent.com": "mobile",
+      "taobao.com": "mobile",
+      "alimama.com": "mobile",
+      "alibaba.com": "web",
+      "snssdk.com": "mobile",
+      "toutiao.com": "mobile",
+      "dftoutiao.com": "mobile",
+      "baidu.com": "web",
+      "baidu.cn": "mobile",
+      "bilibili.com": "mobile",
+      "weibo.com": "web",
+      "xiaohongshu.com": "mobile",
+      "kuaishou.com": "mobile",
+      "ksapisrv.com": "mobile",
+      "youku.com": "web",
+      "iqiyi.com": "web",
+      "netease.com": "web",
+      "163.com": "web",
+      "meituan.com": "mobile",
+      "jd.com": "web"
+    },
+    "excluded_labels": [
+      "api",
+      "auth",
+      "login",
+      "passport",
+      "payment",
+      "pay",
+      "security",
+      "anti-bot",
+      "antivirus",
+      "update",
+      "download",
+      "cdn",
+      "image",
+      "img",
+      "video",
+      "push",
+      "message",
+      "config",
+      "store",
+      "cloud",
+      "bce",
+      "cos",
+      "test",
+      "default",
+      "internal"
+    ]
+  }
 }

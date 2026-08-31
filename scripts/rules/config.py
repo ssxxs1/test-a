@@ -80,10 +80,20 @@ def load_config(root: Path) -> AppConfig:
     random_policy = policy.get("random_domain_policy")
     if not isinstance(random_policy, dict) or any(not isinstance(value, (int, float)) or value <= 0 for value in random_policy.values()):
         raise ConfigurationError("random_domain_policy must contain positive thresholds")
-    for key in ("web_label_categories", "mobile_sdk_labels"):
+    for key in ("web_label_categories", "mobile_sdk_labels", "label_pattern_exclusions"):
         values = policy.get(key)
-        if not isinstance(values, list) or not values or not all(isinstance(value, str) and value for value in values):
-            raise ConfigurationError(f"{key} must be a non-empty string list")
+        if not isinstance(values, list) or not all(isinstance(value, str) and value for value in values):
+            raise ConfigurationError(f"{key} must be a string list")
+    try:
+        import re
+        for key in ("web_label_patterns", "compact_label_patterns"):
+            values = policy.get(key)
+            if not isinstance(values, list) or not values or not all(isinstance(value, str) and value for value in values):
+                raise ConfigurationError(f"{key} must be a non-empty regex list")
+            for value in values:
+                re.compile(value)
+    except re.error as exc:
+        raise ConfigurationError(f"Invalid label pattern: {exc}") from exc
     seen_ids: set[str] = set()
     for item in policy.get("domain_evidence_catalog", []):
         _validate_policy_item(item, True)
@@ -92,6 +102,11 @@ def load_config(root: Path) -> AppConfig:
             raise ConfigurationError("Catalog items require platforms from web/mobile/shared")
         if not isinstance(item.get("lite_enabled"), bool):
             raise ConfigurationError("Catalog items require lite_enabled boolean")
+        for key in ("provider", "product"):
+            if not isinstance(item.get(key), str) or not item[key]:
+                raise ConfigurationError(f"Catalog items require {key}")
+        if not isinstance(item.get("priority"), int) or item["priority"] < 0:
+            raise ConfigurationError("Catalog items require non-negative priority")
         if item["id"] in seen_ids:
             raise ConfigurationError(f"Duplicate policy ID {item['id']}")
         seen_ids.add(item["id"])

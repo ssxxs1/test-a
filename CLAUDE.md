@@ -44,6 +44,7 @@ python scripts/process_rules.py --preview-only --force
 4. 删除长纯数字、长十六进制与高数字比例的结构随机域名；BlockDNS、显式 catalog 和完全双源共识是受控例外。
 5. 广告/追踪分类只匹配完整 DNS label，不能用任意子串推断。例如 `ads.example.com` 可匹配 `ads`，`myads.example.com`、`adobe.example.com` 不会匹配。
 6. BlockDNS 原生 HOST/HOST-SUFFIX/CIDR 在三个输出中完整保留，不被普通 suffix 覆盖去重删除。
+7. 候选按 Tier 1（BlockDNS/catalog）、Tier 2（完整广告/追踪 label）和 Tier 3（已审核 owner 范围内的长尾）依序选择；不会使用 DNS 存活探测、自动 KEYWORD 或主机提权。
 
 ## 策略配置
 
