@@ -1,39 +1,126 @@
 name: Rules Production Deploy
+
 on:
   schedule:
     - cron: "0 0 * * 1"
   workflow_dispatch:
     inputs:
       force_update:
-        description: "Force a full update (bypass cache)"
+        description: Force a rebuild even when all inputs are unchanged
         type: boolean
         default: false
+      preview_only:
+        description: Generate a review artifact without publishing
+        type: boolean
+        default: true
+      initialize_baseline:
+        description: Approve a reviewed candidate as a new baseline
+        type: boolean
+        default: false
+      approve_anomalous_publish:
+        description: Explicitly approve release-guard warnings
+        type: boolean
+        default: false
+      approval_reason:
+        description: Required when approving guard warnings
+        type: string
+        required: false
+      preview_run_id:
+        description: Reviewed Preview run ID required for initialization or approval
+        type: string
+        required: false
+
+concurrency:
+  group: rules-production
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
+    outputs:
+      should_publish: ${{ steps.candidate.outputs.should_publish }}
+      has_candidate: ${{ steps.candidate.outputs.has_candidate }}
     steps:
-      - name: Checkout production
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-
-      - name: Install Dependencies
-        run: pip install requests
-
-      - name: Run Processor
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run offline tests
+        run: python -m unittest discover -s tests -v
+      - name: Validate dispatch mode
+        id: mode
+        env:
+          EVENT: ${{ github.event_name }}
+          PREVIEW: ${{ inputs.preview_only }}
+          INITIALIZE: ${{ inputs.initialize_baseline }}
+          APPROVE: ${{ inputs.approve_anomalous_publish }}
+          REASON: ${{ inputs.approval_reason }}
+          PREVIEW_RUN: ${{ inputs.preview_run_id }}
         run: |
-          mkdir -p dist
-          python scripts/process_rules.py --output_dir dist ${{ github.event.inputs.force_update == 'true' && '--force' || '' }}
-
-      - name: Commit and Push to Main
+          if [ "$EVENT" = "schedule" ]; then
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
+          elif [ "$INITIALIZE" = "true" ] || [ "$APPROVE" = "true" ]; then
+            test -n "$PREVIEW_RUN"
+            if [ "$APPROVE" = "true" ]; then test -n "$REASON"; fi
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Download reviewed preview manifest
+        if: steps.mode.outputs.should_publish == 'true' && github.event_name == 'workflow_dispatch'
+        uses: actions/download-artifact@v4
+        with:
+          name: rules-preview-${{ inputs.preview_run_id }}
+          path: reviewed-preview
+          run-id: ${{ inputs.preview_run_id }}
+          github-token: ${{ github.token }}
+      - name: Build candidate
+        id: candidate
+        env:
+          FORCE: ${{ inputs.force_update }}
+          INITIALIZE: ${{ inputs.initialize_baseline }}
+          APPROVE: ${{ inputs.approve_anomalous_publish }}
+          REASON: ${{ inputs.approval_reason }}
+          EVENT: ${{ github.event_name }}
         run: |
+          args=(--preview-only)
+          if [ "$FORCE" = "true" ]; then args+=(--force); fi
+          if [ "$EVENT" = "workflow_dispatch" ] && [ -d reviewed-preview ]; then args+=(--preview-manifest reviewed-preview/manifest.json); fi
+          if [ "${{ steps.mode.outputs.should_publish }}" = "true" ]; then args+=(--publish-candidate); fi
+          if [ "$INITIALIZE" = "true" ]; then args+=(--initialize-baseline); fi
+          if [ "$APPROVE" = "true" ]; then args+=(--approve-anomalous-publish --approval-reason "$REASON"); fi
+          python scripts/process_rules.py "${args[@]}"
+          echo "should_publish=${{ steps.mode.outputs.should_publish }}" >> "$GITHUB_OUTPUT"
+          echo "has_candidate=$(test -d preview-dist && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - name: Upload candidate
+        if: steps.candidate.outputs.has_candidate == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: rules-preview-${{ github.run_id }}
+          path: preview-dist/
+          retention-days: 14
+
+  publish:
+    needs: build
+    if: needs.build.outputs.should_publish == 'true' && needs.build.outputs.has_candidate == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: rules-preview-${{ github.run_id }}
+          path: candidate-dist
+      - name: Publish managed production artifacts
+        run: |
+          rm -rf dist
+          mv candidate-dist dist
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add dist/*.list dist/*.yaml scripts/rule_cache.json
-          git diff --staged --quiet || (git commit -m "Production Update and Cache Sync $(date +'%Y-%m-%d')" && git push origin main)
+          git add dist/
+          git diff --staged --quiet || (git commit -m "Production rules update $(date -u +%F)" && git push origin main)
