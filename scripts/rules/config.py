@@ -71,28 +71,27 @@ def load_config(root: Path) -> AppConfig:
     if not isinstance(policy.get("qx_policy"), str) or not policy["qx_policy"]:
         raise ConfigurationError("qx_policy is required")
     limits = policy.get("profile_limits")
-    if not isinstance(limits, dict) or set(limits) != {"mac", "mobile", "lite"} or any(not isinstance(value, int) or value <= 0 for value in limits.values()):
-        raise ConfigurationError("profile_limits must define positive mac/mobile/lite limits")
+    expected_profiles = {"clash_full", "qx_universal", "qx_compact"}
+    if not isinstance(limits, dict) or set(limits) != expected_profiles:
+        raise ConfigurationError("profile_limits must define clash_full/qx_universal/qx_compact")
+    for name, limit in limits.items():
+        if not isinstance(limit, dict) or not isinstance(limit.get("target"), int) or not isinstance(limit.get("max"), int) or limit["target"] <= 0 or limit["max"] <= 0 or limit["target"] > limit["max"]:
+            raise ConfigurationError(f"profile_limits.{name} requires positive target <= max")
     random_policy = policy.get("random_domain_policy")
     if not isinstance(random_policy, dict) or any(not isinstance(value, (int, float)) or value <= 0 for value in random_policy.values()):
         raise ConfigurationError("random_domain_policy must contain positive thresholds")
-    if not isinstance(policy.get("admission_label_tokens"), list) or not all(isinstance(value, str) and value for value in policy["admission_label_tokens"]):
-        raise ConfigurationError("admission_label_tokens must be a non-empty string list")
-    try:
-        import re
-        patterns = policy.get("admission_label_patterns", [])
-        if not isinstance(patterns, list) or not all(isinstance(value, str) and value for value in patterns):
-            raise ConfigurationError("admission_label_patterns must be a string list")
-        for pattern in patterns:
-            re.compile(pattern)
-    except re.error as exc:
-        raise ConfigurationError(f"Invalid admission label pattern: {exc}") from exc
+    for key in ("web_label_categories", "mobile_sdk_labels"):
+        values = policy.get(key)
+        if not isinstance(values, list) or not values or not all(isinstance(value, str) and value for value in values):
+            raise ConfigurationError(f"{key} must be a non-empty string list")
     seen_ids: set[str] = set()
     for item in policy.get("domain_evidence_catalog", []):
         _validate_policy_item(item, True)
-        profiles = item.get("profiles")
-        if not isinstance(profiles, list) or not profiles or not set(profiles) <= {"mac", "mobile", "lite"}:
-            raise ConfigurationError("Catalog items require profiles from mac/mobile/lite")
+        platforms = item.get("platforms")
+        if not isinstance(platforms, list) or not platforms or not set(platforms) <= {"web", "mobile", "shared"}:
+            raise ConfigurationError("Catalog items require platforms from web/mobile/shared")
+        if not isinstance(item.get("lite_enabled"), bool):
+            raise ConfigurationError("Catalog items require lite_enabled boolean")
         if item["id"] in seen_ids:
             raise ConfigurationError(f"Duplicate policy ID {item['id']}")
         seen_ids.add(item["id"])

@@ -25,7 +25,7 @@ def verify_baseline(current: dict[str, Any], baseline: dict[str, Any] | None, po
     guards = policy["release_guards"]
     pct = guards["output_total_change_pct"]
     for profile, summary in current["outputs"].items():
-        limit = policy["profile_limits"][profile]
+        limit = policy["profile_limits"][profile]["max"]
         if summary["TOTAL"] > limit:
             raise GuardError(f"{profile} exceeds absolute profile limit {limit}")
         old = baseline.get("outputs", {}).get(profile, {}).get("TOTAL", 0)
