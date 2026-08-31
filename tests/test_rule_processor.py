@@ -20,7 +20,10 @@ def source_result(source_id, role, consensus, rules):
 POLICY = {
     "keyword_denylist": ["api", "log", "stat", "track", "report", "metrics", "analytics"],
     "keyword_allowlist": [{"id": "kw", "value": "appsflyer", "category": "sdk", "note": "x", "evidence": "x"}],
-    "lite_allowlist": [{"id": "sdk", "value": "appsflyer.com", "match": "suffix", "category": "sdk", "note": "x", "evidence": "x"}],
+    "domain_evidence_catalog": [{"id": "sdk", "value": "appsflyer.com", "match": "suffix", "category": "sdk", "note": "x", "evidence": "x", "profiles": ["mac", "mobile", "lite"]}],
+    "profile_limits": {"mac": 20000, "mobile": 10000, "lite": 2000},
+    "random_domain_policy": {"hex_label_min_length": 12, "numeric_label_min_length": 12, "mixed_label_min_length": 18, "mixed_label_min_digit_ratio": 0.5},
+    "admission_label_tokens": ["ads", "pixel", "tracker", "analytics"],
     "mobile_geoip_allowlist": [],
 }
 
@@ -36,8 +39,8 @@ class DomainSafetyTests(unittest.TestCase):
     def test_host_is_never_promoted_to_suffix(self):
         host = Rule("HOST", "metrics.adobe.com")
         profiles, _ = build_profiles([source_result("privacy", "tracking", True, [host])], POLICY)
-        self.assertIn(host, profiles["mac"])
         self.assertNotIn(Rule("HOST-SUFFIX", "adobe.com"), profiles["mac"])
+        self.assertNotIn(host, profiles["mac"])
 
     def test_only_final_suffix_covers_child(self):
         parent = Rule("HOST-SUFFIX", "ads.example.com")
@@ -46,7 +49,7 @@ class DomainSafetyTests(unittest.TestCase):
         self.assertIn(parent, profiles["mac"])
         self.assertNotIn(child, profiles["mac"])
 
-    def test_lite_requires_consensus_or_allowlist(self):
+    def test_lite_allows_exact_label_categories(self):
         single = Rule("HOST", "ads.example.net")
         shared = Rule("HOST", "ads.example.org")
         sdk = Rule("HOST", "api.appsflyer.com")
@@ -54,7 +57,7 @@ class DomainSafetyTests(unittest.TestCase):
             source_result("privacy", "tracking", True, [single, shared, sdk]),
             source_result("adlite", "advertising", True, [shared]),
         ], POLICY)
-        self.assertNotIn(single, profiles["lite"])
+        self.assertIn(single, profiles["lite"])
         self.assertIn(shared, profiles["lite"])
         self.assertIn(sdk, profiles["lite"])
 
@@ -62,7 +65,7 @@ class DomainSafetyTests(unittest.TestCase):
         generic = Rule("HOST-KEYWORD", "somevendor")
         allowed = Rule("HOST-KEYWORD", "appsflyer")
         profiles, _ = build_profiles([source_result("privacy", "tracking", True, [generic, allowed])], POLICY)
-        self.assertIn(generic, profiles["mac"])
+        self.assertNotIn(generic, profiles["mac"])
         self.assertNotIn(generic, profiles["mobile"])
         self.assertIn(allowed, profiles["mobile"])
         self.assertIn(allowed, profiles["lite"])
@@ -70,9 +73,25 @@ class DomainSafetyTests(unittest.TestCase):
     def test_cidr_prefer_no_resolve(self):
         bare = Rule("IP-CIDR", "198.51.100.0/24")
         flagged = Rule("IP-CIDR", "198.51.100.0/24", frozenset({"no-resolve"}))
-        profiles, _ = build_profiles([source_result("privacy", "tracking", True, [bare, flagged])], POLICY)
+        profiles, _ = build_profiles([
+            source_result("privacy", "tracking", True, [bare, flagged]),
+            source_result("adlite", "advertising", True, [flagged]),
+        ], POLICY)
         self.assertNotIn(bare, profiles["mac"])
         self.assertIn(flagged, profiles["mac"])
+    def test_structurally_random_domain_is_excluded(self):
+        random_host = Rule("HOST", "04426f8b7ce9b069431.com")
+        profiles, _ = build_profiles([source_result("privacy", "tracking", True, [random_host])], POLICY)
+        self.assertNotIn(random_host, profiles["mac"])
+        self.assertNotIn(random_host, profiles["lite"])
+
+    def test_dns_passthrough_survives_suffix_reduction(self):
+        host = Rule("HOST", "httpdns.push.oppomobile.com")
+        suffix = Rule("HOST-SUFFIX", "httpdns.push.oppomobile.com")
+        profiles, _ = build_profiles([source_result("BlockDNS", "dns_bypass", False, [host, suffix])], POLICY)
+        for profile in profiles.values():
+            self.assertIn(host, profile)
+            self.assertIn(suffix, profile)
 
 
 if __name__ == "__main__":
