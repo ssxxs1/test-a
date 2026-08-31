@@ -47,3 +47,5 @@ Catalog 条目使用：
 ```
 
 `web` 进入 Clash 与 Universal，`mobile` 进入 Clash 与 Compact，`shared` 进入三档；Compact 还要求 `lite_enabled`。
+
+处理器按确定性层级补充候选：Tier 1 是 BlockDNS 和有证据的 catalog，Tier 2 是受限完整广告/追踪 label 家族，Tier 3 仅在 Clash/Universal 未达到目标时加入已审核 owner 范围及完整证据标签的长尾规则。不会使用 DNS 存活探测、自动 KEYWORD 或 HOST→suffix 扩权。

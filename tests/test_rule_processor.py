@@ -14,11 +14,15 @@ POLICY = {
     "profile_limits": {"clash_full": {"target": 12, "max": 20}, "qx_universal": {"target": 10, "max": 20}, "qx_compact": {"target": 2, "max": 5}},
     "random_domain_policy": {"hex_label_min_length": 12, "numeric_label_min_length": 12, "mixed_label_min_length": 18, "mixed_label_min_digit_ratio": 0.5},
     "web_label_categories": ["ads", "tracker", "analytics", "pixel"],
+    "web_label_patterns": [r"^ad(?:s)?(?:[0-9]+|[-_]?(?:server|service))?$", r"^tracker(?:[-_]?sdk)?$"],
+    "compact_label_patterns": [r"^tracker(?:[-_]?sdk)?$"],
+    "label_pattern_exclusions": ["adobe", "adidas"],
     "mobile_sdk_labels": ["pangle", "appsflyer"],
+    "tier3_policy": {"enabled_profiles": ["clash_full", "qx_universal"], "label_vocabulary": ["ad", "ads"], "owner_platforms": {"example.com": "web"}, "excluded_labels": ["api"]},
     "domain_evidence_catalog": [
-        {"id": "web", "value": "webads.example", "match": "suffix", "platforms": ["web"], "lite_enabled": False},
-        {"id": "mobile", "value": "pangle.io", "match": "suffix", "platforms": ["mobile"], "lite_enabled": True},
-        {"id": "shared", "value": "shared.example", "match": "suffix", "platforms": ["shared"], "lite_enabled": True},
+        {"id": "web", "value": "webads.example", "match": "suffix", "platforms": ["web"], "lite_enabled": False, "provider": "test", "product": "web", "priority": 1},
+        {"id": "mobile", "value": "pangle.io", "match": "suffix", "platforms": ["mobile"], "lite_enabled": True, "provider": "test", "product": "mobile", "priority": 1},
+        {"id": "shared", "value": "shared.example", "match": "suffix", "platforms": ["shared"], "lite_enabled": True, "provider": "test", "product": "shared", "priority": 1},
     ],
 }
 
@@ -49,7 +53,7 @@ class ProductProfileTests(unittest.TestCase):
         self.assertIn(shared, profiles["qx_universal"]); self.assertIn(shared, profiles["qx_compact"])
 
     def test_exact_label_not_substring(self):
-        good = Rule("HOST", "ads.example.com")
+        good = Rule("HOST", "adserver.example.com")
         bad = Rule("HOST", "adidas.example.com")
         profiles, _ = build_profiles([result("privacy", "tracking", [good, bad])], POLICY)
         self.assertIn(good, profiles["qx_universal"])

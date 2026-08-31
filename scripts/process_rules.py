@@ -19,7 +19,7 @@ from rules.pipeline import build_profiles
 from rules.reporting import write_outputs
 from rules.storage import StorageError, load_baseline, publish
 
-PROCESSOR_VERSION = 3
+PROCESSOR_VERSION = 4
 
 
 def repo_root() -> Path:
