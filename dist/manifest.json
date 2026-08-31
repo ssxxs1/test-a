@@ -1,22 +1,20 @@
 {
-  "baseline_exists": false,
-  "built_at": "2026-08-31T06:07:50.953464+00:00",
+  "baseline_exists": true,
+  "built_at": "2026-08-31T09:14:16.688296+00:00",
   "files": {
-    "Clash_Lite.yaml": "8b06804b70cbfef1582fb55f702edbc6e561c95be466116e6beea47cf99606dd",
-    "Clash_Unified.yaml": "f342c6694330bc4d0a1d88ffcc29def0dc06cf165ee9648a4b8a464ac1bdd07f",
-    "Mac_Unified.list": "8f449726db06642327b488a87fa735974185dcbf207c94ad03cfa92f355c6f01",
-    "Mobile_Lite.list": "ad92da6839212f60b1a4b559419c7d921b32286ba2664ae9a119868396ae7f05",
-    "Mobile_Unified.list": "33149e2a8ee8444d9853d291ed417b463f0b72003f3c0345b8cfaa5bcb128002",
-    "Rule_Report.md": "c40200a7d69625b4a00119f57461ff538753e139b551c432e665dfca2b81927e",
-    "rule_baseline.json": "463a1f98922496643d507bf0502bdf04c859c770ef1de657471eb4e2a70e6dff",
-    "rule_decisions.jsonl": "c570c47f2665f26bc4c7734dc1078e031aa107a789fffee2952b580a80f3b418"
+    "Clash_Unified.yaml": "1377418ee5f6753ca8c3d506a32326dcad7e1d66813bc8c1baf13886c19c1997",
+    "QX_Compact.list": "f565702e63ea006d6fd953461ca2cf0f29fb12eb2a2a27dfdfac3867e006d934",
+    "QX_Universal.list": "a4e65e9dd800f7c1ea961bcbb3f47ee43566866f3c250f92f6caab408aeaa6aa",
+    "Rule_Report.md": "07326c870d3dfdc0719e9d4674d7174b0adc27fc281f47690bff0139df727288",
+    "rule_baseline.json": "d962fd2cfdf09072d832fd2c2b3847ba355a3c84bd6af398d8091cdfbe3b2749",
+    "rule_decisions.jsonl": "e0957f6fe77329a1af60acb263fee1678f6b51e50c7c60cfe6f8b7593f11323b"
   },
   "identity": {
     "dependency_identity": "5ebf270993b4ce173f0d0ef429d51cdc732951cc438f697f1428f5e6cb60e6e1",
-    "policy_hash": "3ccb4be26aedf59b285a8b197426b792a8e80e7ccc15a08322cd62ff8a7e2130",
-    "policy_version": 1,
-    "processor_hash": "d227de7bdb092816d585008093e0b15a9ec3d862ae80969ed758d72a06f717bd",
-    "processor_version": 1,
+    "policy_hash": "4bc7fad69d5647960ec038dbd11b29fca27c1e0ec10f58899782645056f2fdf7",
+    "policy_version": 5,
+    "processor_hash": "0c3da70aaf29d7e610b2a7c1605c9abe5774614c109e04cfab4f5d619130801a",
+    "processor_version": 4,
     "source_canonical_hashes": {
       "BlockDNS": "1b8ab6e4d4fa867761d5ebdf793bb21659c2ef3c25c6b46d1f4edb0c31dd7373",
       "adlite": "d32687ce55f318436738dfc4e63f3ef136627cea5a747a25b73fe8fa63e6cd0d",
@@ -27,15 +25,13 @@
       "adlite": "566865dfe8f72c1145567c05d0a72ab8111443f4cddc9a8d636e7cfa756b8e10",
       "privacy": "2791fc2b3c4cf242caaa3e27f0393ea908aa82baa0b54b62c0ed2f4ec2d68198"
     },
-    "sources_hash": "872c7830b4192c69969f8aeb1d9982c8284a81ba6c55b81c8d52a52909f87ac8",
-    "sources_version": 1
+    "sources_hash": "876dd245cd6d92b09a874333725a2da28a6f0b35b3b628571039762903d584f7",
+    "sources_version": 2
   },
   "managed_files": [
-    "Clash_Lite.yaml",
     "Clash_Unified.yaml",
-    "Mac_Unified.list",
-    "Mobile_Lite.list",
-    "Mobile_Unified.list",
+    "QX_Compact.list",
+    "QX_Universal.list",
     "Rule_Report.md",
     "manifest.json",
     "rule_baseline.json",

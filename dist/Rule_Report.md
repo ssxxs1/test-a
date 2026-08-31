@@ -2,9 +2,22 @@
 
 ## Output rules
 
-- `mac`: 77683 rules — HOST=23587, HOST-KEYWORD=195, HOST-SUFFIX=53677, IP-CIDR=220, IP6-CIDR=4
-- `mobile`: 77490 rules — HOST=23587, HOST-KEYWORD=2, HOST-SUFFIX=53677, IP-CIDR=220, IP6-CIDR=4
-- `lite`: 89 rules — HOST=35, HOST-KEYWORD=2, HOST-SUFFIX=24, IP-CIDR=24, IP6-CIDR=4
+- `clash_full`: actual=3972, target=12000, max=20000; reserved DNS=64; eligible=3961
+  - tiers: tier1_eligible=78, tier1_selected=78, tier2_eligible=3852, tier2_selected=3852, tier3_eligible=31, tier3_selected=31
+  - HOST=246, HOST-SUFFIX=3698, IP-CIDR=24, IP6-CIDR=4
+- `qx_universal`: actual=3717, target=10000, max=20000; reserved DNS=64; eligible=3685
+  - tiers: tier1_eligible=27, tier1_selected=27, tier2_eligible=3648, tier2_selected=3648, tier3_eligible=10, tier3_selected=10
+  - HOST=231, HOST-SUFFIX=3458, IP-CIDR=24, IP6-CIDR=4
+- `qx_compact`: actual=1969, target=2000, max=5000; reserved DNS=64; eligible=3361
+  - tiers: tier1_eligible=61, tier1_selected=61, tier2_eligible=3300, tier2_selected=1875
+  - HOST=92, HOST-SUFFIX=1849, IP-CIDR=24, IP6-CIDR=4
+
+## BlockDNS passthrough
+
+- Normalized source rules: 64
+- `clash_full` retained: 64/64
+- `qx_universal` retained: 64/64
+- `qx_compact` retained: 64/64
 
 ## Sources
 
