@@ -32,8 +32,10 @@ def clash_text(name: str, rules: list[Rule]) -> str:
     lines = [f"# NAME: {name}", f"# DOMAIN: {c['HOST']}", f"# DOMAIN-SUFFIX: {c['HOST-SUFFIX']}", f"# DOMAIN-KEYWORD: {c['HOST-KEYWORD']}", f"# IP-CIDR: {c['IP-CIDR'] + c['IP6-CIDR']}", f"# GEOIP: {c['GEOIP']}", f"# UNSUPPORTED-USER-AGENT: {unsupported}", f"# TOTAL: {len(supported)}", "payload:"]
     for rule in supported:
         fields = [CLASH_TYPES[rule.rule_type], rule.value]
-        if "no-resolve" in rule.modifiers:
-            fields.append("no-resolve")
+        # IP 类规则强制注入 no-resolve，防止 Clash 触发不必要的 DNS 反查导致隐私泄漏
+        if rule.rule_type in {"IP-CIDR", "IP6-CIDR"} or "no-resolve" in rule.modifiers:
+            if "no-resolve" not in fields:
+                fields.append("no-resolve")
         lines.append("  - " + ",".join(fields))
     return "\n".join(lines) + "\n"
 
@@ -64,6 +66,7 @@ def write_outputs(directory: Path, profiles: dict[str, list[Rule]], results: lis
     for name, summary in output_counts.items():
         selection = selection_summary[name]
         report.append(f"- `{name}`: actual={summary['TOTAL']}, target={selection['target']}, max={selection['max']}; reserved DNS={selection['reserved']}; eligible={selection['eligible']}")
+        report.append("  - tiers: " + ", ".join(f"{key}={value}" for key, value in sorted(selection.items()) if key.startswith("tier")))
         report.append("  - " + ", ".join(f"{k}={v}" for k, v in sorted(summary.items()) if k != "TOTAL"))
     report.extend(["", "## BlockDNS passthrough", ""])
     report.append(f"- Normalized source rules: {len(dns_rules)}")
