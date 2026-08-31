@@ -287,6 +287,437 @@
       "priority": 800
     },
     {
+      "id": "sdk-google-analytics",
+      "value": "google-analytics.com",
+      "match": "suffix",
+      "category": "analytics_sdk",
+      "note": "Google Analytics 分析服务。",
+      "evidence": "https://analytics.google.com/",
+      "platforms": [
+        "web",
+        "shared"
+      ],
+      "lite_enabled": true,
+      "provider": "google",
+      "product": "google-analytics",
+      "priority": 800
+    },
+    {
+      "id": "sdk-googletagmanager",
+      "value": "googletagmanager.com",
+      "match": "suffix",
+      "category": "analytics_sdk",
+      "note": "Google Tag Manager 代码管理器。",
+      "evidence": "https://tagmanager.google.com/",
+      "platforms": [
+        "web",
+        "shared"
+      ],
+      "lite_enabled": true,
+      "provider": "google",
+      "product": "googletagmanager",
+      "priority": 800
+    },
+    {
+      "id": "sdk-app-measurement",
+      "value": "app-measurement.com",
+      "match": "suffix",
+      "category": "analytics_sdk",
+      "note": "Google Firebase App Measurement 移动分析端点。",
+      "evidence": "https://firebase.google.com/docs/analytics",
+      "platforms": [
+        "mobile",
+        "shared"
+      ],
+      "lite_enabled": true,
+      "provider": "google",
+      "product": "firebase-analytics",
+      "priority": 800
+    },
+    {
+      "id": "sdk-segment-io",
+      "value": "segment.io",
+      "match": "suffix",
+      "category": "analytics_sdk",
+      "note": "Twilio Segment 客户数据平台 (CDP)。",
+      "evidence": "https://segment.com/",
+      "platforms": [
+        "shared"
+      ],
+      "lite_enabled": true,
+      "provider": "segment",
+      "product": "segment",
+      "priority": 800
+    },
+    {
+      "id": "sdk-segment-com",
+      "value": "segment.com",
+      "match": "suffix",
+      "category": "analytics_sdk",
+      "note": "Twilio Segment 客户数据平台 (CDP)。",
+      "evidence": "https://segment.com/",
+      "platforms": [
+        "shared"
+      ],
+      "lite_enabled": true,
+      "provider": "segment",
+      "product": "segment",
+      "priority": 800
+    },
+    {
+      "id": "sdk-mixpanel",
+      "value": "mixpanel.com",
+      "match": "suffix",
+      "category": "analytics_sdk",
+      "note": "Mixpanel 用户行为分析服务。",
+      "evidence": "https://mixpanel.com/",
+      "platforms": [
+        "shared"
+      ],
+      "lite_enabled": true,
+      "provider": "mixpanel",
+      "product": "mixpanel",
+      "priority": 800
+    },
+    {
+      "id": "sdk-amplitude",
+      "value": "amplitude.com",
+      "match": "suffix",
+      "category": "analytics_sdk",
+      "note": "Amplitude 数字产品分析平台。",
+      "evidence": "https://amplitude.com/",
+      "platforms": [
+        "shared"
+      ],
+      "lite_enabled": true,
+      "provider": "amplitude",
+      "product": "amplitude",
+      "priority": 800
+    },
+    {
+      "id": "sdk-kochava",
+      "value": "kochava.com",
+      "match": "suffix",
+      "category": "attribution_sdk",
+      "note": "Kochava 移动归因与分析平台。",
+      "evidence": "https://www.kochava.com/",
+      "platforms": [
+        "mobile",
+        "shared"
+      ],
+      "lite_enabled": true,
+      "provider": "kochava",
+      "product": "kochava",
+      "priority": 800
+    },
+    {
+      "id": "sdk-singular",
+      "value": "singular.net",
+      "match": "suffix",
+      "category": "attribution_sdk",
+      "note": "Singular 移动归因与营销分析平台。",
+      "evidence": "https://www.singular.net/",
+      "platforms": [
+        "mobile",
+        "shared"
+      ],
+      "lite_enabled": true,
+      "provider": "singular",
+      "product": "singular",
+      "priority": 800
+    },
+    {
+      "id": "sdk-criteo-com",
+      "value": "criteo.com",
+      "match": "suffix",
+      "category": "ad_network",
+      "note": "Criteo 商业重定向广告平台。",
+      "evidence": "https://www.criteo.com/",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "criteo",
+      "product": "criteo",
+      "priority": 800
+    },
+    {
+      "id": "sdk-criteo-net",
+      "value": "criteo.net",
+      "match": "suffix",
+      "category": "ad_network",
+      "note": "Criteo 广告分发网络端点。",
+      "evidence": "https://www.criteo.com/",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "criteo",
+      "product": "criteo",
+      "priority": 800
+    },
+    {
+      "id": "sdk-taboola-com",
+      "value": "taboola.com",
+      "match": "suffix",
+      "category": "ad_network",
+      "note": "Taboola 原生推荐广告平台。",
+      "evidence": "https://www.taboola.com/",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "taboola",
+      "product": "taboola",
+      "priority": 800
+    },
+    {
+      "id": "sdk-taboolasyndication",
+      "value": "taboolasyndication.com",
+      "match": "suffix",
+      "category": "ad_network",
+      "note": "Taboola 广告投放与内容分发域名。",
+      "evidence": "https://www.taboola.com/",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "taboola",
+      "product": "taboola",
+      "priority": 800
+    },
+    {
+      "id": "sdk-outbrain",
+      "value": "outbrain.com",
+      "match": "suffix",
+      "category": "ad_network",
+      "note": "Outbrain 网页信息流与原生广告网络。",
+      "evidence": "https://www.outbrain.com/",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "outbrain",
+      "product": "outbrain",
+      "priority": 800
+    },
+    {
+      "id": "sdk-chartboost",
+      "value": "chartboost.com",
+      "match": "suffix",
+      "category": "ad_network",
+      "note": "Chartboost 手机游戏变现与广告平台。",
+      "evidence": "https://www.chartboost.com/",
+      "platforms": [
+        "mobile",
+        "shared"
+      ],
+      "lite_enabled": true,
+      "provider": "chartboost",
+      "product": "chartboost",
+      "priority": 800
+    },
+    {
+      "id": "sdk-tapjoy",
+      "value": "tapjoy.com",
+      "match": "suffix",
+      "category": "ad_network",
+      "note": "Tapjoy 移动激励广告平台。",
+      "evidence": "https://www.tapjoy.com/",
+      "platforms": [
+        "mobile",
+        "shared"
+      ],
+      "lite_enabled": true,
+      "provider": "tapjoy",
+      "product": "tapjoy",
+      "priority": 800
+    },
+    {
+      "id": "sdk-fyber",
+      "value": "fyber.com",
+      "match": "suffix",
+      "category": "ad_network",
+      "note": "Fyber (Digital Turbine) 移动广告聚合平台。",
+      "evidence": "https://www.digitalturbine.com/",
+      "platforms": [
+        "mobile",
+        "shared"
+      ],
+      "lite_enabled": true,
+      "provider": "fyber",
+      "product": "fyber",
+      "priority": 800
+    },
+    {
+      "id": "sdk-smaato",
+      "value": "smaato.net",
+      "match": "suffix",
+      "category": "ad_network",
+      "note": "Smaato 全球全渠道广告技术平台。",
+      "evidence": "https://www.smaato.com/",
+      "platforms": [
+        "shared"
+      ],
+      "lite_enabled": true,
+      "provider": "smaato",
+      "product": "smaato",
+      "priority": 800
+    },
+    {
+      "id": "sdk-pubmatic",
+      "value": "pubmatic.com",
+      "match": "suffix",
+      "category": "ad_network",
+      "note": "PubMatic 数字广告供应链平台。",
+      "evidence": "https://pubmatic.com/",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "pubmatic",
+      "product": "pubmatic",
+      "priority": 800
+    },
+    {
+      "id": "sdk-rubiconproject",
+      "value": "rubiconproject.com",
+      "match": "suffix",
+      "category": "ad_network",
+      "note": "Rubicon Project (Magnite) 全球独立广告交易平台。",
+      "evidence": "https://www.magnite.com/",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "rubicon",
+      "product": "rubicon",
+      "priority": 800
+    },
+    {
+      "id": "sdk-openx",
+      "value": "openx.net",
+      "match": "suffix",
+      "category": "ad_network",
+      "note": "OpenX 广告交易市场服务。",
+      "evidence": "https://www.openx.com/",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "openx",
+      "product": "openx",
+      "priority": 800
+    },
+    {
+      "id": "sdk-amazon-adsystem",
+      "value": "amazon-adsystem.com",
+      "match": "suffix",
+      "category": "ad_network",
+      "note": "Amazon 广告系统端点。",
+      "evidence": "https://advertising.amazon.com/",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "amazon",
+      "product": "amazon-ads",
+      "priority": 800
+    },
+    {
+      "id": "sdk-ms-adnxs",
+      "value": "adnxs.com",
+      "match": "suffix",
+      "category": "ad_network",
+      "note": "Microsoft Xandr (AppNexus / adnxs) 广告平台。",
+      "evidence": "https://about.ads.microsoft.com/",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "microsoft",
+      "product": "xandr-adnxs",
+      "priority": 800
+    },
+    {
+      "id": "sdk-msads",
+      "value": "msads.net",
+      "match": "suffix",
+      "category": "ad_network",
+      "note": "Microsoft 广告分发网络。",
+      "evidence": "https://about.ads.microsoft.com/",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "microsoft",
+      "product": "msads",
+      "priority": 800
+    },
+    {
+      "id": "sdk-bingads",
+      "value": "bingads.com",
+      "match": "suffix",
+      "category": "ad_network",
+      "note": "Microsoft Bing 广告服务。",
+      "evidence": "https://about.ads.microsoft.com/",
+      "platforms": [
+        "web"
+      ],
+      "lite_enabled": false,
+      "provider": "microsoft",
+      "product": "bingads",
+      "priority": 800
+    },
+    {
+      "id": "sdk-apple-iad",
+      "value": "iad-apple.com",
+      "match": "suffix",
+      "category": "ad_network",
+      "note": "Apple iAd 广告端点。",
+      "evidence": "https://searchads.apple.com/",
+      "platforms": [
+        "mobile",
+        "shared"
+      ],
+      "lite_enabled": true,
+      "provider": "apple",
+      "product": "iad",
+      "priority": 800
+    },
+    {
+      "id": "endpoint-apple-iadsdk",
+      "value": "iadsdk.apple.com",
+      "match": "exact",
+      "category": "ad_network",
+      "note": "Apple iAd SDK 服务接口。",
+      "evidence": "https://searchads.apple.com/",
+      "platforms": [
+        "mobile",
+        "shared"
+      ],
+      "lite_enabled": true,
+      "provider": "apple",
+      "product": "iad",
+      "priority": 800
+    },
+    {
+      "id": "endpoint-apple-adservices",
+      "value": "api-adservices.apple.com",
+      "match": "exact",
+      "category": "ad_network",
+      "note": "Apple Search Ads 归因接口。",
+      "evidence": "https://developer.apple.com/documentation/adservices",
+      "platforms": [
+        "mobile",
+        "shared"
+      ],
+      "lite_enabled": true,
+      "provider": "apple",
+      "product": "search-ads",
+      "priority": 800
+    },
+    {
       "id": "sdk-umeng",
       "value": "umeng.com",
       "match": "suffix",
@@ -1033,7 +1464,15 @@
     "telemetry",
     "pixel",
     "beacon",
-    "attribution"
+    "attribution",
+    "criteo",
+    "taboola",
+    "outbrain",
+    "pubmatic",
+    "rubicon",
+    "openx",
+    "adnxs",
+    "msads"
   ],
   "mobile_sdk_labels": [
     "pangle",
@@ -1050,7 +1489,16 @@
     "zhugeio",
     "jpush",
     "getui",
-    "igexin"
+    "igexin",
+    "kochava",
+    "singular",
+    "mixpanel",
+    "amplitude",
+    "segment",
+    "chartboost",
+    "tapjoy",
+    "smaato",
+    "fyber"
   ],
   "web_label_patterns": [
     "^ad(?:s|x)?(?:[0-9]+|[-_]?(?:server|service|serving|network|exchange|tech|manager|system|form|mob|sdk|unit|slot|delivery|click|proxy|track|log|stat|img|api))?$",
