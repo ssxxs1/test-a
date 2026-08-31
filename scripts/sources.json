@@ -1,0 +1,35 @@
+{
+  "sources_version": 1,
+  "sources": [
+    {
+      "id": "privacy",
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Privacy/Privacy.list",
+      "role": "tracking",
+      "tier": "trusted",
+      "participates_in_consensus": true,
+      "allowed_hosts": ["raw.githubusercontent.com"],
+      "max_bytes": 12000000,
+      "max_rules": 100000
+    },
+    {
+      "id": "adlite",
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/AdvertisingLite/AdvertisingLite.list",
+      "role": "advertising",
+      "tier": "trusted",
+      "participates_in_consensus": true,
+      "allowed_hosts": ["raw.githubusercontent.com"],
+      "max_bytes": 12000000,
+      "max_rules": 100000
+    },
+    {
+      "id": "BlockDNS",
+      "url": "https://github.com/VirgilClyne/GetSomeFries/raw/main/ruleset/HTTPDNS.Block.list",
+      "role": "dns_bypass",
+      "tier": "passthrough",
+      "participates_in_consensus": false,
+      "allowed_hosts": ["github.com", "raw.githubusercontent.com"],
+      "max_bytes": 1000000,
+      "max_rules": 10000
+    }
+  ]
+}
