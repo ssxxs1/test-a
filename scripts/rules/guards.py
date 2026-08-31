@@ -8,8 +8,10 @@ class GuardError(RuntimeError):
 
 
 def verify_baseline(current: dict[str, Any], baseline: dict[str, Any] | None, policy: dict[str, Any], allow_anomaly: bool, initialize: bool) -> list[str]:
-    if initialize or baseline is None:
+    if initialize:
         return []
+    if baseline is None:
+        raise GuardError("No approved baseline exists; run a reviewed initialize_baseline workflow first")
     prior_identity = baseline.get("identity", {})
     current_identity = current.get("identity", {})
     version_pairs = (("policy_version", "policy_version"), ("sources_version", "sources_version"), ("processor_version", "processor_version"))
