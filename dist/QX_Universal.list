@@ -1,11 +1,11 @@
 # NAME: QX_Universal
-# HOST: 231
-# HOST-SUFFIX: 3458
+# HOST: 234
+# HOST-SUFFIX: 3481
 # HOST-KEYWORD: 0
 # IP-CIDR: 28
 # GEOIP: 0
 # USER-AGENT: 0
-# TOTAL: 3717
+# TOTAL: 3743
 HOST,ad-server.co.za,Advertising
 HOST,ad.10010.com,Advertising
 HOST,ad.1ting.com,Advertising
@@ -51,6 +51,7 @@ HOST,adclick.pk,Advertising
 HOST,adclick.tencentmusic.com,Advertising
 HOST,adexchange.io,Advertising
 HOST,adlog.vivo.com.cn,Advertising
+HOST,adnxs.net,Advertising
 HOST,ads-sdk.upltv.com,Advertising
 HOST,ads.95516.com,Advertising
 HOST,ads.adiquity.com,Advertising
@@ -162,6 +163,7 @@ HOST,banner.titanpoker.com,Advertising
 HOST,beacon.kmi-us.com,Advertising
 HOST,bonzai.ad,Advertising
 HOST,buythis.ad,Advertising
+HOST,cdn.taboola.com.cn,Advertising
 HOST,chameleon.ad,Advertising
 HOST,content.ad,Advertising
 HOST,dns.jd.com,Advertising
@@ -215,6 +217,7 @@ HOST,pixel.xmladfeed.com,Advertising
 HOST,resolvers-cn.httpdns.aliyuncs.com,Advertising
 HOST,spider.ad,Advertising
 HOST,sponsored.com,Advertising
+HOST,taboolasyndication.com,Advertising
 HOST,tracker.stats.in.th,Advertising
 HOST,tracker.tgbus.com,Advertising
 HOST,tracking.adweb.co.kr,Advertising
@@ -485,6 +488,7 @@ HOST-SUFFIX,adimg.vue.weibo.com,Advertising
 HOST-SUFFIX,adlog.com.com,Advertising
 HOST-SUFFIX,admob.com,Advertising
 HOST-SUFFIX,admob.xiaomi.com,Advertising
+HOST-SUFFIX,adnxs.com,Advertising
 HOST-SUFFIX,ads.979799777.com,Advertising
 HOST-SUFFIX,ads.aplus.pptv.com,Advertising
 HOST-SUFFIX,ads.aplusapi.pptv.com,Advertising
@@ -1234,6 +1238,7 @@ HOST-SUFFIX,analytics.zevvle.com,Advertising
 HOST-SUFFIX,analytics.zg-api.com,Advertising
 HOST-SUFFIX,analytics.ziftsolutions.com,Advertising
 HOST-SUFFIX,analyticsapi.qogita.com,Advertising
+HOST-SUFFIX,app-measurement.com,Advertising
 HOST-SUFFIX,banner.101xp.com,Advertising
 HOST-SUFFIX,banner.3ddownloads.com,Advertising
 HOST-SUFFIX,banner.automotiveworld.com,Advertising
@@ -1292,22 +1297,31 @@ HOST-SUFFIX,beacon.wikia-services.com,Advertising
 HOST-SUFFIX,beacon.www.theguardian.com,Advertising
 HOST-SUFFIX,cdn.adapi.fotoable.com,Advertising
 HOST-SUFFIX,cdn.ads.jlscds.com,Advertising
+HOST-SUFFIX,cdn.taboolasyndication.com,Advertising
+HOST-SUFFIX,chartboost.com,Advertising
 HOST-SUFFIX,cm.ad.bilibili.com,Advertising
 HOST-SUFFIX,cm.ad.gifshow.com,Advertising
 HOST-SUFFIX,cpro.baidu.com,Advertising
 HOST-SUFFIX,cpro.tieba.baidu.com,Advertising
 HOST-SUFFIX,cpro.zhidao.baidu.com,Advertising
+HOST-SUFFIX,criteo.com,Advertising
+HOST-SUFFIX,criteo.gap.ae,Advertising
+HOST-SUFFIX,criteo.net,Advertising
 HOST-SUFFIX,cs.analytics.lego.com,Advertising
 HOST-SUFFIX,doubleclick.net,Advertising
 HOST-SUFFIX,duclick.baidu.com,Advertising
 HOST-SUFFIX,eclick.baidu.com,Advertising
 HOST-SUFFIX,g.ad8.cc,Advertising
+HOST-SUFFIX,google-analytics.com,Advertising
 HOST-SUFFIX,googlesyndication.com,Advertising
+HOST-SUFFIX,googletagmanager.com,Advertising
 HOST-SUFFIX,httpdns.pro,Advertising
 HOST-SUFFIX,huid.ad.360.cn,Advertising
+HOST-SUFFIX,ib.adnxs.co,Advertising
 HOST-SUFFIX,inmobi.com,Advertising
 HOST-SUFFIX,ironsrc.com,Advertising
 HOST-SUFFIX,kinesis.us-east-1.analytics.edmentum.com,Advertising
+HOST-SUFFIX,kochava.com,Advertising
 HOST-SUFFIX,m1.ad.10010.com,Advertising
 HOST-SUFFIX,metric.1035thearrow.com,Advertising
 HOST-SUFFIX,metric.4imprint.com,Advertising
@@ -2780,9 +2794,12 @@ HOST-SUFFIX,metrics.yola.com,Advertising
 HOST-SUFFIX,metrics.youandyourwedding.co.uk,Advertising
 HOST-SUFFIX,metrics.yourlexusdealer.com,Advertising
 HOST-SUFFIX,metrics.zacks.com,Advertising
+HOST-SUFFIX,mixpanel.com,Advertising
+HOST-SUFFIX,msads.net,Advertising
 HOST-SUFFIX,mtj.baidu.com,Advertising
 HOST-SUFFIX,nsclick.baidu.com,Advertising
 HOST-SUFFIX,oca.telemetry.microsoft.com.nsatc.net,Advertising
+HOST-SUFFIX,outbrain.com,Advertising
 HOST-SUFFIX,pixel.1und1.de,Advertising
 HOST-SUFFIX,pixel.4players.de,Advertising
 HOST-SUFFIX,pixel.ampry.com,Advertising
@@ -2861,13 +2878,19 @@ HOST-SUFFIX,pixel.yola.com,Advertising
 HOST-SUFFIX,pixel.zumby.io,Advertising
 HOST-SUFFIX,prod.tracking.refinitiv.com,Advertising
 HOST-SUFFIX,publish.ad.youth.cn,Advertising
+HOST-SUFFIX,pubmatic.com,Advertising
+HOST-SUFFIX,qldmga.criteo.work,Advertising
+HOST-SUFFIX,rubiconproject.com,Advertising
 HOST-SUFFIX,s.metrics.artistsnetwork.com,Advertising
 HOST-SUFFIX,s.metrics.skyandtelescope.com,Advertising
 HOST-SUFFIX,search.anonymous.ads.brave.com,Advertising
 HOST-SUFFIX,secure.analytics.crowneplaza.com,Advertising
 HOST-SUFFIX,secure.analytics.intercontinental.com,Advertising
+HOST-SUFFIX,segment.com,Advertising
+HOST-SUFFIX,segment.io,Advertising
 HOST-SUFFIX,service.ad.adesk.com,Advertising
 HOST-SUFFIX,simetra.tracking.ringieraxelspringer.tech,Advertising
+HOST-SUFFIX,smaato.net,Advertising
 HOST-SUFFIX,smetric.ads.microsoft.com,Advertising
 HOST-SUFFIX,sqm.telemetry.microsoft.com.nsatc.net,Advertising
 HOST-SUFFIX,stat.alibaba.com,Advertising
@@ -2876,6 +2899,8 @@ HOST-SUFFIX,stat.v.baidu.com,Advertising
 HOST-SUFFIX,stat.youku.com,Advertising
 HOST-SUFFIX,statis.mobile.youku.com,Advertising
 HOST-SUFFIX,t.adx.opera.com,Advertising
+HOST-SUFFIX,taboola.com,Advertising
+HOST-SUFFIX,tapjoy.com,Advertising
 HOST-SUFFIX,telecommand.telemetry.microsoft.com.nsatc.net,Advertising
 HOST-SUFFIX,telemetry.adobe.io,Advertising
 HOST-SUFFIX,telemetry.algolia.com,Advertising
@@ -3687,6 +3712,7 @@ HOST-SUFFIX,tracking.zakelijk.cz.nl,Advertising
 HOST-SUFFIX,tracking.zierlicheladies.de,Advertising
 HOST-SUFFIX,trackingapi.cloudapp.net,Advertising
 HOST-SUFFIX,tw.adx.nextmedia.com,Advertising
+HOST-SUFFIX,urc.taboolasyndication.com,Advertising
 HOST-SUFFIX,vungle.com,Advertising
 HOST-SUFFIX,watson.telemetry.microsoft.com.nsatc.net,Advertising
 HOST-SUFFIX,web.analytics.metrobyt-mobile.com,Advertising

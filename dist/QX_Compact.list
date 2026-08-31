@@ -1,11 +1,11 @@
 # NAME: QX_Compact
 # HOST: 92
-# HOST-SUFFIX: 1849
+# HOST-SUFFIX: 1841
 # HOST-KEYWORD: 0
 # IP-CIDR: 28
 # GEOIP: 0
 # USER-AGENT: 0
-# TOTAL: 1969
+# TOTAL: 1961
 HOST,aedns.weixin.qq.com,Advertising
 HOST,alimama.com,Advertising
 HOST,analytic.rocks,Advertising
@@ -112,6 +112,7 @@ HOST-SUFFIX,afpeng.alimama.com,Advertising
 HOST-SUFFIX,afpssp.alimama.com,Advertising
 HOST-SUFFIX,afptrack.alimama.com,Advertising
 HOST-SUFFIX,amazon-email.branch.rocks,Advertising
+HOST-SUFFIX,amplitude.chess.com,Advertising
 HOST-SUFFIX,analytic.alabama.aaa.com,Advertising
 HOST-SUFFIX,analytic.americanfunds.com,Advertising
 HOST-SUFFIX,analytic.buoyweather.com,Advertising
@@ -762,6 +763,7 @@ HOST-SUFFIX,analytics.ziftsolutions.com,Advertising
 HOST-SUFFIX,analyticsapi.qogita.com,Advertising
 HOST-SUFFIX,api.talkingdata.com,Advertising
 HOST-SUFFIX,apm-track.xiaohongshu.com,Advertising
+HOST-SUFFIX,app-measurement.com,Advertising
 HOST-SUFFIX,avasgtest.branch.rocks,Advertising
 HOST-SUFFIX,banner.alimama.com,Advertising
 HOST-SUFFIX,bdtestsendpulse.branch.rocks,Advertising
@@ -893,6 +895,7 @@ HOST-SUFFIX,branch.wellsitenavigator.com,Advertising
 HOST-SUFFIX,branch.whatsnxt.app,Advertising
 HOST-SUFFIX,branch.xoxloveheart.com,Advertising
 HOST-SUFFIX,c.alimama.com,Advertising
+HOST-SUFFIX,chartboost.com,Advertising
 HOST-SUFFIX,clevertapsendgrid.branch.rocks,Advertising
 HOST-SUFFIX,click1.email-postup.branch.rocks,Advertising
 HOST-SUFFIX,cm.adcommon.bilibili.com,Advertising
@@ -948,6 +951,8 @@ HOST-SUFFIX,galileotelemetry.tencent.com,Advertising
 HOST-SUFFIX,gdt.qq.com,Advertising
 HOST-SUFFIX,getui.com,Advertising
 HOST-SUFFIX,getui.net,Advertising
+HOST-SUFFIX,google-analytics.com,Advertising
+HOST-SUFFIX,googletagmanager.com,Advertising
 HOST-SUFFIX,growingio.com,Advertising
 HOST-SUFFIX,h5.analytics.126.net,Advertising
 HOST-SUFFIX,hanadev.branch.rocks,Advertising
@@ -973,6 +978,7 @@ HOST-SUFFIX,jic.talkingdata.com,Advertising
 HOST-SUFFIX,jpush.cn,Advertising
 HOST-SUFFIX,jpush.html5.qq.com,Advertising
 HOST-SUFFIX,kinesis.us-east-1.analytics.edmentum.com,Advertising
+HOST-SUFFIX,kochava.com,Advertising
 HOST-SUFFIX,links.silverpop-email.branch.rocks,Advertising
 HOST-SUFFIX,links.sparkmail.branch.rocks,Advertising
 HOST-SUFFIX,log.snssdk.com,Advertising
@@ -1905,25 +1911,7 @@ HOST-SUFFIX,metrics.nfl.com,Advertising
 HOST-SUFFIX,metrics.nflextrapoints.com,Advertising
 HOST-SUFFIX,metrics.nfluk.com,Advertising
 HOST-SUFFIX,metrics.nfm.com,Advertising
-HOST-SUFFIX,metrics.nfpa.org,Advertising
-HOST-SUFFIX,metrics.nhm.ac.uk,Advertising
-HOST-SUFFIX,metrics.nhmshop.co.uk,Advertising
-HOST-SUFFIX,metrics.nielsen.com,Advertising
-HOST-SUFFIX,metrics.nike.net,Advertising
-HOST-SUFFIX,metrics.nintendo.com,Advertising
-HOST-SUFFIX,metrics.nissan.co.uk,Advertising
-HOST-SUFFIX,metrics.nissan.ee,Advertising
-HOST-SUFFIX,metrics.nissan.es,Advertising
-HOST-SUFFIX,metrics.nissan.lt,Advertising
-HOST-SUFFIX,metrics.nissan.lv,Advertising
-HOST-SUFFIX,metrics.nissan.no,Advertising
-HOST-SUFFIX,metrics.nissanusa.com,Advertising
-HOST-SUFFIX,metrics.nmfn.com,Advertising
-HOST-SUFFIX,metrics.nn.nl,Advertising
-HOST-SUFFIX,metrics.noloan.com,Advertising
-HOST-SUFFIX,metrics.northeast.aaa.com,Advertising
-HOST-SUFFIX,metrics.northernnewengland.aaa.com,Advertising
-HOST-SUFFIX,metrics.northwesternmutual.com,Advertising
+HOST-SUFFIX,mixpanel.com,Advertising
 HOST-SUFFIX,mmstat.com,Advertising
 HOST-SUFFIX,mobads-logs.baidu.com,Advertising
 HOST-SUFFIX,mtj.baidu.com,Advertising
@@ -1931,13 +1919,17 @@ HOST-SUFFIX,mtrace.qq.com,Advertising
 HOST-SUFFIX,p.alimama.com,Advertising
 HOST-SUFFIX,pangle.io,Advertising
 HOST-SUFFIX,report.meituan.com,Advertising
+HOST-SUFFIX,segment.com,Advertising
+HOST-SUFFIX,segment.io,Advertising
 HOST-SUFFIX,simba.m.taobao.com,Advertising
+HOST-SUFFIX,smaato.net,Advertising
 HOST-SUFFIX,stat.y.qq.com,Advertising
 HOST-SUFFIX,static.alimama.com,Advertising
 HOST-SUFFIX,t-ads.xiaohongshu.com,Advertising
 HOST-SUFFIX,t.alimama.com,Advertising
 HOST-SUFFIX,talkingdata.net,Advertising
 HOST-SUFFIX,tanx.com,Advertising
+HOST-SUFFIX,tapjoy.com,Advertising
 HOST-SUFFIX,tongji.baidu.com,Advertising
 HOST-SUFFIX,trace.qq.com,Advertising
 HOST-SUFFIX,track.toutiao.com,Advertising

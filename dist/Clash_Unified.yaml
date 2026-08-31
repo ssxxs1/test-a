@@ -1,11 +1,11 @@
 # NAME: Clash_Unified
-# DOMAIN: 246
-# DOMAIN-SUFFIX: 3698
+# DOMAIN: 249
+# DOMAIN-SUFFIX: 3725
 # DOMAIN-KEYWORD: 0
 # IP-CIDR: 28
 # GEOIP: 0
 # UNSUPPORTED-USER-AGENT: 0
-# TOTAL: 3972
+# TOTAL: 4002
 payload:
   - DOMAIN,ad-server.co.za
   - DOMAIN,ad.10010.com
@@ -52,6 +52,7 @@ payload:
   - DOMAIN,adclick.tencentmusic.com
   - DOMAIN,adexchange.io
   - DOMAIN,adlog.vivo.com.cn
+  - DOMAIN,adnxs.net
   - DOMAIN,ads-sdk.upltv.com
   - DOMAIN,ads.95516.com
   - DOMAIN,ads.adiquity.com
@@ -165,6 +166,7 @@ payload:
   - DOMAIN,bonzai.ad
   - DOMAIN,buythis.ad
   - DOMAIN,c.ssp.qq.com
+  - DOMAIN,cdn.taboola.com.cn
   - DOMAIN,chameleon.ad
   - DOMAIN,content.ad
   - DOMAIN,dns.jd.com
@@ -226,6 +228,7 @@ payload:
   - DOMAIN,resolvers-cn.httpdns.aliyuncs.com
   - DOMAIN,spider.ad
   - DOMAIN,sponsored.com
+  - DOMAIN,taboolasyndication.com
   - DOMAIN,tracker.ai.xiaomi.com
   - DOMAIN,tracker.stats.in.th
   - DOMAIN,tracker.tgbus.com
@@ -508,6 +511,7 @@ payload:
   - DOMAIN-SUFFIX,adlog.com.com
   - DOMAIN-SUFFIX,admob.com
   - DOMAIN-SUFFIX,admob.xiaomi.com
+  - DOMAIN-SUFFIX,adnxs.com
   - DOMAIN-SUFFIX,ads.979799777.com
   - DOMAIN-SUFFIX,ads.aplus.pptv.com
   - DOMAIN-SUFFIX,ads.aplusapi.pptv.com
@@ -613,6 +617,7 @@ payload:
   - DOMAIN-SUFFIX,afpssp.alimama.com
   - DOMAIN-SUFFIX,afptrack.alimama.com
   - DOMAIN-SUFFIX,amazon-email.branch.rocks
+  - DOMAIN-SUFFIX,amplitude.chess.com
   - DOMAIN-SUFFIX,analytic.alabama.aaa.com
   - DOMAIN-SUFFIX,analytic.americanfunds.com
   - DOMAIN-SUFFIX,analytic.buoyweather.com
@@ -1265,6 +1270,7 @@ payload:
   - DOMAIN-SUFFIX,analyticsapi.qogita.com
   - DOMAIN-SUFFIX,api.talkingdata.com
   - DOMAIN-SUFFIX,apm-track.xiaohongshu.com
+  - DOMAIN-SUFFIX,app-measurement.com
   - DOMAIN-SUFFIX,avasgtest.branch.rocks
   - DOMAIN-SUFFIX,banner.101xp.com
   - DOMAIN-SUFFIX,banner.3ddownloads.com
@@ -1405,6 +1411,8 @@ payload:
   - DOMAIN-SUFFIX,c.alimama.com
   - DOMAIN-SUFFIX,cdn.adapi.fotoable.com
   - DOMAIN-SUFFIX,cdn.ads.jlscds.com
+  - DOMAIN-SUFFIX,cdn.taboolasyndication.com
+  - DOMAIN-SUFFIX,chartboost.com
   - DOMAIN-SUFFIX,clevertapsendgrid.branch.rocks
   - DOMAIN-SUFFIX,click.tz.simba.taobao.com
   - DOMAIN-SUFFIX,click1.email-postup.branch.rocks
@@ -1418,6 +1426,9 @@ payload:
   - DOMAIN-SUFFIX,cpro.baidu.com
   - DOMAIN-SUFFIX,cpro.tieba.baidu.com
   - DOMAIN-SUFFIX,cpro.zhidao.baidu.com
+  - DOMAIN-SUFFIX,criteo.com
+  - DOMAIN-SUFFIX,criteo.gap.ae
+  - DOMAIN-SUFFIX,criteo.net
   - DOMAIN-SUFFIX,cs.analytics.lego.com
   - DOMAIN-SUFFIX,cttest.branch.rocks
   - DOMAIN-SUFFIX,delivery.email-pepipost.branch.rocks
@@ -1473,7 +1484,9 @@ payload:
   - DOMAIN-SUFFIX,gdt.qq.com
   - DOMAIN-SUFFIX,getui.com
   - DOMAIN-SUFFIX,getui.net
+  - DOMAIN-SUFFIX,google-analytics.com
   - DOMAIN-SUFFIX,googlesyndication.com
+  - DOMAIN-SUFFIX,googletagmanager.com
   - DOMAIN-SUFFIX,growingio.com
   - DOMAIN-SUFFIX,h5.analytics.126.net
   - DOMAIN-SUFFIX,hanadev.branch.rocks
@@ -1492,6 +1505,7 @@ payload:
   - DOMAIN-SUFFIX,httpdns.pro
   - DOMAIN-SUFFIX,hubert.branch.rocks
   - DOMAIN-SUFFIX,huid.ad.360.cn
+  - DOMAIN-SUFFIX,ib.adnxs.co
   - DOMAIN-SUFFIX,igexin.com
   - DOMAIN-SUFFIX,igorsgtest.branch.rocks
   - DOMAIN-SUFFIX,inmobi.com
@@ -1500,6 +1514,7 @@ payload:
   - DOMAIN-SUFFIX,jpush.cn
   - DOMAIN-SUFFIX,jpush.html5.qq.com
   - DOMAIN-SUFFIX,kinesis.us-east-1.analytics.edmentum.com
+  - DOMAIN-SUFFIX,kochava.com
   - DOMAIN-SUFFIX,links.silverpop-email.branch.rocks
   - DOMAIN-SUFFIX,links.sparkmail.branch.rocks
   - DOMAIN-SUFFIX,log.snssdk.com
@@ -2978,10 +2993,12 @@ payload:
   - DOMAIN-SUFFIX,metrics.youandyourwedding.co.uk
   - DOMAIN-SUFFIX,metrics.yourlexusdealer.com
   - DOMAIN-SUFFIX,metrics.zacks.com
+  - DOMAIN-SUFFIX,mixpanel.com
   - DOMAIN-SUFFIX,mmstat.com
   - DOMAIN-SUFFIX,mobads-logs.baidu.com
   - DOMAIN-SUFFIX,mobads.baidu.cn
   - DOMAIN-SUFFIX,monster.branch.rocks
+  - DOMAIN-SUFFIX,msads.net
   - DOMAIN-SUFFIX,mta.qq.com
   - DOMAIN-SUFFIX,mtj.baidu.cn
   - DOMAIN-SUFFIX,mtj.baidu.com
@@ -2991,6 +3008,7 @@ payload:
   - DOMAIN-SUFFIX,news.ssp.qq.com
   - DOMAIN-SUFFIX,nsclick.baidu.com
   - DOMAIN-SUFFIX,oca.telemetry.microsoft.com.nsatc.net
+  - DOMAIN-SUFFIX,outbrain.com
   - DOMAIN-SUFFIX,p.alimama.com
   - DOMAIN-SUFFIX,pangle.io
   - DOMAIN-SUFFIX,pixel.1und1.de
@@ -3072,17 +3090,23 @@ payload:
   - DOMAIN-SUFFIX,prod.tracking.refinitiv.com
   - DOMAIN-SUFFIX,psmastersendgrid.branch.rocks
   - DOMAIN-SUFFIX,publish.ad.youth.cn
+  - DOMAIN-SUFFIX,pubmatic.com
   - DOMAIN-SUFFIX,qa-prod.branch.rocks
+  - DOMAIN-SUFFIX,qldmga.criteo.work
   - DOMAIN-SUFFIX,redirect.simba.taobao.com
   - DOMAIN-SUFFIX,report.huatuo.qq.com
   - DOMAIN-SUFFIX,report.meituan.com
   - DOMAIN-SUFFIX,report.qq.com
   - DOMAIN-SUFFIX,report.vip.qq.com
+  - DOMAIN-SUFFIX,rubiconproject.com
   - DOMAIN-SUFFIX,s.metrics.artistsnetwork.com
   - DOMAIN-SUFFIX,s.metrics.skyandtelescope.com
   - DOMAIN-SUFFIX,search.anonymous.ads.brave.com
   - DOMAIN-SUFFIX,secure.analytics.crowneplaza.com
   - DOMAIN-SUFFIX,secure.analytics.intercontinental.com
+  - DOMAIN-SUFFIX,segment.com
+  - DOMAIN-SUFFIX,segment.io
+  - DOMAIN-SUFFIX,segment.lalr.co
   - DOMAIN-SUFFIX,sendpulsenewtest.branch.rocks
   - DOMAIN-SUFFIX,sendpulsetest.branch.rocks
   - DOMAIN-SUFFIX,sensorsdata.ruguoapp.com
@@ -3093,6 +3117,8 @@ payload:
   - DOMAIN-SUFFIX,simba.m.taobao.com
   - DOMAIN-SUFFIX,simetra.tracking.ringieraxelspringer.tech
   - DOMAIN-SUFFIX,sis.jpush.io
+  - DOMAIN-SUFFIX,smaato.com
+  - DOMAIN-SUFFIX,smaato.net
   - DOMAIN-SUFFIX,smetric.ads.microsoft.com
   - DOMAIN-SUFFIX,sms-vbs.branch.rocks
   - DOMAIN-SUFFIX,socialflow.branch.rocks
@@ -3110,9 +3136,12 @@ payload:
   - DOMAIN-SUFFIX,t.adx.opera.com
   - DOMAIN-SUFFIX,t.alimama.com
   - DOMAIN-SUFFIX,t.appsflyer.com
+  - DOMAIN-SUFFIX,taboola.com
   - DOMAIN-SUFFIX,talkingdata.com
   - DOMAIN-SUFFIX,talkingdata.net
   - DOMAIN-SUFFIX,tanx.com
+  - DOMAIN-SUFFIX,tapjoy.cn
+  - DOMAIN-SUFFIX,tapjoy.com
   - DOMAIN-SUFFIX,telecommand.telemetry.microsoft.com.nsatc.net
   - DOMAIN-SUFFIX,telemetry.adobe.io
   - DOMAIN-SUFFIX,telemetry.algolia.com
@@ -3930,6 +3959,7 @@ payload:
   - DOMAIN-SUFFIX,trackingapi.cloudapp.net
   - DOMAIN-SUFFIX,tw.adx.nextmedia.com
   - DOMAIN-SUFFIX,unityads.unity3d.com
+  - DOMAIN-SUFFIX,urc.taboolasyndication.com
   - DOMAIN-SUFFIX,url6013.qa-app11-sendgrid.branch.rocks
   - DOMAIN-SUFFIX,url6035.clay-sendgrid-test.branch.rocks
   - DOMAIN-SUFFIX,url6143.branch.rocks
