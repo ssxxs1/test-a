@@ -124,11 +124,16 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add dist/
           git diff --staged --quiet || (git commit -m "Production rules update $(date -u +%F)" && git push origin main)
+      - name: Set version
+        id: ver
+        run: echo "tag=v1.1.1.$(date -u +%y%m%d%H%M)" >> "$GITHUB_OUTPUT"
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: rules-${{ github.run_id }}
-          name: Rules ${{ github.run_id }}
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: ${{ steps.ver.outputs.tag }}
+          draft: false
+          prerelease: false
           files: |
             dist/Clash_Unified.yaml
             dist/QX_Universal.list
