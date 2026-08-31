@@ -1,0 +1,44 @@
+{
+  "baseline_exists": false,
+  "built_at": "2026-08-31T06:07:50.953464+00:00",
+  "files": {
+    "Clash_Lite.yaml": "8b06804b70cbfef1582fb55f702edbc6e561c95be466116e6beea47cf99606dd",
+    "Clash_Unified.yaml": "f342c6694330bc4d0a1d88ffcc29def0dc06cf165ee9648a4b8a464ac1bdd07f",
+    "Mac_Unified.list": "8f449726db06642327b488a87fa735974185dcbf207c94ad03cfa92f355c6f01",
+    "Mobile_Lite.list": "ad92da6839212f60b1a4b559419c7d921b32286ba2664ae9a119868396ae7f05",
+    "Mobile_Unified.list": "33149e2a8ee8444d9853d291ed417b463f0b72003f3c0345b8cfaa5bcb128002",
+    "Rule_Report.md": "c40200a7d69625b4a00119f57461ff538753e139b551c432e665dfca2b81927e",
+    "rule_baseline.json": "463a1f98922496643d507bf0502bdf04c859c770ef1de657471eb4e2a70e6dff",
+    "rule_decisions.jsonl": "c570c47f2665f26bc4c7734dc1078e031aa107a789fffee2952b580a80f3b418"
+  },
+  "identity": {
+    "dependency_identity": "5ebf270993b4ce173f0d0ef429d51cdc732951cc438f697f1428f5e6cb60e6e1",
+    "policy_hash": "3ccb4be26aedf59b285a8b197426b792a8e80e7ccc15a08322cd62ff8a7e2130",
+    "policy_version": 1,
+    "processor_hash": "d227de7bdb092816d585008093e0b15a9ec3d862ae80969ed758d72a06f717bd",
+    "processor_version": 1,
+    "source_canonical_hashes": {
+      "BlockDNS": "1b8ab6e4d4fa867761d5ebdf793bb21659c2ef3c25c6b46d1f4edb0c31dd7373",
+      "adlite": "d32687ce55f318436738dfc4e63f3ef136627cea5a747a25b73fe8fa63e6cd0d",
+      "privacy": "c240a05d77c37fe25a2d6b74a13ce3f2e90cebaca625ce0e514303b052640967"
+    },
+    "source_raw_hashes": {
+      "BlockDNS": "1f22f942384e2f71ead423d3fbd02703734c17f93762975d74556ebcade89b86",
+      "adlite": "566865dfe8f72c1145567c05d0a72ab8111443f4cddc9a8d636e7cfa756b8e10",
+      "privacy": "2791fc2b3c4cf242caaa3e27f0393ea908aa82baa0b54b62c0ed2f4ec2d68198"
+    },
+    "sources_hash": "872c7830b4192c69969f8aeb1d9982c8284a81ba6c55b81c8d52a52909f87ac8",
+    "sources_version": 1
+  },
+  "managed_files": [
+    "Clash_Lite.yaml",
+    "Clash_Unified.yaml",
+    "Mac_Unified.list",
+    "Mobile_Lite.list",
+    "Mobile_Unified.list",
+    "Rule_Report.md",
+    "manifest.json",
+    "rule_baseline.json",
+    "rule_decisions.jsonl"
+  ]
+}

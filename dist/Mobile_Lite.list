@@ -1,0 +1,97 @@
+# NAME: Mobile_Lite
+# HOST: 35
+# HOST-SUFFIX: 24
+# HOST-KEYWORD: 2
+# IP-CIDR: 28
+# GEOIP: 0
+# USER-AGENT: 0
+# TOTAL: 89
+HOST,aedns.weixin.qq.com,Advertising
+HOST,alimama.com,Advertising
+HOST,dns.jd.com,Advertising
+HOST,dns.weibo.cn,Advertising
+HOST,dns.weixin.qq.com,Advertising
+HOST,dns.weixin.qq.com.cn,Advertising
+HOST,dnspod.meituan.httpdns.qcloud.com,Advertising
+HOST,dnspod.meituan.httpdns.start.qcloud.com,Advertising
+HOST,doh.iqiyi.com,Advertising
+HOST,httpdns-api.aliyuncs.com,Advertising
+HOST,httpdns-sc.aliyuncs.com,Advertising
+HOST,httpdns-sdk.n.netease.com,Advertising
+HOST,httpdns.alicdn.com,Advertising
+HOST,httpdns.baidu.com,Advertising
+HOST,httpdns.baidubce.com,Advertising
+HOST,httpdns.bcelive.com,Advertising
+HOST,httpdns.bilivideo.com,Advertising
+HOST,httpdns.c.cdnhwc2.com,Advertising
+HOST,httpdns.calorietech.com,Advertising
+HOST,httpdns.immomo.com,Advertising
+HOST,httpdns.kg.qq.com,Advertising
+HOST,httpdns.meituan.com,Advertising
+HOST,httpdns.music.163.com,Advertising
+HOST,httpdns.n.netease.com,Advertising
+HOST,httpdns.ocloud.oppomobile.com,Advertising
+HOST,httpdns.volcengineapi.com,Advertising
+HOST,httpdns.yunxindns.com,Advertising
+HOST,httpdns.yunxinfw.com,Advertising
+HOST,httpdnsmultiapi.meituan.com,Advertising
+HOST,httpdnsmultiapivip.meituan.com,Advertising
+HOST,httpsdns.baidu.com,Advertising
+HOST,lofter.httpdns.c.163.com,Advertising
+HOST,music.httpdns.c.163.com,Advertising
+HOST,resolvers-cn.httpdns.aliyuncs.com,Advertising
+HOST,yuyin-httpdns.gslb.yy.com,Advertising
+HOST-SUFFIX,acookie.alimama.com,Advertising
+HOST-SUFFIX,adcolony.com,Advertising
+HOST-SUFFIX,admob.com,Advertising
+HOST-SUFFIX,afpeng.alimama.com,Advertising
+HOST-SUFFIX,afpssp.alimama.com,Advertising
+HOST-SUFFIX,afptrack.alimama.com,Advertising
+HOST-SUFFIX,banner.alimama.com,Advertising
+HOST-SUFFIX,beacon.qq.com,Advertising
+HOST-SUFFIX,c.alimama.com,Advertising
+HOST-SUFFIX,cpc.click.alimama.com,Advertising
+HOST-SUFFIX,doubleclick.net,Advertising
+HOST-SUFFIX,googlesyndication.com,Advertising
+HOST-SUFFIX,httpdns.pro,Advertising
+HOST-SUFFIX,inmobi.com,Advertising
+HOST-SUFFIX,ironsrc.com,Advertising
+HOST-SUFFIX,jpush.cn,Advertising
+HOST-SUFFIX,p.alimama.com,Advertising
+HOST-SUFFIX,pangle.io,Advertising
+HOST-SUFFIX,static.alimama.com,Advertising
+HOST-SUFFIX,t.alimama.com,Advertising
+HOST-SUFFIX,talkingdata.net,Advertising
+HOST-SUFFIX,tanx.com,Advertising
+HOST-SUFFIX,unityads.unity3d.com,Advertising
+HOST-SUFFIX,vungle.com,Advertising
+HOST-KEYWORD,appsflyer,Advertising
+HOST-KEYWORD,umeng,Advertising
+IP-CIDR,101.124.19.122/32,Advertising
+IP-CIDR,103.224.222.208/32,Advertising
+IP-CIDR,115.236.121.195/32,Advertising
+IP-CIDR,115.236.121.51/32,Advertising
+IP-CIDR,118.89.204.198/32,Advertising
+IP-CIDR,119.29.29.98/32,Advertising
+IP-CIDR,119.29.29.99/32,Advertising
+IP-CIDR,123.151.54.50/32,Advertising
+IP-CIDR,180.76.76.112/32,Advertising
+IP-CIDR,180.76.76.200/32,Advertising
+IP-CIDR,180.76.76.220/32,Advertising
+IP-CIDR,182.254.116.117/32,Advertising
+IP-CIDR,182.254.118.119/32,Advertising
+IP-CIDR,202.90.108.13/32,Advertising
+IP-CIDR,202.90.110.46/32,Advertising
+IP-CIDR,203.107.1.0/24,Advertising
+IP-CIDR,39.97.128.148/32,Advertising
+IP-CIDR,39.97.130.51/32,Advertising
+IP-CIDR,42.187.182.106/32,Advertising
+IP-CIDR,42.187.182.123/32,Advertising
+IP-CIDR,42.187.184.154/32,Advertising
+IP-CIDR,42.81.232.18/32,Advertising
+IP-CIDR,59.111.239.61/32,Advertising
+IP-CIDR,59.111.239.62/32,Advertising
+IP6-CIDR,2402:4e00:1200:ed00:0:9089:6dac:96b6/128,Advertising
+IP6-CIDR,2402:4e00:1900:1700:0:9554:1ad9:c3a/128,Advertising
+IP6-CIDR,2402:db40:5100:1011::5/128,Advertising
+IP6-CIDR,240e:928:1400:10::25/128,Advertising
