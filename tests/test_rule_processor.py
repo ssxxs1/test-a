@@ -70,5 +70,35 @@ class ProductProfileTests(unittest.TestCase):
         profiles, _ = build_profiles([result("BlockDNS", "dns_bypass", [host, suffix])], POLICY)
         for rules in profiles.values(): self.assertIn(host, rules); self.assertIn(suffix, rules)
 
+    def test_elimination_of_lexicographical_bias(self):
+        # r_z starts with z but has consensus (2 sources); r_a starts with a but only 1 source
+        r_a = Rule("HOST-SUFFIX", "adserver-a.example.com")
+        r_z = Rule("HOST-SUFFIX", "adserver-z.example.com")
+        # Set target=1, max=5 for clash profile to force truncation
+        custom_policy = dict(POLICY)
+        custom_policy["profile_limits"] = {"clash_full": {"target": 1, "max": 5}, "qx_universal": {"target": 10, "max": 20}, "qx_compact": {"target": 2, "max": 5}}
+        res1 = result("privacy", "tracking", [r_a, r_z], consensus=True)
+        res2 = result("adlite", "advertising", [r_z], consensus=True)
+        profiles, _ = build_profiles([res1, res2], custom_policy)
+        # r_z has 2 sources consensus, so it MUST be selected over r_a despite starting with z!
+        self.assertIn(r_z, profiles["clash_full"])
+        self.assertNotIn(r_a, profiles["clash_full"])
+
+    def test_keyword_allowlist_admissibility(self):
+        kw_allowed = Rule("HOST-KEYWORD", "pangle")
+        kw_denied = Rule("HOST-KEYWORD", "randomjunkword")
+        custom_policy = dict(POLICY)
+        custom_policy["keyword_allowlist"] = [{"id": "kw-pangle", "value": "pangle", "category": "sdk", "note": "x", "evidence": "x"}]
+        profiles, decisions = build_profiles([result("privacy", "tracking", [kw_allowed, kw_denied])], custom_policy)
+        self.assertIn(kw_allowed, profiles["clash_full"])
+        self.assertNotIn(kw_denied, profiles["clash_full"])
+
+    def test_catalog_seed_injection(self):
+        # Catalog has pangle.io (lite_enabled=True, platforms=["mobile"]).
+        # If upstream does not provide pangle.io at all, it should be seeded as a seed rule!
+        profiles, _ = build_profiles([result("privacy", "tracking", [])], POLICY)
+        self.assertIn(Rule("HOST-SUFFIX", "pangle.io"), profiles["qx_compact"])
+        self.assertIn(Rule("HOST-SUFFIX", "pangle.io"), profiles["clash_full"])
+
 
 if __name__ == "__main__": unittest.main()
