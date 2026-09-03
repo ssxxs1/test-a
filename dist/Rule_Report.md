@@ -2,15 +2,15 @@
 
 ## Output rules
 
-- `clash_full`: actual=4002, target=12000, max=20000; reserved DNS=64; eligible=3999
-  - tiers: tier1_eligible=107, tier1_selected=107, tier2_eligible=3861, tier2_selected=3861, tier3_eligible=31, tier3_selected=31
-  - HOST=249, HOST-SUFFIX=3725, IP-CIDR=24, IP6-CIDR=4
-- `qx_universal`: actual=3743, target=10000, max=20000; reserved DNS=64; eligible=3719
-  - tiers: tier1_eligible=56, tier1_selected=56, tier2_eligible=3653, tier2_selected=3653, tier3_eligible=10, tier3_selected=10
-  - HOST=234, HOST-SUFFIX=3481, IP-CIDR=24, IP6-CIDR=4
-- `qx_compact`: actual=1961, target=2000, max=5000; reserved DNS=64; eligible=3383
-  - tiers: tier1_eligible=79, tier1_selected=79, tier2_eligible=3304, tier2_selected=1857
-  - HOST=92, HOST-SUFFIX=1841, IP-CIDR=24, IP6-CIDR=4
+- `clash_full`: actual=4008, target=12000, max=20000; reserved DNS=64; eligible=4016
+  - tiers: tier1_eligible=124, tier1_selected=101, tier2_eligible=3861, tier2_selected=3812, tier3_eligible=31, tier3_selected=30
+  - HOST=242, HOST-KEYWORD=2, HOST-SUFFIX=3736, IP-CIDR=24, IP6-CIDR=4
+- `qx_universal`: actual=3755, target=10000, max=20000; reserved DNS=64; eligible=3731
+  - tiers: tier1_eligible=68, tier1_selected=53, tier2_eligible=3653, tier2_selected=3629, tier3_eligible=10, tier3_selected=10
+  - HOST=236, HOST-KEYWORD=2, HOST-SUFFIX=3489, IP-CIDR=24, IP6-CIDR=4
+- `qx_compact`: actual=2000, target=2000, max=5000; reserved DNS=64; eligible=3397
+  - tiers: tier1_eligible=93, tier1_selected=73, tier2_eligible=3304, tier2_selected=1863
+  - HOST=79, HOST-KEYWORD=2, HOST-SUFFIX=1891, IP-CIDR=24, IP6-CIDR=4
 
 ## BlockDNS passthrough
 

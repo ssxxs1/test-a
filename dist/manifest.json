@@ -1,13 +1,13 @@
 {
   "baseline_exists": true,
-  "built_at": "2026-08-31T14:54:44.247971+00:00",
+  "built_at": "2026-09-03T04:07:05.413622+00:00",
   "files": {
-    "Clash_Unified.yaml": "7c0e7f1c48c55ba6d3c8bafa72791df3a2ca4ae661deedf2a75b9577aa2745dc",
-    "QX_Compact.list": "57ad002ca11dcbfd6b0a2f2c93b4ad220751b689bda57fd6f272bfc805d8d26e",
-    "QX_Universal.list": "9e87a4e60528babefa55d194be989702a914bd7d4a170dca6365e844f789a8fe",
-    "Rule_Report.md": "c85f4c5ac7de8cc1b063ce46aaaef3ad62de7aea6fb13e8ff175e47757b624ae",
-    "rule_baseline.json": "a10e0b5927fc4aeae5460f02601b7ab6e46b0114005e2fb457fcd85d4f8cf6d8",
-    "rule_decisions.jsonl": "b18e56fca14e58d66159ad1a8063d56b02c469561f2786eb88ccc31589b07128"
+    "Clash_Unified.yaml": "43df8bf576cfdb56ba0f8e14cf36a94eacfa15781180809d70d100b1b0194c23",
+    "QX_Compact.list": "9326231f339f498ee3e3cd9ba716338e97b5c742d7fea04bc36ec8d43d88bfdb",
+    "QX_Universal.list": "c42516a62bd82d2d067eb0ce8e7233711793a4529eeea09147a2e53a7f692664",
+    "Rule_Report.md": "d91267e0459794d2a1bdc9f126173203873a2b34c4ed156f91b45ed1f9ec133b",
+    "rule_baseline.json": "b7ea04715a4cc41b0df1a371a4216936fd1cb217c4249c76d1529e1150e1f2f2",
+    "rule_decisions.jsonl": "c3d36d1ba07daa12f8d263363a46dc25f344a15941d76acce3e3ae1a67a0dee5"
   },
   "identity": {
     "dependency_identity": "5ebf270993b4ce173f0d0ef429d51cdc732951cc438f697f1428f5e6cb60e6e1",

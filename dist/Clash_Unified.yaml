@@ -1,11 +1,11 @@
 # NAME: Clash_Unified
-# DOMAIN: 249
-# DOMAIN-SUFFIX: 3725
-# DOMAIN-KEYWORD: 0
+# DOMAIN: 242
+# DOMAIN-SUFFIX: 3736
+# DOMAIN-KEYWORD: 2
 # IP-CIDR: 28
 # GEOIP: 0
 # UNSUPPORTED-USER-AGENT: 0
-# TOTAL: 4002
+# TOTAL: 4008
 payload:
   - DOMAIN,ad-server.co.za
   - DOMAIN,ad.10010.com
@@ -154,6 +154,7 @@ payload:
   - DOMAIN,analytics.techweb.com.cn
   - DOMAIN,analytics.tv189.cn
   - DOMAIN,analytics.woozooo.com
+  - DOMAIN,api-adservices.apple.com
   - DOMAIN,api.ad.xv555.com
   - DOMAIN,api.ad.yipinread.com
   - DOMAIN,api.analytics.omgpop.com
@@ -176,7 +177,6 @@ payload:
   - DOMAIN,dnspod.meituan.httpdns.qcloud.com
   - DOMAIN,dnspod.meituan.httpdns.start.qcloud.com
   - DOMAIN,doh.iqiyi.com
-  - DOMAIN,fcanr.tracking.miui.com
   - DOMAIN,httpdns-api.aliyuncs.com
   - DOMAIN,httpdns-sc.aliyuncs.com
   - DOMAIN,httpdns-sdk.n.netease.com
@@ -200,6 +200,7 @@ payload:
   - DOMAIN,httpdnsmultiapi.meituan.com
   - DOMAIN,httpdnsmultiapivip.meituan.com
   - DOMAIN,httpsdns.baidu.com
+  - DOMAIN,iadsdk.apple.com
   - DOMAIN,img.ads.huntmad.com
   - DOMAIN,img.ads.mobilefuse.net
   - DOMAIN,img.ads.mocean.mobi
@@ -214,14 +215,11 @@ payload:
   - DOMAIN,match.ads.betweendigital.com
   - DOMAIN,metrics.el-mundo.net
   - DOMAIN,metrics.io
-  - DOMAIN,metrics.washingtonpost.com
   - DOMAIN,mon.snssdk.com
   - DOMAIN,music.httpdns.c.163.com
   - DOMAIN,ng3.ads.warnerbros.com
   - DOMAIN,op.ssp.qq.com
   - DOMAIN,pixel.ad
-  - DOMAIN,pixel.condenastdigital.com
-  - DOMAIN,pixel.facebook.com
   - DOMAIN,pixel.watch
   - DOMAIN,pixel.xmladfeed.com
   - DOMAIN,reportlog.dftoutiao.com
@@ -229,7 +227,6 @@ payload:
   - DOMAIN,spider.ad
   - DOMAIN,sponsored.com
   - DOMAIN,taboolasyndication.com
-  - DOMAIN,tracker.ai.xiaomi.com
   - DOMAIN,tracker.stats.in.th
   - DOMAIN,tracker.tgbus.com
   - DOMAIN,tracking.adweb.co.kr
@@ -240,7 +237,6 @@ payload:
   - DOMAIN,tracking.fccinteractive.com
   - DOMAIN,tracking.fits.me
   - DOMAIN,tracking.interweave.com
-  - DOMAIN,tracking.intl.miui.com
   - DOMAIN,tracking.klickthru.com
   - DOMAIN,tracking.m6r.eu
   - DOMAIN,tracking.maxcdn.com
@@ -249,13 +245,10 @@ payload:
   - DOMAIN,tracking.sembox.it
   - DOMAIN,tracking.skyword.com
   - DOMAIN,tracking.to
-  - DOMAIN,tracking.unrealengine.com
   - DOMAIN,tracking.v.tf.360.cn
   - DOMAIN,tracking.worldmedia.net
-  - DOMAIN,www.talkingdata.com
   - DOMAIN,yk-ssp.ad.youku.com
   - DOMAIN,yuyin-httpdns.gslb.yy.com
-  - DOMAIN,zgsdk.zhugeio.com
   - DOMAIN-SUFFIX,22153974.branch.rocks
   - DOMAIN-SUFFIX,a8cv.cpi.ad.jp
   - DOMAIN-SUFFIX,a8cv.secure.sakura.ad.jp
@@ -616,8 +609,10 @@ payload:
   - DOMAIN-SUFFIX,afpeng.alimama.com
   - DOMAIN-SUFFIX,afpssp.alimama.com
   - DOMAIN-SUFFIX,afptrack.alimama.com
+  - DOMAIN-SUFFIX,amazon-adsystem.com
   - DOMAIN-SUFFIX,amazon-email.branch.rocks
   - DOMAIN-SUFFIX,amplitude.chess.com
+  - DOMAIN-SUFFIX,amplitude.com
   - DOMAIN-SUFFIX,analytic.alabama.aaa.com
   - DOMAIN-SUFFIX,analytic.americanfunds.com
   - DOMAIN-SUFFIX,analytic.buoyweather.com
@@ -1268,9 +1263,9 @@ payload:
   - DOMAIN-SUFFIX,analytics.zg-api.com
   - DOMAIN-SUFFIX,analytics.ziftsolutions.com
   - DOMAIN-SUFFIX,analyticsapi.qogita.com
-  - DOMAIN-SUFFIX,api.talkingdata.com
   - DOMAIN-SUFFIX,apm-track.xiaohongshu.com
   - DOMAIN-SUFFIX,app-measurement.com
+  - DOMAIN-SUFFIX,applovin.com
   - DOMAIN-SUFFIX,avasgtest.branch.rocks
   - DOMAIN-SUFFIX,banner.101xp.com
   - DOMAIN-SUFFIX,banner.3ddownloads.com
@@ -1330,6 +1325,7 @@ payload:
   - DOMAIN-SUFFIX,beacon.watch.impress.co.jp
   - DOMAIN-SUFFIX,beacon.wikia-services.com
   - DOMAIN-SUFFIX,beacon.www.theguardian.com
+  - DOMAIN-SUFFIX,bingads.com
   - DOMAIN-SUFFIX,bluecore-email.branch.rocks
   - DOMAIN-SUFFIX,bmf.branch.rocks
   - DOMAIN-SUFFIX,branch.365soup.bibsolution.net
@@ -1478,6 +1474,7 @@ payload:
   - DOMAIN-SUFFIX,email.email-cusomerio.branch.rocks
   - DOMAIN-SUFFIX,expertsender.branch.rocks
   - DOMAIN-SUFFIX,fav.simba.taobao.com
+  - DOMAIN-SUFFIX,fyber.com
   - DOMAIN-SUFFIX,g.ad8.cc
   - DOMAIN-SUFFIX,g993dvyzae.branch.salesfloor.net
   - DOMAIN-SUFFIX,galileotelemetry.tencent.com
@@ -1505,12 +1502,12 @@ payload:
   - DOMAIN-SUFFIX,httpdns.pro
   - DOMAIN-SUFFIX,hubert.branch.rocks
   - DOMAIN-SUFFIX,huid.ad.360.cn
+  - DOMAIN-SUFFIX,iad-apple.com
   - DOMAIN-SUFFIX,ib.adnxs.co
   - DOMAIN-SUFFIX,igexin.com
   - DOMAIN-SUFFIX,igorsgtest.branch.rocks
   - DOMAIN-SUFFIX,inmobi.com
   - DOMAIN-SUFFIX,ironsrc.com
-  - DOMAIN-SUFFIX,jic.talkingdata.com
   - DOMAIN-SUFFIX,jpush.cn
   - DOMAIN-SUFFIX,jpush.html5.qq.com
   - DOMAIN-SUFFIX,kinesis.us-east-1.analytics.edmentum.com
@@ -1521,6 +1518,7 @@ payload:
   - DOMAIN-SUFFIX,m.gdt.vip1790.cn
   - DOMAIN-SUFFIX,m.simba.taobao.com
   - DOMAIN-SUFFIX,m1.ad.10010.com
+  - DOMAIN-SUFFIX,mbridge.com
   - DOMAIN-SUFFIX,mclick.simba.taobao.com
   - DOMAIN-SUFFIX,metric.1035thearrow.com
   - DOMAIN-SUFFIX,metric.4imprint.com
@@ -2993,6 +2991,7 @@ payload:
   - DOMAIN-SUFFIX,metrics.youandyourwedding.co.uk
   - DOMAIN-SUFFIX,metrics.yourlexusdealer.com
   - DOMAIN-SUFFIX,metrics.zacks.com
+  - DOMAIN-SUFFIX,mintegral.com
   - DOMAIN-SUFFIX,mixpanel.com
   - DOMAIN-SUFFIX,mmstat.com
   - DOMAIN-SUFFIX,mobads-logs.baidu.com
@@ -3008,6 +3007,7 @@ payload:
   - DOMAIN-SUFFIX,news.ssp.qq.com
   - DOMAIN-SUFFIX,nsclick.baidu.com
   - DOMAIN-SUFFIX,oca.telemetry.microsoft.com.nsatc.net
+  - DOMAIN-SUFFIX,openx.net
   - DOMAIN-SUFFIX,outbrain.com
   - DOMAIN-SUFFIX,p.alimama.com
   - DOMAIN-SUFFIX,pangle.io
@@ -3109,13 +3109,16 @@ payload:
   - DOMAIN-SUFFIX,segment.lalr.co
   - DOMAIN-SUFFIX,sendpulsenewtest.branch.rocks
   - DOMAIN-SUFFIX,sendpulsetest.branch.rocks
+  - DOMAIN-SUFFIX,sensorsdata.cn
   - DOMAIN-SUFFIX,sensorsdata.ruguoapp.com
   - DOMAIN-SUFFIX,sephora-qa.branch.rocks
   - DOMAIN-SUFFIX,service.ad.adesk.com
   - DOMAIN-SUFFIX,sf4567w2a56q.branch.salesfloor.net
   - DOMAIN-SUFFIX,sf5q8gbnve37.branch.salesfloor.net
+  - DOMAIN-SUFFIX,sigmob.cn
   - DOMAIN-SUFFIX,simba.m.taobao.com
   - DOMAIN-SUFFIX,simetra.tracking.ringieraxelspringer.tech
+  - DOMAIN-SUFFIX,singular.net
   - DOMAIN-SUFFIX,sis.jpush.io
   - DOMAIN-SUFFIX,smaato.com
   - DOMAIN-SUFFIX,smaato.net
@@ -3958,6 +3961,7 @@ payload:
   - DOMAIN-SUFFIX,tracking.zierlicheladies.de
   - DOMAIN-SUFFIX,trackingapi.cloudapp.net
   - DOMAIN-SUFFIX,tw.adx.nextmedia.com
+  - DOMAIN-SUFFIX,umeng.com
   - DOMAIN-SUFFIX,unityads.unity3d.com
   - DOMAIN-SUFFIX,urc.taboolasyndication.com
   - DOMAIN-SUFFIX,url6013.qa-app11-sendgrid.branch.rocks
@@ -3981,6 +3985,8 @@ payload:
   - DOMAIN-SUFFIX,xlog.snssdk.com
   - DOMAIN-SUFFIX,yiyemail.branch.rocks
   - DOMAIN-SUFFIX,zhugeio.com
+  - DOMAIN-KEYWORD,appsflyer
+  - DOMAIN-KEYWORD,umeng
   - IP-CIDR,101.124.19.122/32,no-resolve
   - IP-CIDR,103.224.222.208/32,no-resolve
   - IP-CIDR,115.236.121.195/32,no-resolve
