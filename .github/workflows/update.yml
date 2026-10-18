@@ -2,7 +2,7 @@ name: Rules Production Deploy
 
 on:
   schedule:
-    - cron: "0 0 * * 1"
+    - cron: "0 0 1 * *"
   workflow_dispatch:
     inputs:
       force_update:
@@ -116,7 +116,30 @@ jobs:
         with:
           name: rules-preview-${{ github.run_id }}
           path: candidate-dist
+      - name: Check for rule changes (Anti-spurious release)
+        id: diff_check
+        env:
+          FORCE: ${{ inputs.force_update }}
+          INITIALIZE: ${{ inputs.initialize_baseline }}
+        run: |
+          if [ "$FORCE" = "true" ] || [ "$INITIALIZE" = "true" ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "Force/initialize mode: proceeding with release."
+            exit 0
+          fi
+          CHANGES=false
+          for file in Clash_Unified.yaml QX_Universal.list QX_Compact.list; do
+            if [ ! -f "dist/$file" ] || ! cmp -s "dist/$file" "candidate-dist/$file"; then
+              echo "Detected changes in $file"
+              CHANGES=true
+            fi
+          done
+          echo "has_changes=$CHANGES" >> "$GITHUB_OUTPUT"
+          if [ "$CHANGES" = "false" ]; then
+            echo "No rule changes detected across Clash_Unified.yaml, QX_Universal.list, and QX_Compact.list. Skipping publish and release."
+          fi
       - name: Publish managed production artifacts
+        if: steps.diff_check.outputs.has_changes == 'true'
         run: |
           rm -rf dist
           mv candidate-dist dist
@@ -125,9 +148,11 @@ jobs:
           git add dist/
           git diff --staged --quiet || (git commit -m "Production rules update $(date -u +%F)" && git push origin main)
       - name: Set version
+        if: steps.diff_check.outputs.has_changes == 'true'
         id: ver
         run: echo "tag=v1.1.1.$(date -u +%y%m%d%H%M)" >> "$GITHUB_OUTPUT"
       - name: Create GitHub Release
+        if: steps.diff_check.outputs.has_changes == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.ver.outputs.tag }}

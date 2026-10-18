@@ -182,3 +182,4 @@ cython_debug/
 *.db
 *.sqlite
 *.sql
+.claude/
