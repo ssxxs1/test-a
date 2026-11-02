@@ -82,11 +82,9 @@ def main(argv: list[str] | None = None) -> int:
         if args.preview_manifest:
             if _read_preview_identity(args.preview_manifest) != identity:
                 raise GuardError("Current complete build identity differs from the reviewed preview")
-        skip_candidate = not args.force and not args.initialize_baseline
-        if baseline and baseline.get("identity") == identity and skip_candidate:
-            if not args.preview_only or args.publish_candidate:
-                print("Skipping: all build inputs match the published baseline.")
-                return 0
+        if baseline and baseline.get("identity") == identity and not args.force and not args.preview_only and not args.initialize_baseline:
+            print("Skipping: all build inputs match the published baseline.")
+            return 0
         profiles, _ = build_profiles(results, config.policy)
         approval = {"reason": args.approval_reason} if args.approve_anomalous_publish else None
         stage_parent = Path(tempfile.mkdtemp(prefix="rules-build-", dir=root))
