@@ -18,9 +18,21 @@ def verify_baseline(current: dict[str, Any], baseline: dict[str, Any] | None, po
     for key, _ in version_pairs:
         if current_identity.get(key) != prior_identity.get(key):
             raise GuardError(f"{key} changed; create and review a preview before initializing a new baseline")
+    mapping = {
+        "policy_hash": ("policy_version", "scripts/rule_policy.json"),
+        "sources_hash": ("sources_version", "scripts/sources.json"),
+        "processor_hash": ("processor_version", "scripts/process_rules.py (PROCESSOR_VERSION)"),
+        "dependency_identity": ("requirements.txt", "requirements.txt"),
+    }
     for key in ("policy_hash", "sources_hash", "processor_hash", "dependency_identity"):
         if current_identity.get(key) != prior_identity.get(key):
-            raise GuardError(f"{key} changed without a version upgrade")
+            hint_ver, file_path = mapping.get(key, (key, "config"))
+            curr_ver = current_identity.get(hint_ver, "N/A")
+            raise GuardError(
+                f"{key} changed without a version upgrade. "
+                f"Hint: Increment '{hint_ver}' (current: {curr_ver}) in {file_path} "
+                f"or run with --initialize-baseline after review."
+            )
     warnings: list[str] = []
     guards = policy["release_guards"]
     pct = guards["output_total_change_pct"]

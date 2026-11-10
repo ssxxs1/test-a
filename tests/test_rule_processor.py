@@ -100,5 +100,76 @@ class ProductProfileTests(unittest.TestCase):
         self.assertIn(Rule("HOST-SUFFIX", "pangle.io"), profiles["qx_compact"])
         self.assertIn(Rule("HOST-SUFFIX", "pangle.io"), profiles["clash_full"])
 
+    def test_domain_exclusions_bypass(self):
+        # Excluded domains should be dropped even if matched by mobile_sdk_labels or tracking
+        r_getui = Rule("HOST-SUFFIX", "getui.com")
+        r_sub_getui = Rule("HOST", "sdk.getui.net")
+        r_alipay_collect = Rule("HOST-SUFFIX", "collect.alipay.com")
+        r_ad = Rule("HOST-SUFFIX", "adserver.example.com")
+
+        custom_policy = dict(POLICY)
+        custom_policy["domain_exclusions"] = ["getui.com", "getui.net", "collect.alipay.com"]
+
+        res = result("privacy", "tracking", [r_getui, r_sub_getui, r_alipay_collect, r_ad])
+        profiles, decisions = build_profiles([res], custom_policy)
+
+        for name, profile in profiles.items():
+            self.assertNotIn(r_getui, profile)
+            self.assertNotIn(r_sub_getui, profile)
+            self.assertNotIn(r_alipay_collect, profile)
+
+        # Verify decision reasons
+        self.assertEqual(decisions[r_getui], ("dropped", "domain_exclusion:getui.com"))
+        self.assertEqual(decisions[r_sub_getui], ("dropped", "domain_exclusion:getui.net"))
+        self.assertEqual(decisions[r_alipay_collect], ("dropped", "domain_exclusion:collect.alipay.com"))
+
+    def test_domain_exclusions_hardened_edge_cases(self):
+        # Exclusions with leading/trailing dots, precedence over DNS bypass, and keyword blocking
+        r_dns_bank = Rule("HOST", "citibank.com")
+        r_kw_bank = Rule("HOST-KEYWORD", "citibank")
+        custom_policy = dict(POLICY)
+        custom_policy["domain_exclusions"] = [".citibank.com."]
+        custom_policy["keyword_allowlist"] = [{"id": "kw-citibank", "value": "citibank", "category": "sdk", "note": "x", "evidence": "x"}]
+
+        res_dns = result("BlockDNS", "dns_bypass", [r_dns_bank])
+        res_kw = result("privacy", "tracking", [r_kw_bank])
+        profiles, decisions = build_profiles([res_dns, res_kw], custom_policy)
+
+        # Exclusion should take precedence over DNS bypass
+        for name, profile in profiles.items():
+            self.assertNotIn(r_dns_bank, profile)
+            self.assertNotIn(r_kw_bank, profile)
+        self.assertEqual(decisions[r_dns_bank], ("dropped", "domain_exclusion:citibank.com"))
+        self.assertEqual(decisions[r_kw_bank], ("dropped", "domain_exclusion:citibank"))
+
+    def test_load_config_with_exclusions(self):
+        from rules.config import load_config
+        config = load_config(ROOT)
+        self.assertIn("domain_exclusions", config.policy)
+        self.assertIn("getui.com", config.policy["domain_exclusions"])
+        self.assertIn("collect.alipay.com", config.policy["domain_exclusions"])
+
+    def test_ip_cidr_subnet_reduction(self):
+        from rules.pipeline import _reduce
+        r_parent = Rule("IP-CIDR", "10.0.0.0/8")
+        r_child = Rule("IP-CIDR", "10.1.0.0/16")
+        r_other = Rule("IP-CIDR", "192.168.1.0/24")
+        r_reserved_child = Rule("IP-CIDR", "10.2.0.0/16")
+
+        reduced = _reduce({r_parent, r_child, r_other, r_reserved_child}, reserved={r_reserved_child})
+        self.assertIn(r_parent, reduced)
+        self.assertNotIn(r_child, reduced)
+        self.assertIn(r_other, reduced)
+        self.assertIn(r_reserved_child, reduced)
+
+    def test_fetch_candidate_fallback_urls(self):
+        from rules.fetch import _candidate_urls
+        from rules.models import SourceConfig
+        source_raw = SourceConfig("test", "https://raw.githubusercontent.com/owner/repo/main/path/rule.list?token=abc", "tracking", "trusted", True, ("raw.githubusercontent.com", "cdn.jsdelivr.net"), 1000, 1000)
+        urls = _candidate_urls(source_raw)
+        self.assertEqual(len(urls), 2)
+        self.assertEqual(urls[0], "https://raw.githubusercontent.com/owner/repo/main/path/rule.list?token=abc")
+        self.assertEqual(urls[1], "https://cdn.jsdelivr.net/gh/owner/repo@main/path/rule.list?token=abc")
+
 
 if __name__ == "__main__": unittest.main()

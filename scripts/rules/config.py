@@ -84,6 +84,12 @@ def load_config(root: Path) -> AppConfig:
         values = policy.get(key)
         if not isinstance(values, list) or not all(isinstance(value, str) and value for value in values):
             raise ConfigurationError(f"{key} must be a string list")
+    domain_exclusions = policy.get("domain_exclusions", [])
+    if not isinstance(domain_exclusions, list) or not all(
+        isinstance(value, str) and value.strip().strip(".") and not any(ch in value for ch in "/* \t\r\n")
+        for value in domain_exclusions
+    ):
+        raise ConfigurationError("domain_exclusions must be a list of valid domain strings without slashes or wildcards")
     try:
         import re
         for key in ("web_label_patterns", "compact_label_patterns"):

@@ -39,15 +39,21 @@ def _reduce(rules, reserved):
         cover = covered_by_suffix(rule.value, suffixes - ({rule.value} if rule.rule_type == "HOST-SUFFIX" else set()))
         if cover:
             result.discard(rule)
-    for rule in sorted(list(result), key=lambda r: (r.rule_type, r.value, tuple(r.modifiers))):
-        if rule in reserved or rule.rule_type not in {"IP-CIDR", "IP6-CIDR"}:
-            continue
-        net = ipaddress.ip_network(rule.value)
-        for parent in result:
-            if parent is rule or parent.rule_type != rule.rule_type or parent.modifiers != rule.modifiers:
-                continue
-            if net != ipaddress.ip_network(parent.value) and net.subnet_of(ipaddress.ip_network(parent.value)):
-                result.discard(rule); break
+    ip_rules = [r for r in result if r.rule_type in {"IP-CIDR", "IP6-CIDR"}]
+    if ip_rules:
+        ip_groups = defaultdict(list)
+        for r in ip_rules:
+            ip_groups[(r.rule_type, tuple(sorted(r.modifiers)))].append(r)
+        for (rtype, mods), grp_rules in ip_groups.items():
+            parsed_nets = [(r, ipaddress.ip_network(r.value)) for r in grp_rules]
+            parsed_nets.sort(key=lambda item: (item[1].prefixlen, item[1].network_address))
+            accepted_parents = []
+            for r, net in parsed_nets:
+                if any(net != p and net.subnet_of(p) for p in accepted_parents):
+                    if r not in reserved:
+                        result.discard(r)
+                else:
+                    accepted_parents.append(net)
     return result
 
 
@@ -67,13 +73,23 @@ def _select(name, grouped, sources, policy):
     excluded_labels = set(policy["label_pattern_exclusions"])
     web_patterns = [re.compile(value) for value in policy["web_label_patterns"]]
     compact_patterns = [re.compile(value) for value in policy["compact_label_patterns"]]
+    domain_exclusions = tuple(e.strip().strip(".").lower() for e in policy.get("domain_exclusions", []) if isinstance(e, str) and e.strip().strip("."))
     allowed_keywords = {item.value.lower() for item in policy_items(policy, "keyword_allowlist")} if "keyword_allowlist" in policy else set()
     reserved, candidates, reasons, tier_counts = set(), {1: [], 2: [], 3: []}, {}, defaultdict(int)
     tier3 = policy["tier3_policy"]
     for rule, records in grouped.items():
-        dns = any(sources[r.source].role == "dns_bypass" for r in records if r.source in sources)
+        if rule.rule_type in {"HOST", "HOST-SUFFIX"} and domain_exclusions:
+            rule_val = rule.value.lower().strip(".")
+            matched_exclusion = next((ex for ex in domain_exclusions if rule_val == ex or rule_val.endswith("." + ex)), None)
+            if matched_exclusion:
+                reasons[rule] = f"domain_exclusion:{matched_exclusion}"
+                continue
         if rule.rule_type == "HOST-KEYWORD":
-            if rule.value.lower() in allowed_keywords:
+            rule_kw = rule.value.lower().strip(".")
+            if rule_kw in allowed_keywords:
+                if domain_exclusions and any(ex == rule_kw or ex.startswith(rule_kw + ".") or ("." + rule_kw + ".") in ex for ex in domain_exclusions):
+                    reasons[rule] = f"domain_exclusion:{rule_kw}"
+                    continue
                 tier = 1
                 reasons[rule] = "tier1:keyword_allowlist"
                 candidates[1].append(((-990, TYPE_ORDER[rule.rule_type], len(rule.value), rule.value), rule))
@@ -82,6 +98,7 @@ def _select(name, grouped, sources, policy):
             else:
                 reasons[rule] = "keyword_not_admissible"
                 continue
+        dns = any(sources[r.source].role == "dns_bypass" for r in records if r.source in sources)
         if dns and rule.rule_type in {"HOST", "HOST-SUFFIX", "IP-CIDR", "IP6-CIDR"}:
             reserved.add(rule); reasons[rule] = "tier1_dns_passthrough"; continue
         catalog, platforms, lite = _catalog_data(rule, raw_catalog)
@@ -213,10 +230,14 @@ def build_profiles(results, policy):
     for name in PROFILES:
         if len(profiles[name]) > policy["profile_limits"][name]["max"]: raise ValueError(f"{name} exceeds max")
     decisions = {}
+    profile_sets = {name: set(profiles[name]) for name in PROFILES}
+    clash_set = profile_sets["clash_full"]
     for rule, records in grouped.items():
+        is_kept_clash = rule in clash_set
         for record in records:
-            for name in PROFILES: record.decisions[name] = "kept" if rule in profiles[name] else reasons[name].get(rule, "not_selected")
-        decisions[rule] = ("kept", None) if rule in clash else ("dropped", reasons["clash_full"].get(rule))
+            for name in PROFILES:
+                record.decisions[name] = "kept" if rule in profile_sets[name] else reasons[name].get(rule, "not_selected")
+        decisions[rule] = ("kept", None) if is_kept_clash else ("dropped", reasons["clash_full"].get(rule))
     return profiles, decisions
 
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import ipaddress
 import re
 
@@ -13,6 +14,13 @@ EXTRACTOR = tldextract.TLDExtract(
     fallback_to_snapshot=True,
     include_psl_private_domains=True,
 )
+
+
+@functools.lru_cache(maxsize=131072)
+def _cached_extract(ascii_value: str) -> tldextract.models.ExtractResult:
+    return EXTRACTOR(ascii_value)
+
+
 HOST_LABEL = re.compile(r"^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$")
 KEYWORD = re.compile(r"^[A-Za-z0-9._-]{1,128}$")
 
@@ -37,7 +45,7 @@ def normalize_domain(value: str) -> tuple[str | None, str | None, str | None]:
         return None, None, "invalid_idn"
     if len(ascii_value) > 253 or any(not HOST_LABEL.fullmatch(label) for label in ascii_value.split(".")):
         return None, None, "invalid_domain"
-    result = EXTRACTOR(ascii_value)
+    result = _cached_extract(ascii_value)
     if not result.suffix:
         return None, None, "psl_unknown_suffix"
     if not result.domain:
