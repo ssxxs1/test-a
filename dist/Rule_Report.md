@@ -2,15 +2,15 @@
 
 ## Output rules
 
-- `clash_full`: actual=3972, target=12000, max=20000; reserved DNS=64; eligible=3980
-  - tiers: tier1_eligible=123, tier1_selected=100, tier2_eligible=3826, tier2_selected=3777, tier3_eligible=31, tier3_selected=30
-  - HOST=241, HOST-KEYWORD=2, HOST-SUFFIX=3701, IP-CIDR=24, IP6-CIDR=4
-- `qx_universal`: actual=3723, target=10000, max=20000; reserved DNS=64; eligible=3699
-  - tiers: tier1_eligible=68, tier1_selected=53, tier2_eligible=3621, tier2_selected=3597, tier3_eligible=10, tier3_selected=10
-  - HOST=235, HOST-KEYWORD=2, HOST-SUFFIX=3458, IP-CIDR=24, IP6-CIDR=4
-- `qx_compact`: actual=2000, target=2000, max=5000; reserved DNS=64; eligible=3362
-  - tiers: tier1_eligible=92, tier1_selected=72, tier2_eligible=3270, tier2_selected=1864
-  - HOST=79, HOST-KEYWORD=2, HOST-SUFFIX=1891, IP-CIDR=24, IP6-CIDR=4
+- `clash_full`: actual=4184, target=12000, max=20000; reserved DNS=64; eligible=4192
+  - tiers: tier1_eligible=143, tier1_selected=120, tier2_eligible=4018, tier2_selected=3969, tier3_eligible=31, tier3_selected=30
+  - HOST=240, HOST-KEYWORD=23, HOST-SUFFIX=3699, IP-CIDR=218, IP6-CIDR=4
+- `qx_universal`: actual=3938, target=10000, max=20000; reserved DNS=64; eligible=3914
+  - tiers: tier1_eligible=89, tier1_selected=74, tier2_eligible=3815, tier2_selected=3791, tier3_eligible=10, tier3_selected=10
+  - HOST=235, HOST-KEYWORD=23, HOST-SUFFIX=3458, IP-CIDR=218, IP6-CIDR=4
+- `qx_compact`: actual=2281, target=2000, max=5000; reserved DNS=64; eligible=3574
+  - tiers: tier1_eligible=112, tier1_selected=92, tier2_eligible=3462, tier2_selected=2125
+  - HOST=83, HOST-KEYWORD=23, HOST-SUFFIX=2147, IP-CIDR=24, IP6-CIDR=4
 
 ## BlockDNS passthrough
 
@@ -21,12 +21,13 @@
 
 ## Sources
 
-- `privacy`: candidates=39936, parsed=39934, canonical=c240a05d77c37fe25a2d6b74a13ce3f2e90cebaca625ce0e514303b052640967
-- `adlite`: candidates=38066, parsed=38053, canonical=d32687ce55f318436738dfc4e63f3ef136627cea5a747a25b73fe8fa63e6cd0d
+- `privacy`: candidates=39936, parsed=39933, canonical=f8d1fd3c8007cfa4e31a06ae01d2cb407d463f2aba85e10de173dcb7f86009c5
+- `adlite`: candidates=38066, parsed=38052, canonical=6331dfe05ef2b38a014872038a62fe5ac265ea46f7e1436f3956965f5c6db66e
 - `BlockDNS`: candidates=64, parsed=64, canonical=1b8ab6e4d4fa867761d5ebdf793bb21659c2ef3c25c6b46d1f4edb0c31dd7373
 
 ## Safety rejections
 
 - `keyword_too_short`: 1
+- `private_or_reserved_cidr`: 2
 - `psl_unknown_suffix`: 9
 - `public_suffix_root`: 5

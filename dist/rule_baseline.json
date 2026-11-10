@@ -2,14 +2,14 @@
   "approval": null,
   "identity": {
     "dependency_identity": "5ebf270993b4ce173f0d0ef429d51cdc732951cc438f697f1428f5e6cb60e6e1",
-    "policy_hash": "4c315891c299d66f101f9bbfffa4bc4874d7ef39cc0e756a5f2a004def526058",
-    "policy_version": 6,
-    "processor_hash": "0c3da70aaf29d7e610b2a7c1605c9abe5774614c109e04cfab4f5d619130801a",
-    "processor_version": 4,
+    "policy_hash": "ac914c1d3fa80e2f5b33f85958725c9aa16d92afe5b4e8cd13b7d33eae42c02c",
+    "policy_version": 7,
+    "processor_hash": "1a156b5075b62f4d57945290e4f2a41913739ddd8885a7de2ff0be8dc1ba8040",
+    "processor_version": 5,
     "source_canonical_hashes": {
       "BlockDNS": "1b8ab6e4d4fa867761d5ebdf793bb21659c2ef3c25c6b46d1f4edb0c31dd7373",
-      "adlite": "d32687ce55f318436738dfc4e63f3ef136627cea5a747a25b73fe8fa63e6cd0d",
-      "privacy": "c240a05d77c37fe25a2d6b74a13ce3f2e90cebaca625ce0e514303b052640967"
+      "adlite": "6331dfe05ef2b38a014872038a62fe5ac265ea46f7e1436f3956965f5c6db66e",
+      "privacy": "f8d1fd3c8007cfa4e31a06ae01d2cb407d463f2aba85e10de173dcb7f86009c5"
     },
     "source_raw_hashes": {
       "BlockDNS": "1f22f942384e2f71ead423d3fbd02703734c17f93762975d74556ebcade89b86",
@@ -21,28 +21,28 @@
   },
   "outputs": {
     "clash_full": {
-      "HOST": 241,
-      "HOST-KEYWORD": 2,
-      "HOST-SUFFIX": 3701,
-      "IP-CIDR": 24,
+      "HOST": 240,
+      "HOST-KEYWORD": 23,
+      "HOST-SUFFIX": 3699,
+      "IP-CIDR": 218,
       "IP6-CIDR": 4,
-      "TOTAL": 3972
+      "TOTAL": 4184
     },
     "qx_compact": {
-      "HOST": 79,
-      "HOST-KEYWORD": 2,
-      "HOST-SUFFIX": 1891,
+      "HOST": 83,
+      "HOST-KEYWORD": 23,
+      "HOST-SUFFIX": 2147,
       "IP-CIDR": 24,
       "IP6-CIDR": 4,
-      "TOTAL": 2000
+      "TOTAL": 2281
     },
     "qx_universal": {
       "HOST": 235,
-      "HOST-KEYWORD": 2,
+      "HOST-KEYWORD": 23,
       "HOST-SUFFIX": 3458,
-      "IP-CIDR": 24,
+      "IP-CIDR": 218,
       "IP6-CIDR": 4,
-      "TOTAL": 3723
+      "TOTAL": 3938
     }
   },
   "root_suffixes": [
@@ -80,7 +80,6 @@
     "iad-apple.com",
     "inmobi.com",
     "ironsrc.com",
-    "jpush.cn",
     "kochava.com",
     "mbridge.com",
     "metrics.abbott",
@@ -112,6 +111,7 @@
   ],
   "safety_rejections": {
     "keyword_too_short": 1,
+    "private_or_reserved_cidr": 2,
     "psl_unknown_suffix": 9,
     "public_suffix_root": 5
   },
@@ -125,21 +125,23 @@
     },
     "adlite": {
       "candidate_lines": 38066,
-      "canonical_events_hash": "d32687ce55f318436738dfc4e63f3ef136627cea5a747a25b73fe8fa63e6cd0d",
-      "parsed_rules": 38053,
+      "canonical_events_hash": "6331dfe05ef2b38a014872038a62fe5ac265ea46f7e1436f3956965f5c6db66e",
+      "parsed_rules": 38052,
       "raw_content_hash": "566865dfe8f72c1145567c05d0a72ab8111443f4cddc9a8d636e7cfa756b8e10",
       "rejections": {
+        "private_or_reserved_cidr": 1,
         "psl_unknown_suffix": 8,
         "public_suffix_root": 5
       }
     },
     "privacy": {
       "candidate_lines": 39936,
-      "canonical_events_hash": "c240a05d77c37fe25a2d6b74a13ce3f2e90cebaca625ce0e514303b052640967",
-      "parsed_rules": 39934,
+      "canonical_events_hash": "f8d1fd3c8007cfa4e31a06ae01d2cb407d463f2aba85e10de173dcb7f86009c5",
+      "parsed_rules": 39933,
       "raw_content_hash": "2791fc2b3c4cf242caaa3e27f0393ea908aa82baa0b54b62c0ed2f4ec2d68198",
       "rejections": {
         "keyword_too_short": 1,
+        "private_or_reserved_cidr": 1,
         "psl_unknown_suffix": 1
       }
     }
