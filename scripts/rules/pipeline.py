@@ -156,7 +156,7 @@ def _select(name, grouped, sources, policy, rd_sources=None):
         if rd_sources and rule.rule_type in {"HOST", "HOST-SUFFIX"}:
             _, registrable, _ = normalize_domain(rule.value)
             if registrable:
-                rd_source_count = len(rd_sources.get(registrable, {1}))
+                rd_source_count = len(rd_sources.get(registrable, set())) or 1
 
         if tier == 1:
             priority = max((item.get("priority", 800) for item in catalog), default=800)

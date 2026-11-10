@@ -25,6 +25,8 @@
     "getui.com",
     "getui.net",
     "igexin.com",
+    "jpush.cn",
+    "jpush.io",
     "collect.alipay.com",
     "95516.com",
     "citibank.com",
@@ -816,7 +818,7 @@
       "platforms": [
         "mobile"
       ],
-      "lite_enabled": true,
+      "lite_enabled": false,
       "provider": "third_party",
       "product": "sdk-jpush",
       "priority": 800

@@ -74,6 +74,10 @@ def normalize_ip(value: str, expected_version: int) -> tuple[str | None, str | N
         return None, "invalid_cidr"
     if network.version != expected_version:
         return None, "cidr_version_mismatch"
+    if network.is_private or network.is_loopback or network.is_reserved or network.is_unspecified or network.is_link_local:
+        return None, "private_or_reserved_cidr"
+    if (network.version == 4 and network.prefixlen < 9) or (network.version == 6 and network.prefixlen < 16):
+        return None, "cidr_prefix_too_broad"
     return str(network), None
 
 

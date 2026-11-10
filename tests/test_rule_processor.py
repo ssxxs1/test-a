@@ -267,5 +267,28 @@ class ProductProfileTests(unittest.TestCase):
         self.assertEqual(_extract_repo_identity("https://cdn.jsdelivr.net/gh/owner/repo@main/path/rule.list"), "owner/repo")
         self.assertIsNone(_extract_repo_identity("https://example.com/some/path"))
 
+    def test_private_and_bogus_ip_cidr_rejected(self):
+        from rules.normalize import normalize_ip
+        # Private LAN networks
+        self.assertEqual(normalize_ip("10.72.25.0/24", 4), (None, "private_or_reserved_cidr"))
+        self.assertEqual(normalize_ip("192.168.1.1/32", 4), (None, "private_or_reserved_cidr"))
+        self.assertEqual(normalize_ip("172.16.0.0/16", 4), (None, "private_or_reserved_cidr"))
+        self.assertEqual(normalize_ip("127.0.0.1/32", 4), (None, "private_or_reserved_cidr"))
+        # Broad or reserved
+        self.assertEqual(normalize_ip("0.0.0.1/32", 4), (None, "private_or_reserved_cidr"))
+        self.assertEqual(normalize_ip("0.0.0.0/0", 4), (None, "private_or_reserved_cidr"))
+        # Valid public IP
+        self.assertEqual(normalize_ip("101.124.19.122/32", 4), ("101.124.19.122/32", None))
+
+    def test_jpush_excluded_by_domain_exclusions(self):
+        r_jpush = Rule("HOST-SUFFIX", "jpush.cn")
+        r_sis = Rule("HOST-SUFFIX", "sis.jpush.io")
+        custom_policy = dict(POLICY)
+        custom_policy["domain_exclusions"] = ["jpush.cn", "jpush.io"]
+        profiles, decisions = build_profiles([result("adlite", "advertising", [r_jpush, r_sis])], custom_policy)
+        for name in ("clash_full", "qx_universal", "qx_compact"):
+            self.assertNotIn(r_jpush, profiles[name])
+            self.assertNotIn(r_sis, profiles[name])
+
 
 if __name__ == "__main__": unittest.main()
