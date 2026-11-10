@@ -137,8 +137,30 @@ def _select(name, grouped, sources, policy):
             priority = max((item.get("priority", 800) for item in catalog), default=800)
             rank_score = (-priority, -consensus_count, -is_suffix, TYPE_ORDER.get(rule.rule_type, 99), len(rule.value), rule.value)
         elif tier == 2:
-            matched_evidence_count = len(labels & (web_labels | mobile_labels)) + len(pattern_web if name != "qx_compact" else pattern_compact)
-            rank_score = (-consensus_count, -matched_evidence_count, -is_suffix, TYPE_ORDER.get(rule.rule_type, 99), len(rule.value), rule.value)
+            if name == "qx_compact":
+                sdk_count = len(labels & mobile_labels)
+                tracker_count = len({l for l in pattern_compact if re.search(r"track", l)})
+                pixel_count = len({l for l in pattern_compact if re.search(r"pixel|beacon", l)})
+                analytics_count = len({l for l in pattern_compact if re.search(r"analytic", l)})
+                metrics_count = len({l for l in pattern_compact if re.search(r"metric", l)})
+
+                if sdk_count > 0:
+                    evidence_grade = 50 + min(sdk_count, 5)
+                elif tracker_count > 0:
+                    evidence_grade = 40 + min(tracker_count, 5)
+                elif pixel_count > 0:
+                    evidence_grade = 30 + min(pixel_count, 5)
+                elif analytics_count > 0:
+                    evidence_grade = 20 + min(analytics_count, 5)
+                elif metrics_count > 0:
+                    parts = rule.value.split(".")
+                    is_special_metric = any("-" in l or "_" in l or l == "metric" for l in pattern_compact) or len(parts) != 3
+                    evidence_grade = 15 if is_special_metric else 10
+                else:
+                    evidence_grade = 5
+            else:
+                evidence_grade = len(labels & (web_labels | mobile_labels)) + len(pattern_web)
+            rank_score = (-consensus_count, -evidence_grade, -is_suffix, TYPE_ORDER.get(rule.rule_type, 99), len(rule.value), rule.value)
         else:
             rank_score = (-consensus_count, -is_suffix, TYPE_ORDER.get(rule.rule_type, 99), len(rule.value), rule.value)
 
@@ -151,23 +173,30 @@ def _select(name, grouped, sources, policy):
     target_cap = limit["target"]
     hard_max = limit["max"]
 
-    # 优化容量调度：Tier 1 与 多源共识核心规则允许吸纳至 hard_max；普通规则填充至 target_cap 并做前置去重
+    # 优化容量调度：质量分梯度平滑录取与弹性缓冲区，避免死板硬截断与分档撕裂
+    active_bracket = None
     for tier in (1, 2, 3):
-        for _, rule in sorted(candidates[tier]):
+        for rank_score, rule in sorted(candidates[tier]):
             if rule.rule_type in {"HOST", "HOST-SUFFIX"} and rule not in reserved:
                 if covered_by_suffix(rule.value, current_suffixes - ({rule.value} if rule.rule_type == "HOST-SUFFIX" else set())):
                     reasons[rule] = "covered_by_active_suffix"
                     continue
+            bracket_key = (tier, rank_score[0], rank_score[1], rank_score[2])
             is_core = (tier == 1) or (rule in grouped and len(grouped[rule][0].consensus_sources) >= 2)
             current_count = len(selected)
             if is_core:
                 if current_count >= hard_max:
                     reasons[rule] = f"max_exceeded_tier{tier}"
                     continue
+                active_bracket = bracket_key
             else:
                 if current_count >= target_cap:
-                    reasons[rule] = f"target_reached_tier{tier}"
-                    continue
+                    buffer = max(1, int(target_cap * 0.15))
+                    soft_cap = min(hard_max, target_cap + buffer)
+                    if bracket_key != active_bracket or current_count >= soft_cap:
+                        reasons[rule] = f"target_reached_tier{tier}"
+                        continue
+                active_bracket = bracket_key
             selected.add(rule)
             if rule.rule_type == "HOST-SUFFIX":
                 current_suffixes.add(rule.value)

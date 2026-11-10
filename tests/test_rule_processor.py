@@ -171,5 +171,52 @@ class ProductProfileTests(unittest.TestCase):
         self.assertEqual(urls[0], "https://raw.githubusercontent.com/owner/repo/main/path/rule.list?token=abc")
         self.assertEqual(urls[1], "https://cdn.jsdelivr.net/gh/owner/repo@main/path/rule.list?token=abc")
 
+    def test_smooth_bracket_elastic_admission(self):
+        # 3 rules of identical tier & evidence grade: bracket should finish smoothly past target into buffer
+        r1 = Rule("HOST-SUFFIX", "tracker.alpha.com")
+        r2 = Rule("HOST-SUFFIX", "tracker.beta.com")
+        r3 = Rule("HOST-SUFFIX", "tracker.gamma.com")
+        # 1 lower-ranked rule (different bracket)
+        r_low = Rule("HOST", "other.delta.com")
+
+        custom_policy = dict(POLICY)
+        custom_policy["domain_evidence_catalog"] = []
+        # target=2, max=5. Buffer allows 2 + max(1, int(2*0.15)) = 3 rules.
+        custom_policy["profile_limits"] = {
+            "clash_full": {"target": 10, "max": 20},
+            "qx_universal": {"target": 10, "max": 20},
+            "qx_compact": {"target": 2, "max": 5}
+        }
+        res = result("privacy", "tracking", [r1, r2, r3, r_low])
+        profiles, decisions = build_profiles([res], custom_policy)
+        compact = profiles["qx_compact"]
+        # r1, r2, r3 share the same bracket and must ALL be smoothly admitted (count=3 <= soft_cap 3)
+        self.assertIn(r1, compact)
+        self.assertIn(r2, compact)
+        self.assertIn(r3, compact)
+        # r_low is in a lower bracket and target was reached, so it must NOT be admitted
+        self.assertNotIn(r_low, compact)
+
+    def test_mobile_sdk_priority_in_compact(self):
+        # In QX compact, mobile SDK rule has higher evidence grade than generic tracker/metric
+        # Even if mobile SDK rule has longer domain name or later alphabetical letter
+        r_sdk = Rule("HOST-SUFFIX", "sensorsdata.z-long-corp-name.com")
+        r_generic = Rule("HOST-SUFFIX", "tracker.a.com")
+
+        custom_policy = dict(POLICY)
+        custom_policy["domain_evidence_catalog"] = []
+        custom_policy["mobile_sdk_labels"] = ["sensorsdata"]
+        custom_policy["profile_limits"] = {
+            "clash_full": {"target": 10, "max": 20},
+            "qx_universal": {"target": 10, "max": 20},
+            "qx_compact": {"target": 1, "max": 2}
+        }
+        res = result("privacy", "tracking", [r_sdk, r_generic])
+        profiles, decisions = build_profiles([res], custom_policy)
+        compact = profiles["qx_compact"]
+        # r_sdk has mobile_sdk evidence grade (51) > tracker (41), so with target=1, r_sdk MUST be admitted
+        self.assertIn(r_sdk, compact)
+        self.assertNotIn(r_generic, compact)
+
 
 if __name__ == "__main__": unittest.main()
