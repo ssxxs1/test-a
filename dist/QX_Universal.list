@@ -1,11 +1,11 @@
 # NAME: QX_Universal
-# HOST: 236
-# HOST-SUFFIX: 3489
+# HOST: 235
+# HOST-SUFFIX: 3458
 # HOST-KEYWORD: 2
 # IP-CIDR: 28
 # GEOIP: 0
 # USER-AGENT: 0
-# TOTAL: 3755
+# TOTAL: 3723
 HOST,ad-server.co.za,Advertising
 HOST,ad.10010.com,Advertising
 HOST,ad.1ting.com,Advertising
@@ -53,7 +53,6 @@ HOST,adexchange.io,Advertising
 HOST,adlog.vivo.com.cn,Advertising
 HOST,adnxs.net,Advertising
 HOST,ads-sdk.upltv.com,Advertising
-HOST,ads.95516.com,Advertising
 HOST,ads.adiquity.com,Advertising
 HOST,ads.admoda.com,Advertising
 HOST,ads.aol.co.uk,Advertising
@@ -639,7 +638,6 @@ HOST-SUFFIX,analytics.airtron.com,Advertising
 HOST-SUFFIX,analytics.aita.gov.vn,Advertising
 HOST-SUFFIX,analytics.algolia.com,Advertising
 HOST-SUFFIX,analytics.allovoisins.com,Advertising
-HOST-SUFFIX,analytics.alrajhibank.com.sa,Advertising
 HOST-SUFFIX,analytics.amakings.com,Advertising
 HOST-SUFFIX,analytics.americanfunds.com,Advertising
 HOST-SUFFIX,analytics.amig.com,Advertising
@@ -660,7 +658,6 @@ HOST-SUFFIX,analytics.avanser.com.au,Advertising
 HOST-SUFFIX,analytics.avis.de,Advertising
 HOST-SUFFIX,analytics.aweber.com,Advertising
 HOST-SUFFIX,analytics.awhr.com,Advertising
-HOST-SUFFIX,analytics.banksneveraskthat.com,Advertising
 HOST-SUFFIX,analytics.basistheory.com,Advertising
 HOST-SUFFIX,analytics.belgacom.be,Advertising
 HOST-SUFFIX,analytics.bestreviews.com,Advertising
@@ -748,7 +745,6 @@ HOST-SUFFIX,analytics.cyrillus.com,Advertising
 HOST-SUFFIX,analytics.cyrillus.de,Advertising
 HOST-SUFFIX,analytics.cyrillus.fr,Advertising
 HOST-SUFFIX,analytics.daasrv.net,Advertising
-HOST-SUFFIX,analytics.data.lloydsbankinggroup.com,Advertising
 HOST-SUFFIX,analytics.data.visenze.com,Advertising
 HOST-SUFFIX,analytics.datahc.com,Advertising
 HOST-SUFFIX,analytics.designspiration.com,Advertising
@@ -788,8 +784,6 @@ HOST-SUFFIX,analytics.fatmedia.io,Advertising
 HOST-SUFFIX,analytics.favcy.com,Advertising
 HOST-SUFFIX,analytics.ferguson.com,Advertising
 HOST-SUFFIX,analytics.firespring.com,Advertising
-HOST-SUFFIX,analytics.firstbankcardcenter.com,Advertising
-HOST-SUFFIX,analytics.firstbankcardplcc.com,Advertising
 HOST-SUFFIX,analytics.firstnational.com,Advertising
 HOST-SUFFIX,analytics.fishtrack.com,Advertising
 HOST-SUFFIX,analytics.flexpay.io,Advertising
@@ -839,7 +833,6 @@ HOST-SUFFIX,analytics.hiome.com,Advertising
 HOST-SUFFIX,analytics.hlntv.com,Advertising
 HOST-SUFFIX,analytics.holidayinn.com,Advertising
 HOST-SUFFIX,analytics.hollywoodlife.com,Advertising
-HOST-SUFFIX,analytics.homebank.ro,Advertising
 HOST-SUFFIX,analytics.homes.com,Advertising
 HOST-SUFFIX,analytics.hottopic.com,Advertising
 HOST-SUFFIX,analytics.humanautomation.ai,Advertising
@@ -1346,7 +1339,6 @@ HOST-SUFFIX,metric.barclaycardus.com,Advertising
 HOST-SUFFIX,metric.baylorhealth.com,Advertising
 HOST-SUFFIX,metric.billmelater.com,Advertising
 HOST-SUFFIX,metric.bostonscientific.com,Advertising
-HOST-SUFFIX,metric.caixabank.es,Advertising
 HOST-SUFFIX,metric.carview.co.jp,Advertising
 HOST-SUFFIX,metric.ch.nissan.co.jp,Advertising
 HOST-SUFFIX,metric.changiairport.com,Advertising
@@ -1572,11 +1564,6 @@ HOST-SUFFIX,metrics.bakeryinfo.co.uk,Advertising
 HOST-SUFFIX,metrics.bananarepublic.eu,Advertising
 HOST-SUFFIX,metrics.bancobmg.com.br,Advertising
 HOST-SUFFIX,metrics.bangbros.com,Advertising
-HOST-SUFFIX,metrics.bankatfirst.com,Advertising
-HOST-SUFFIX,metrics.bankia.es,Advertising
-HOST-SUFFIX,metrics.bankofamerica.com,Advertising
-HOST-SUFFIX,metrics.banksa.com.au,Advertising
-HOST-SUFFIX,metrics.bankwest.com.au,Advertising
 HOST-SUFFIX,metrics.barclaycardus.com,Advertising
 HOST-SUFFIX,metrics.barclays.co.uk,Advertising
 HOST-SUFFIX,metrics.base.be,Advertising
@@ -1644,7 +1631,6 @@ HOST-SUFFIX,metrics.c2fo.com,Advertising
 HOST-SUFFIX,metrics.caesars.com,Advertising
 HOST-SUFFIX,metrics.cahealthwellness.com,Advertising
 HOST-SUFFIX,metrics.cairnspost.com.au,Advertising
-HOST-SUFFIX,metrics.caixabank.es,Advertising
 HOST-SUFFIX,metrics.calbaptist.edu,Advertising
 HOST-SUFFIX,metrics.calgary.ca,Advertising
 HOST-SUFFIX,metrics.calia.com,Advertising
@@ -1695,10 +1681,7 @@ HOST-SUFFIX,metrics.churchill.com,Advertising
 HOST-SUFFIX,metrics.cib.bnpparibas,Advertising
 HOST-SUFFIX,metrics.cigarsinternational.com,Advertising
 HOST-SUFFIX,metrics.citi.com,Advertising
-HOST-SUFFIX,metrics.citibank.com,Advertising
-HOST-SUFFIX,metrics.citibank.com.my,Advertising
 HOST-SUFFIX,metrics.citimortgage.com,Advertising
-HOST-SUFFIX,metrics.citizensbank.com,Advertising
 HOST-SUFFIX,metrics.claires.com,Advertising
 HOST-SUFFIX,metrics.cluballiance.aaa.com,Advertising
 HOST-SUFFIX,metrics.clubmonaco.ca,Advertising
@@ -1959,7 +1942,6 @@ HOST-SUFFIX,metrics.globe.com.ph,Advertising
 HOST-SUFFIX,metrics.glucerna.net,Advertising
 HOST-SUFFIX,metrics.gnc.com,Advertising
 HOST-SUFFIX,metrics.goalfinancial.net,Advertising
-HOST-SUFFIX,metrics.gobank.com,Advertising
 HOST-SUFFIX,metrics.goindigo.in,Advertising
 HOST-SUFFIX,metrics.goinggoing.com,Advertising
 HOST-SUFFIX,metrics.goldcoastbulletin.com.au,Advertising
@@ -2038,7 +2020,6 @@ HOST-SUFFIX,metrics.insider.hagerty.com,Advertising
 HOST-SUFFIX,metrics.instyle.com,Advertising
 HOST-SUFFIX,metrics.insuramatch.com,Advertising
 HOST-SUFFIX,metrics.insurancesaver.com,Advertising
-HOST-SUFFIX,metrics.interbank.pe,Advertising
 HOST-SUFFIX,metrics.interestfree.com.au,Advertising
 HOST-SUFFIX,metrics.interhyp.de,Advertising
 HOST-SUFFIX,metrics.internationalwinechallenge.com,Advertising
@@ -2196,7 +2177,6 @@ HOST-SUFFIX,metrics.mindshareworld.com,Advertising
 HOST-SUFFIX,metrics.miniusa.com,Advertising
 HOST-SUFFIX,metrics.missselfridge.com,Advertising
 HOST-SUFFIX,metrics.misumi-ec.com,Advertising
-HOST-SUFFIX,metrics.mobilebanking.scotiabank.com,Advertising
 HOST-SUFFIX,metrics.modcloth.com,Advertising
 HOST-SUFFIX,metrics.moen.com,Advertising
 HOST-SUFFIX,metrics.monclick.it,Advertising
@@ -2451,7 +2431,6 @@ HOST-SUFFIX,metrics.royalmailgroup.com,Advertising
 HOST-SUFFIX,metrics.rozlytrek.com,Advertising
 HOST-SUFFIX,metrics.ryanhomes.com,Advertising
 HOST-SUFFIX,metrics.rydahls.se,Advertising
-HOST-SUFFIX,metrics.sainsburysbank.co.uk,Advertising
 HOST-SUFFIX,metrics.salliemae.com,Advertising
 HOST-SUFFIX,metrics.samsclub.com,Advertising
 HOST-SUFFIX,metrics.samsunglife.com,Advertising
@@ -2484,7 +2463,6 @@ HOST-SUFFIX,metrics.shangri-la.com,Advertising
 HOST-SUFFIX,metrics.shannons.com.au,Advertising
 HOST-SUFFIX,metrics.sharecare.com,Advertising
 HOST-SUFFIX,metrics.sharpusa.com,Advertising
-HOST-SUFFIX,metrics.shinseibank.com,Advertising
 HOST-SUFFIX,metrics.shiremedinfo.com,Advertising
 HOST-SUFFIX,metrics.shop.learningcurve.com,Advertising
 HOST-SUFFIX,metrics.shop.superstore.ca,Advertising
@@ -2550,7 +2528,6 @@ HOST-SUFFIX,metrics.stubhub.co.uk,Advertising
 HOST-SUFFIX,metrics.stubhub.de,Advertising
 HOST-SUFFIX,metrics.stubhub.fr,Advertising
 HOST-SUFFIX,metrics.stwater.co.uk,Advertising
-HOST-SUFFIX,metrics.suncorpbank.com.au,Advertising
 HOST-SUFFIX,metrics.sunflowerhealthplan.com,Advertising
 HOST-SUFFIX,metrics.sungard.com,Advertising
 HOST-SUFFIX,metrics.sunlife.com,Advertising
@@ -2597,7 +2574,6 @@ HOST-SUFFIX,metrics.teeoff.com,Advertising
 HOST-SUFFIX,metrics.telegraph.co.uk,Advertising
 HOST-SUFFIX,metrics.telenet.be,Advertising
 HOST-SUFFIX,metrics.telenor.se,Advertising
-HOST-SUFFIX,metrics.tescobank.com,Advertising
 HOST-SUFFIX,metrics.teveten-us.com,Advertising
 HOST-SUFFIX,metrics.texas.aaa.com,Advertising
 HOST-SUFFIX,metrics.tgifridays.com,Advertising
@@ -2686,14 +2662,12 @@ HOST-SUFFIX,metrics.tysonfoodservice.com,Advertising
 HOST-SUFFIX,metrics.ubi.com,Advertising
 HOST-SUFFIX,metrics.uhc.com,Advertising
 HOST-SUFFIX,metrics.ukfoodanddrinkshows.co.uk,Advertising
-HOST-SUFFIX,metrics.ulsterbank.com,Advertising
 HOST-SUFFIX,metrics.unipolsai.it,Advertising
 HOST-SUFFIX,metrics.united-internet.de,Advertising
 HOST-SUFFIX,metrics.uol.com.br,Advertising
 HOST-SUFFIX,metrics.upcload.com,Advertising
 HOST-SUFFIX,metrics.ups.com,Advertising
 HOST-SUFFIX,metrics.us.playstation.com,Advertising
-HOST-SUFFIX,metrics.usbank.com,Advertising
 HOST-SUFFIX,metrics.userguiding.com,Advertising
 HOST-SUFFIX,metrics.usfoods.com,Advertising
 HOST-SUFFIX,metrics.usmint.gov,Advertising
@@ -3100,9 +3074,6 @@ HOST-SUFFIX,tracking.avladies.de,Advertising
 HOST-SUFFIX,tracking.b-cdn.net,Advertising
 HOST-SUFFIX,tracking.bababam.com,Advertising
 HOST-SUFFIX,tracking.badeladies.de,Advertising
-HOST-SUFFIX,tracking.bankofalbuquerque.com,Advertising
-HOST-SUFFIX,tracking.bankofoklahoma.com,Advertising
-HOST-SUFFIX,tracking.bankoftexas.com,Advertising
 HOST-SUFFIX,tracking.barcodediscount.com,Advertising
 HOST-SUFFIX,tracking.barcodegiant.com,Advertising
 HOST-SUFFIX,tracking.barcodesinc.com,Advertising
@@ -3153,7 +3124,6 @@ HOST-SUFFIX,tracking.c.mercedes-benz.com.cn,Advertising
 HOST-SUFFIX,tracking.c.mercedes-benz.de,Advertising
 HOST-SUFFIX,tracking.cairn.info,Advertising
 HOST-SUFFIX,tracking.campaigns.drax.com,Advertising
-HOST-SUFFIX,tracking.capitalbank.jo,Advertising
 HOST-SUFFIX,tracking.capterra.com,Advertising
 HOST-SUFFIX,tracking.care.essentiahealth.org,Advertising
 HOST-SUFFIX,tracking.care.muschealth.org,Advertising
@@ -3282,7 +3252,6 @@ HOST-SUFFIX,tracking.go.atcc.org,Advertising
 HOST-SUFFIX,tracking.go.epsilon.com,Advertising
 HOST-SUFFIX,tracking.go.lorainccc.edu,Advertising
 HOST-SUFFIX,tracking.go.onshape.com,Advertising
-HOST-SUFFIX,tracking.go.provident.bank,Advertising
 HOST-SUFFIX,tracking.go.toyobo-mc.jp,Advertising
 HOST-SUFFIX,tracking.go.toyobo.co.jp,Advertising
 HOST-SUFFIX,tracking.goal.pl,Advertising
@@ -3727,7 +3696,6 @@ HOST-SUFFIX,vungle.com,Advertising
 HOST-SUFFIX,watson.telemetry.microsoft.com.nsatc.net,Advertising
 HOST-SUFFIX,web.analytics.metrobyt-mobile.com,Advertising
 HOST-SUFFIX,wt.ara.ad,Advertising
-HOST-SUFFIX,www.metrics.bankaustria.at,Advertising
 HOST-SUFFIX,www.tracking.adp.ch,Advertising
 HOST-SUFFIX,www.tracking.adp.co.uk,Advertising
 HOST-SUFFIX,www.tracking.alabamapower.com,Advertising

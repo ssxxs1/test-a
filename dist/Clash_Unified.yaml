@@ -1,11 +1,11 @@
 # NAME: Clash_Unified
-# DOMAIN: 242
-# DOMAIN-SUFFIX: 3736
+# DOMAIN: 241
+# DOMAIN-SUFFIX: 3701
 # DOMAIN-KEYWORD: 2
 # IP-CIDR: 28
 # GEOIP: 0
 # UNSUPPORTED-USER-AGENT: 0
-# TOTAL: 4008
+# TOTAL: 3972
 payload:
   - DOMAIN,ad-server.co.za
   - DOMAIN,ad.10010.com
@@ -54,7 +54,6 @@ payload:
   - DOMAIN,adlog.vivo.com.cn
   - DOMAIN,adnxs.net
   - DOMAIN,ads-sdk.upltv.com
-  - DOMAIN,ads.95516.com
   - DOMAIN,ads.adiquity.com
   - DOMAIN,ads.admoda.com
   - DOMAIN,ads.aol.co.uk
@@ -660,7 +659,6 @@ payload:
   - DOMAIN-SUFFIX,analytics.aita.gov.vn
   - DOMAIN-SUFFIX,analytics.algolia.com
   - DOMAIN-SUFFIX,analytics.allovoisins.com
-  - DOMAIN-SUFFIX,analytics.alrajhibank.com.sa
   - DOMAIN-SUFFIX,analytics.amakings.com
   - DOMAIN-SUFFIX,analytics.americanfunds.com
   - DOMAIN-SUFFIX,analytics.amig.com
@@ -681,7 +679,6 @@ payload:
   - DOMAIN-SUFFIX,analytics.avis.de
   - DOMAIN-SUFFIX,analytics.aweber.com
   - DOMAIN-SUFFIX,analytics.awhr.com
-  - DOMAIN-SUFFIX,analytics.banksneveraskthat.com
   - DOMAIN-SUFFIX,analytics.basistheory.com
   - DOMAIN-SUFFIX,analytics.belgacom.be
   - DOMAIN-SUFFIX,analytics.bestreviews.com
@@ -769,7 +766,6 @@ payload:
   - DOMAIN-SUFFIX,analytics.cyrillus.de
   - DOMAIN-SUFFIX,analytics.cyrillus.fr
   - DOMAIN-SUFFIX,analytics.daasrv.net
-  - DOMAIN-SUFFIX,analytics.data.lloydsbankinggroup.com
   - DOMAIN-SUFFIX,analytics.data.visenze.com
   - DOMAIN-SUFFIX,analytics.datahc.com
   - DOMAIN-SUFFIX,analytics.designspiration.com
@@ -809,8 +805,6 @@ payload:
   - DOMAIN-SUFFIX,analytics.favcy.com
   - DOMAIN-SUFFIX,analytics.ferguson.com
   - DOMAIN-SUFFIX,analytics.firespring.com
-  - DOMAIN-SUFFIX,analytics.firstbankcardcenter.com
-  - DOMAIN-SUFFIX,analytics.firstbankcardplcc.com
   - DOMAIN-SUFFIX,analytics.firstnational.com
   - DOMAIN-SUFFIX,analytics.fishtrack.com
   - DOMAIN-SUFFIX,analytics.flexpay.io
@@ -860,7 +854,6 @@ payload:
   - DOMAIN-SUFFIX,analytics.hlntv.com
   - DOMAIN-SUFFIX,analytics.holidayinn.com
   - DOMAIN-SUFFIX,analytics.hollywoodlife.com
-  - DOMAIN-SUFFIX,analytics.homebank.ro
   - DOMAIN-SUFFIX,analytics.homes.com
   - DOMAIN-SUFFIX,analytics.hottopic.com
   - DOMAIN-SUFFIX,analytics.humanautomation.ai
@@ -1416,7 +1409,6 @@ payload:
   - DOMAIN-SUFFIX,cm.ad.gifshow.com
   - DOMAIN-SUFFIX,cm.adcommon.bilibili.com
   - DOMAIN-SUFFIX,cm.track.biligame.bilibili.com
-  - DOMAIN-SUFFIX,collect.alipay.com
   - DOMAIN-SUFFIX,cpc.click.alimama.com
   - DOMAIN-SUFFIX,cpro.baidu.cn
   - DOMAIN-SUFFIX,cpro.baidu.com
@@ -1479,8 +1471,6 @@ payload:
   - DOMAIN-SUFFIX,g993dvyzae.branch.salesfloor.net
   - DOMAIN-SUFFIX,galileotelemetry.tencent.com
   - DOMAIN-SUFFIX,gdt.qq.com
-  - DOMAIN-SUFFIX,getui.com
-  - DOMAIN-SUFFIX,getui.net
   - DOMAIN-SUFFIX,google-analytics.com
   - DOMAIN-SUFFIX,googlesyndication.com
   - DOMAIN-SUFFIX,googletagmanager.com
@@ -1504,7 +1494,6 @@ payload:
   - DOMAIN-SUFFIX,huid.ad.360.cn
   - DOMAIN-SUFFIX,iad-apple.com
   - DOMAIN-SUFFIX,ib.adnxs.co
-  - DOMAIN-SUFFIX,igexin.com
   - DOMAIN-SUFFIX,igorsgtest.branch.rocks
   - DOMAIN-SUFFIX,inmobi.com
   - DOMAIN-SUFFIX,ironsrc.com
@@ -1535,7 +1524,6 @@ payload:
   - DOMAIN-SUFFIX,metric.baylorhealth.com
   - DOMAIN-SUFFIX,metric.billmelater.com
   - DOMAIN-SUFFIX,metric.bostonscientific.com
-  - DOMAIN-SUFFIX,metric.caixabank.es
   - DOMAIN-SUFFIX,metric.carview.co.jp
   - DOMAIN-SUFFIX,metric.ch.nissan.co.jp
   - DOMAIN-SUFFIX,metric.changiairport.com
@@ -1761,11 +1749,6 @@ payload:
   - DOMAIN-SUFFIX,metrics.bananarepublic.eu
   - DOMAIN-SUFFIX,metrics.bancobmg.com.br
   - DOMAIN-SUFFIX,metrics.bangbros.com
-  - DOMAIN-SUFFIX,metrics.bankatfirst.com
-  - DOMAIN-SUFFIX,metrics.bankia.es
-  - DOMAIN-SUFFIX,metrics.bankofamerica.com
-  - DOMAIN-SUFFIX,metrics.banksa.com.au
-  - DOMAIN-SUFFIX,metrics.bankwest.com.au
   - DOMAIN-SUFFIX,metrics.barclaycardus.com
   - DOMAIN-SUFFIX,metrics.barclays.co.uk
   - DOMAIN-SUFFIX,metrics.base.be
@@ -1833,7 +1816,6 @@ payload:
   - DOMAIN-SUFFIX,metrics.caesars.com
   - DOMAIN-SUFFIX,metrics.cahealthwellness.com
   - DOMAIN-SUFFIX,metrics.cairnspost.com.au
-  - DOMAIN-SUFFIX,metrics.caixabank.es
   - DOMAIN-SUFFIX,metrics.calbaptist.edu
   - DOMAIN-SUFFIX,metrics.calgary.ca
   - DOMAIN-SUFFIX,metrics.calia.com
@@ -1884,10 +1866,7 @@ payload:
   - DOMAIN-SUFFIX,metrics.cib.bnpparibas
   - DOMAIN-SUFFIX,metrics.cigarsinternational.com
   - DOMAIN-SUFFIX,metrics.citi.com
-  - DOMAIN-SUFFIX,metrics.citibank.com
-  - DOMAIN-SUFFIX,metrics.citibank.com.my
   - DOMAIN-SUFFIX,metrics.citimortgage.com
-  - DOMAIN-SUFFIX,metrics.citizensbank.com
   - DOMAIN-SUFFIX,metrics.claires.com
   - DOMAIN-SUFFIX,metrics.cluballiance.aaa.com
   - DOMAIN-SUFFIX,metrics.clubmonaco.ca
@@ -2148,7 +2127,6 @@ payload:
   - DOMAIN-SUFFIX,metrics.glucerna.net
   - DOMAIN-SUFFIX,metrics.gnc.com
   - DOMAIN-SUFFIX,metrics.goalfinancial.net
-  - DOMAIN-SUFFIX,metrics.gobank.com
   - DOMAIN-SUFFIX,metrics.goindigo.in
   - DOMAIN-SUFFIX,metrics.goinggoing.com
   - DOMAIN-SUFFIX,metrics.goldcoastbulletin.com.au
@@ -2227,7 +2205,6 @@ payload:
   - DOMAIN-SUFFIX,metrics.instyle.com
   - DOMAIN-SUFFIX,metrics.insuramatch.com
   - DOMAIN-SUFFIX,metrics.insurancesaver.com
-  - DOMAIN-SUFFIX,metrics.interbank.pe
   - DOMAIN-SUFFIX,metrics.interestfree.com.au
   - DOMAIN-SUFFIX,metrics.interhyp.de
   - DOMAIN-SUFFIX,metrics.internationalwinechallenge.com
@@ -2385,7 +2362,6 @@ payload:
   - DOMAIN-SUFFIX,metrics.miniusa.com
   - DOMAIN-SUFFIX,metrics.missselfridge.com
   - DOMAIN-SUFFIX,metrics.misumi-ec.com
-  - DOMAIN-SUFFIX,metrics.mobilebanking.scotiabank.com
   - DOMAIN-SUFFIX,metrics.modcloth.com
   - DOMAIN-SUFFIX,metrics.moen.com
   - DOMAIN-SUFFIX,metrics.monclick.it
@@ -2640,7 +2616,6 @@ payload:
   - DOMAIN-SUFFIX,metrics.rozlytrek.com
   - DOMAIN-SUFFIX,metrics.ryanhomes.com
   - DOMAIN-SUFFIX,metrics.rydahls.se
-  - DOMAIN-SUFFIX,metrics.sainsburysbank.co.uk
   - DOMAIN-SUFFIX,metrics.salliemae.com
   - DOMAIN-SUFFIX,metrics.samsclub.com
   - DOMAIN-SUFFIX,metrics.samsunglife.com
@@ -2673,7 +2648,6 @@ payload:
   - DOMAIN-SUFFIX,metrics.shannons.com.au
   - DOMAIN-SUFFIX,metrics.sharecare.com
   - DOMAIN-SUFFIX,metrics.sharpusa.com
-  - DOMAIN-SUFFIX,metrics.shinseibank.com
   - DOMAIN-SUFFIX,metrics.shiremedinfo.com
   - DOMAIN-SUFFIX,metrics.shop.learningcurve.com
   - DOMAIN-SUFFIX,metrics.shop.superstore.ca
@@ -2739,7 +2713,6 @@ payload:
   - DOMAIN-SUFFIX,metrics.stubhub.de
   - DOMAIN-SUFFIX,metrics.stubhub.fr
   - DOMAIN-SUFFIX,metrics.stwater.co.uk
-  - DOMAIN-SUFFIX,metrics.suncorpbank.com.au
   - DOMAIN-SUFFIX,metrics.sunflowerhealthplan.com
   - DOMAIN-SUFFIX,metrics.sungard.com
   - DOMAIN-SUFFIX,metrics.sunlife.com
@@ -2786,7 +2759,6 @@ payload:
   - DOMAIN-SUFFIX,metrics.telegraph.co.uk
   - DOMAIN-SUFFIX,metrics.telenet.be
   - DOMAIN-SUFFIX,metrics.telenor.se
-  - DOMAIN-SUFFIX,metrics.tescobank.com
   - DOMAIN-SUFFIX,metrics.teveten-us.com
   - DOMAIN-SUFFIX,metrics.texas.aaa.com
   - DOMAIN-SUFFIX,metrics.tgifridays.com
@@ -2875,14 +2847,12 @@ payload:
   - DOMAIN-SUFFIX,metrics.ubi.com
   - DOMAIN-SUFFIX,metrics.uhc.com
   - DOMAIN-SUFFIX,metrics.ukfoodanddrinkshows.co.uk
-  - DOMAIN-SUFFIX,metrics.ulsterbank.com
   - DOMAIN-SUFFIX,metrics.unipolsai.it
   - DOMAIN-SUFFIX,metrics.united-internet.de
   - DOMAIN-SUFFIX,metrics.uol.com.br
   - DOMAIN-SUFFIX,metrics.upcload.com
   - DOMAIN-SUFFIX,metrics.ups.com
   - DOMAIN-SUFFIX,metrics.us.playstation.com
-  - DOMAIN-SUFFIX,metrics.usbank.com
   - DOMAIN-SUFFIX,metrics.userguiding.com
   - DOMAIN-SUFFIX,metrics.usfoods.com
   - DOMAIN-SUFFIX,metrics.usmint.gov
@@ -3339,9 +3309,6 @@ payload:
   - DOMAIN-SUFFIX,tracking.b-cdn.net
   - DOMAIN-SUFFIX,tracking.bababam.com
   - DOMAIN-SUFFIX,tracking.badeladies.de
-  - DOMAIN-SUFFIX,tracking.bankofalbuquerque.com
-  - DOMAIN-SUFFIX,tracking.bankofoklahoma.com
-  - DOMAIN-SUFFIX,tracking.bankoftexas.com
   - DOMAIN-SUFFIX,tracking.barcodediscount.com
   - DOMAIN-SUFFIX,tracking.barcodegiant.com
   - DOMAIN-SUFFIX,tracking.barcodesinc.com
@@ -3392,7 +3359,6 @@ payload:
   - DOMAIN-SUFFIX,tracking.c.mercedes-benz.de
   - DOMAIN-SUFFIX,tracking.cairn.info
   - DOMAIN-SUFFIX,tracking.campaigns.drax.com
-  - DOMAIN-SUFFIX,tracking.capitalbank.jo
   - DOMAIN-SUFFIX,tracking.capterra.com
   - DOMAIN-SUFFIX,tracking.care.essentiahealth.org
   - DOMAIN-SUFFIX,tracking.care.muschealth.org
@@ -3521,7 +3487,6 @@ payload:
   - DOMAIN-SUFFIX,tracking.go.epsilon.com
   - DOMAIN-SUFFIX,tracking.go.lorainccc.edu
   - DOMAIN-SUFFIX,tracking.go.onshape.com
-  - DOMAIN-SUFFIX,tracking.go.provident.bank
   - DOMAIN-SUFFIX,tracking.go.toyobo-mc.jp
   - DOMAIN-SUFFIX,tracking.go.toyobo.co.jp
   - DOMAIN-SUFFIX,tracking.goal.pl
@@ -3978,7 +3943,6 @@ payload:
   - DOMAIN-SUFFIX,wmlog.meituan.com
   - DOMAIN-SUFFIX,wt.ara.ad
   - DOMAIN-SUFFIX,www.branch.rocks
-  - DOMAIN-SUFFIX,www.metrics.bankaustria.at
   - DOMAIN-SUFFIX,www.tracking.adp.ch
   - DOMAIN-SUFFIX,www.tracking.adp.co.uk
   - DOMAIN-SUFFIX,www.tracking.alabamapower.com

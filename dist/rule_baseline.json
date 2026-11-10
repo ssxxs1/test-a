@@ -2,8 +2,8 @@
   "approval": null,
   "identity": {
     "dependency_identity": "5ebf270993b4ce173f0d0ef429d51cdc732951cc438f697f1428f5e6cb60e6e1",
-    "policy_hash": "c224579d6d3072cd61b0a1137b849410bf079fc87380ad00a55778d3c665f26e",
-    "policy_version": 5,
+    "policy_hash": "4c315891c299d66f101f9bbfffa4bc4874d7ef39cc0e756a5f2a004def526058",
+    "policy_version": 6,
     "processor_hash": "0c3da70aaf29d7e610b2a7c1605c9abe5774614c109e04cfab4f5d619130801a",
     "processor_version": 4,
     "source_canonical_hashes": {
@@ -21,12 +21,12 @@
   },
   "outputs": {
     "clash_full": {
-      "HOST": 242,
+      "HOST": 241,
       "HOST-KEYWORD": 2,
-      "HOST-SUFFIX": 3736,
+      "HOST-SUFFIX": 3701,
       "IP-CIDR": 24,
       "IP6-CIDR": 4,
-      "TOTAL": 4008
+      "TOTAL": 3972
     },
     "qx_compact": {
       "HOST": 79,
@@ -37,12 +37,12 @@
       "TOTAL": 2000
     },
     "qx_universal": {
-      "HOST": 236,
+      "HOST": 235,
       "HOST-KEYWORD": 2,
-      "HOST-SUFFIX": 3489,
+      "HOST-SUFFIX": 3458,
       "IP-CIDR": 24,
       "IP6-CIDR": 4,
-      "TOTAL": 3755
+      "TOTAL": 3723
     }
   },
   "root_suffixes": [
@@ -72,15 +72,12 @@
     "criteo.net",
     "doubleclick.net",
     "fyber.com",
-    "getui.com",
-    "getui.net",
     "google-analytics.com",
     "googlesyndication.com",
     "googletagmanager.com",
     "growingio.com",
     "httpdns.pro",
     "iad-apple.com",
-    "igexin.com",
     "inmobi.com",
     "ironsrc.com",
     "jpush.cn",
