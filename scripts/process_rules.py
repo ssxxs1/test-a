@@ -19,11 +19,18 @@ from rules.pipeline import build_profiles
 from rules.reporting import write_outputs
 from rules.storage import StorageError, load_baseline, publish
 
-PROCESSOR_VERSION = 4
+PROCESSOR_VERSION = 5
 
 
 def repo_root() -> Path:
     return Path(__file__).resolve().parent.parent
+
+
+def processor_identity(root: Path) -> str:
+    rules_dir = root / "scripts" / "rules"
+    py_files = sorted([Path(__file__)] + list(rules_dir.glob("*.py")))
+    combined = "".join(file_sha256(f) for f in py_files)
+    return hashlib.sha256(combined.encode()).hexdigest()
 
 
 def dependency_identity(root: Path) -> str:
@@ -73,7 +80,7 @@ def main(argv: list[str] | None = None) -> int:
         identity = {
             "policy_version": config.policy["policy_version"], "policy_hash": config.policy_hash,
             "sources_version": json.loads((root / "scripts" / "sources.json").read_text(encoding="utf-8"))["sources_version"], "sources_hash": config.sources_hash,
-            "processor_version": PROCESSOR_VERSION, "processor_hash": file_sha256(Path(__file__)),
+            "processor_version": PROCESSOR_VERSION, "processor_hash": processor_identity(root),
             "dependency_identity": dependency_identity(root),
             "source_canonical_hashes": {result.source.source_id: result.canonical_events_hash for result in results},
             "source_raw_hashes": {result.source.source_id: result.raw_content_hash for result in results},

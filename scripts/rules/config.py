@@ -98,8 +98,14 @@ def load_config(root: Path) -> AppConfig:
                 raise ConfigurationError(f"{key} must be a non-empty regex list")
             for value in values:
                 re.compile(value)
+        kw_root_pats = policy.get("keyword_root_patterns", [])
+        if kw_root_pats:
+            if not isinstance(kw_root_pats, list) or not all(isinstance(p, str) and p for p in kw_root_pats):
+                raise ConfigurationError("keyword_root_patterns must be a string list")
+            for p in kw_root_pats:
+                re.compile(p)
     except re.error as exc:
-        raise ConfigurationError(f"Invalid label pattern: {exc}") from exc
+        raise ConfigurationError(f"Invalid regex pattern: {exc}") from exc
     seen_ids: set[str] = set()
     for item in policy.get("domain_evidence_catalog", []):
         _validate_policy_item(item, True)

@@ -18,6 +18,18 @@ def _validate_url(url: str, source: SourceConfig) -> None:
         raise FetchError(f"{source.source_id}: URL outside allowed HTTPS hosts: {url}")
 
 
+def _extract_repo_identity(url: str) -> str | None:
+    parsed = urlparse(url)
+    if parsed.hostname == "raw.githubusercontent.com":
+        parts = parsed.path.strip("/").split("/")
+        return f"{parts[0]}/{parts[1]}" if len(parts) >= 2 else None
+    if parsed.hostname == "cdn.jsdelivr.net":
+        parts = parsed.path.strip("/").split("/")
+        if len(parts) >= 3 and parts[0] == "gh":
+            return f"{parts[1]}/{parts[2].split('@')[0]}"
+    return None
+
+
 def _candidate_urls(source: SourceConfig) -> list[str]:
     urls = [source.url]
     parsed = urlparse(source.url)
@@ -38,11 +50,16 @@ def fetch_source(source: SourceConfig, attempts: int = 3) -> bytes:
     max_per_url = 2 if len(urls) > 1 else attempts
     for url in urls:
         _validate_url(url, source)
+        origin_identity = _extract_repo_identity(url)
         for attempt in range(max_per_url):
             try:
                 current = url
                 for _ in range(4):
                     _validate_url(current, source)
+                    if origin_identity:
+                        curr_identity = _extract_repo_identity(current)
+                        if curr_identity and curr_identity != origin_identity:
+                            raise FetchError(f"{source.source_id}: redirect changes repo from {origin_identity} to {curr_identity}: {current}")
                     response = requests.get(current, timeout=(5, 20), allow_redirects=False, stream=True, headers={"User-Agent": "test-a-rule-processor/1"})
                     if response.is_redirect:
                         location = response.headers.get("Location")

@@ -6,7 +6,7 @@ from collections import defaultdict
 
 from .config import policy_items
 from .models import Rule, SourceConfig, SourceRecord, SourceResult
-from .normalize import covered_by_suffix, structural_random_reasons
+from .normalize import covered_by_suffix, normalize_domain, structural_random_reasons
 
 TYPE_ORDER = {"HOST": 1, "HOST-SUFFIX": 2, "HOST-KEYWORD": 3, "IP-CIDR": 4, "IP6-CIDR": 5, "GEOIP": 6, "USER-AGENT": 7}
 PROFILES = ("clash_full", "qx_universal", "qx_compact")
@@ -66,13 +66,14 @@ def _catalog_data(rule, raw_catalog):
     return matched, platforms, any(x["lite_enabled"] for x in matched)
 
 
-def _select(name, grouped, sources, policy):
+def _select(name, grouped, sources, policy, rd_sources=None):
     limit = policy["profile_limits"][name]
     raw_catalog = policy["domain_evidence_catalog"]
     web_labels, mobile_labels = set(policy["web_label_categories"]), set(policy["mobile_sdk_labels"])
     excluded_labels = set(policy["label_pattern_exclusions"])
     web_patterns = [re.compile(value) for value in policy["web_label_patterns"]]
     compact_patterns = [re.compile(value) for value in policy["compact_label_patterns"]]
+    kw_root_patterns = [re.compile(value) for value in policy.get("keyword_root_patterns", [])]
     domain_exclusions = tuple(e.strip().strip(".").lower() for e in policy.get("domain_exclusions", []) if isinstance(e, str) and e.strip().strip("."))
     allowed_keywords = {item.value.lower() for item in policy_items(policy, "keyword_allowlist")} if "keyword_allowlist" in policy else set()
     reserved, candidates, reasons, tier_counts = set(), {1: [], 2: [], 3: []}, {}, defaultdict(int)
@@ -93,6 +94,17 @@ def _select(name, grouped, sources, policy):
                 tier = 1
                 reasons[rule] = "tier1:keyword_allowlist"
                 candidates[1].append(((-990, TYPE_ORDER[rule.rule_type], len(rule.value), rule.value), rule))
+                tier_counts["tier1_eligible"] += 1
+                continue
+            elif (len(rule_kw) >= 5 and "." not in rule_kw
+                  and kw_root_patterns
+                  and any(pat.fullmatch(rule_kw) for pat in kw_root_patterns)):
+                if domain_exclusions and any(ex == rule_kw or ex.startswith(rule_kw + ".") or ("." + rule_kw + ".") in ex for ex in domain_exclusions):
+                    reasons[rule] = f"domain_exclusion:{rule_kw}"
+                    continue
+                tier = 1
+                reasons[rule] = "tier1:keyword_root"
+                candidates[1].append(((-985, TYPE_ORDER[rule.rule_type], len(rule.value), rule.value), rule))
                 tier_counts["tier1_eligible"] += 1
                 continue
             else:
@@ -127,15 +139,28 @@ def _select(name, grouped, sources, policy):
             profile_ok = name == "clash_full" or owner == "web"
             if owner and evidence and not blocked and profile_ok:
                 tier = 3
+        if tier is None and rule.rule_type in {"IP-CIDR", "IP6-CIDR"}:
+            trusted_ad = any(
+                r.source in sources and sources[r.source].role in {"advertising", "tracking"}
+                for r in records
+            )
+            if trusted_ad:
+                tier = 2
         if tier is None:
             reasons[rule] = "platform_or_evidence_excluded"
             continue
 
         # 消除字典序截断偏差：根据规则类型权重、共识信度、特征匹配丰富度进行科学多维排序
         is_suffix = 1 if rule.rule_type == "HOST-SUFFIX" else 0
+        rd_source_count = 1
+        if rd_sources and rule.rule_type in {"HOST", "HOST-SUFFIX"}:
+            _, registrable, _ = normalize_domain(rule.value)
+            if registrable:
+                rd_source_count = len(rd_sources.get(registrable, {1}))
+
         if tier == 1:
             priority = max((item.get("priority", 800) for item in catalog), default=800)
-            rank_score = (-priority, -consensus_count, -is_suffix, TYPE_ORDER.get(rule.rule_type, 99), len(rule.value), rule.value)
+            rank_score = (-priority, -consensus_count, -rd_source_count, -is_suffix, TYPE_ORDER.get(rule.rule_type, 99), len(rule.value), rule.value)
         elif tier == 2:
             if name == "qx_compact":
                 sdk_count = len(labels & mobile_labels)
@@ -160,9 +185,9 @@ def _select(name, grouped, sources, policy):
                     evidence_grade = 5
             else:
                 evidence_grade = len(labels & (web_labels | mobile_labels)) + len(pattern_web)
-            rank_score = (-consensus_count, -evidence_grade, -is_suffix, TYPE_ORDER.get(rule.rule_type, 99), len(rule.value), rule.value)
+            rank_score = (-consensus_count, -evidence_grade, -rd_source_count, -is_suffix, TYPE_ORDER.get(rule.rule_type, 99), len(rule.value), rule.value)
         else:
-            rank_score = (-consensus_count, -is_suffix, TYPE_ORDER.get(rule.rule_type, 99), len(rule.value), rule.value)
+            rank_score = (-consensus_count, -rd_source_count, -is_suffix, TYPE_ORDER.get(rule.rule_type, 99), len(rule.value), rule.value)
 
         candidates[tier].append((rank_score, rule))
         reasons[rule] = f"tier{tier}:catalog" if tier == 1 else f"tier{tier}:label_or_evidence"
@@ -234,16 +259,23 @@ def _group_and_seed(results, policy):
                 consensus_sources=["domain_catalog_seed"]
             )
             grouped[cat_rule].append(seed_record)
-    return grouped
+    rd_sources = defaultdict(set)
+    for rule, records in grouped.items():
+        if rule.rule_type in {"HOST", "HOST-SUFFIX"}:
+            _, registrable, _ = normalize_domain(rule.value)
+            if registrable:
+                for rec in records:
+                    rd_sources[registrable].add(rec.source)
+    return grouped, dict(rd_sources)
 
 
 def build_profiles(results, policy):
-    grouped = _group_and_seed(results, policy)
+    grouped, rd_sources = _group_and_seed(results, policy)
     sources = _sources_map(results)
     profiles, reasons, summaries = {}, {}, {}
-    profiles["clash_full"], reasons["clash_full"], summaries["clash_full"] = _select("clash_full", grouped, sources, policy)
+    profiles["clash_full"], reasons["clash_full"], summaries["clash_full"] = _select("clash_full", grouped, sources, policy, rd_sources)
     for name in ("qx_universal", "qx_compact"):
-        profiles[name], reasons[name], summaries[name] = _select(name, grouped, sources, policy)
+        profiles[name], reasons[name], summaries[name] = _select(name, grouped, sources, policy, rd_sources)
     clash = set(profiles["clash_full"])
     for name in ("qx_universal", "qx_compact"):
         clash.update(profiles[name])
@@ -271,6 +303,6 @@ def build_profiles(results, policy):
 
 
 def profile_summary(results, profiles, policy):
-    grouped = _group_and_seed(results, policy)
+    grouped, rd_sources = _group_and_seed(results, policy)
     sources = _sources_map(results)
-    return {name: _select(name, grouped, sources, policy)[2] for name in PROFILES}
+    return {name: _select(name, grouped, sources, policy, rd_sources)[2] for name in PROFILES}

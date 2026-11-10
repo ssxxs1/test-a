@@ -218,5 +218,54 @@ class ProductProfileTests(unittest.TestCase):
         self.assertIn(r_sdk, compact)
         self.assertNotIn(r_generic, compact)
 
+    def test_ip_cidr_trusted_source_channel(self):
+        """IP-CIDR from advertising source must pass through."""
+        r_ip = Rule("IP-CIDR", "1.2.3.4/32")
+        r_ip6 = Rule("IP6-CIDR", "2001:db8::/32")
+        custom_policy = dict(POLICY)
+        custom_policy["domain_evidence_catalog"] = []
+        profiles, decisions = build_profiles([result("adlite", "advertising", [r_ip, r_ip6])], custom_policy)
+        self.assertIn(r_ip, profiles["clash_full"])
+        self.assertIn(r_ip6, profiles["clash_full"])
+
+    def test_keyword_root_pattern_admission(self):
+        """Plain ad-root keyword matching keyword_root_patterns must be admitted to Tier 1."""
+        kw_adservice = Rule("HOST-KEYWORD", "adservice")
+        kw_random = Rule("HOST-KEYWORD", "xjkqwerty")
+        custom_policy = dict(POLICY)
+        custom_policy["domain_evidence_catalog"] = []
+        custom_policy["keyword_root_patterns"] = ["^adservice$"]
+        profiles, _ = build_profiles([result("adlite", "advertising", [kw_adservice, kw_random])], custom_policy)
+        self.assertIn(kw_adservice, profiles["clash_full"])
+        self.assertNotIn(kw_random, profiles["clash_full"])
+
+    def test_registrable_domain_consensus_scoring(self):
+        """Rules sharing the same registrable domain across multiple sources get higher rd_source_count."""
+        r_multi = Rule("HOST-SUFFIX", "tracker.multi-source-domain.com")
+        r_single = Rule("HOST-SUFFIX", "tracker.single-source-domain.com")
+        custom_policy = dict(POLICY)
+        custom_policy["domain_evidence_catalog"] = []
+        custom_policy["profile_limits"] = {
+            "clash_full": {"target": 1, "max": 2},
+            "qx_universal": {"target": 1, "max": 2},
+            "qx_compact": {"target": 1, "max": 2}
+        }
+        res1 = result("source1", "advertising", [r_multi, r_single])
+        res2 = result("source2", "tracking", [Rule("HOST", "ad.multi-source-domain.com")])
+        profiles, _ = build_profiles([res1, res2], custom_policy)
+        self.assertIn(r_multi, profiles["qx_compact"])
+        self.assertNotIn(r_single, profiles["qx_compact"])
+
+    def test_processor_identity_covers_rules_directory(self):
+        from process_rules import processor_identity
+        ident = processor_identity(ROOT)
+        self.assertEqual(len(ident), 64)
+
+    def test_fetch_extract_repo_identity(self):
+        from rules.fetch import _extract_repo_identity
+        self.assertEqual(_extract_repo_identity("https://raw.githubusercontent.com/owner/repo/main/path/rule.list"), "owner/repo")
+        self.assertEqual(_extract_repo_identity("https://cdn.jsdelivr.net/gh/owner/repo@main/path/rule.list"), "owner/repo")
+        self.assertIsNone(_extract_repo_identity("https://example.com/some/path"))
+
 
 if __name__ == "__main__": unittest.main()

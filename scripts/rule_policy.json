@@ -1,5 +1,5 @@
 {
-  "policy_version": 6,
+  "policy_version": 7,
   "qx_policy": "Advertising",
   "profile_limits": {
     "clash_full": {
@@ -60,6 +60,10 @@
     "tiqcdn.com",
     "online-metrix.net",
     "dingxiang-inc.com"
+  ],
+  "keyword_root_patterns": [
+    "^ad(?:form|marv(?:el)?|master|sage|sens(?:or)?|service|smogo|srvmedia|serving|system|words)$",
+    "^(?:applovin|domob|dtscout|histats|mathtag|omniture|openx|supersonicads|pangolin-sdk-toutiao|pglstatp-toutiao|guanggao)$"
   ],
   "keyword_denylist": [
     "api",
