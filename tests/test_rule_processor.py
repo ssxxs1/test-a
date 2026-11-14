@@ -290,22 +290,26 @@ class ProductProfileTests(unittest.TestCase):
             self.assertNotIn(r_jpush, profiles[name])
             self.assertNotIn(r_sis, profiles[name])
 
-    def test_keyword_substring_blocked_by_domain_exclusions(self):
-        # HOST-KEYWORD / DOMAIN-KEYWORD is a substring match in clients; non-dot-delimited substrings must also be blocked
+    def test_keyword_boundary_blocked_by_domain_exclusions(self):
+        # 关键词冲突必须严格遵循点分隔/标签边界匹配，杜绝非边界任意子串乱咬导致合法广告关键词自杀
         r_kw_sub = Rule("HOST-KEYWORD", "alipay")
-        r_kw_partial = Rule("HOST-KEYWORD", "getui")
-        r_kw_non_dot = Rule("HOST-KEYWORD", "getu")
+        r_kw_root = Rule("HOST-KEYWORD", "getui")
+        r_kw_safe = Rule("HOST-KEYWORD", "appsflyer")
         custom_policy = dict(POLICY)
         custom_policy["domain_exclusions"] = ["collect.alipay.com", "getui.com"]
         custom_policy["keyword_allowlist"] = [
             {"id": "kw-1", "value": "alipay", "category": "sdk", "note": "x", "evidence": "x"},
             {"id": "kw-2", "value": "getui", "category": "sdk", "note": "x", "evidence": "x"},
-            {"id": "kw-3", "value": "getu", "category": "sdk", "note": "x", "evidence": "x"},
+            {"id": "kw-3", "value": "appsflyer", "category": "sdk", "note": "x", "evidence": "x"},
         ]
-        profiles, decisions = build_profiles([result("privacy", "tracking", [r_kw_sub, r_kw_partial, r_kw_non_dot])], custom_policy)
-        for kw in (r_kw_sub, r_kw_partial, r_kw_non_dot):
-            self.assertNotIn(kw, profiles["clash_full"])
-            self.assertTrue(decisions[kw][1].startswith("domain_exclusion:"))
+        profiles, decisions = build_profiles([result("privacy", "tracking", [r_kw_sub, r_kw_root, r_kw_safe])], custom_policy)
+        # alipay 和 getui 命中了点分隔白名单标签，必须被排除
+        self.assertNotIn(r_kw_sub, profiles["clash_full"])
+        self.assertNotIn(r_kw_root, profiles["clash_full"])
+        self.assertTrue(decisions[r_kw_sub][1].startswith("domain_exclusion:"))
+        self.assertTrue(decisions[r_kw_root][1].startswith("domain_exclusion:"))
+        # appsflyer 无白名单冲突，必须 100% 正常准入 Tier 1
+        self.assertIn(r_kw_safe, profiles["clash_full"])
 
     def test_dynamic_suffix_folding_frees_capacity_budget(self):
         # r_sub (HOST) has 2-source consensus -> admitted before r_parent (HOST-SUFFIX) which has 1-source

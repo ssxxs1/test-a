@@ -88,7 +88,7 @@ def _select(name, grouped, sources, policy, rd_sources=None):
         if rule.rule_type == "HOST-KEYWORD":
             rule_kw = rule.value.lower().strip(".")
             if rule_kw in allowed_keywords:
-                if domain_exclusions and any(rule_kw in ex for ex in domain_exclusions):
+                if domain_exclusions and any(ex == rule_kw or ex.startswith(rule_kw + ".") or ("." + rule_kw + ".") in ex for ex in domain_exclusions):
                     reasons[rule] = f"domain_exclusion:{rule_kw}"
                     continue
                 tier = 1
@@ -99,7 +99,7 @@ def _select(name, grouped, sources, policy, rd_sources=None):
             elif (len(rule_kw) >= 5 and "." not in rule_kw
                   and kw_root_patterns
                   and any(pat.fullmatch(rule_kw) for pat in kw_root_patterns)):
-                if domain_exclusions and any(rule_kw in ex for ex in domain_exclusions):
+                if domain_exclusions and any(ex == rule_kw or ex.startswith(rule_kw + ".") or ("." + rule_kw + ".") in ex for ex in domain_exclusions):
                     reasons[rule] = f"domain_exclusion:{rule_kw}"
                     continue
                 tier = 1
@@ -194,6 +194,7 @@ def _select(name, grouped, sources, policy, rd_sources=None):
         tier_counts[f"tier{tier}_eligible"] += 1
     if len(reserved) > limit["max"]: raise ValueError(f"{name} DNS reservation exceeds max")
     selected = set(reserved)
+    rule_tier_map: dict[Rule, int] = {}
     current_suffixes = {r.value for r in selected if r.rule_type == "HOST-SUFFIX"}
     target_cap = limit["target"]
     hard_max = limit["max"]
@@ -223,9 +224,10 @@ def _select(name, grouped, sources, policy, rd_sources=None):
                         continue
                 active_bracket = bracket_key
             selected.add(rule)
+            rule_tier_map[rule] = tier
             if rule.rule_type == "HOST-SUFFIX":
                 current_suffixes.add(rule.value)
-                # 动态折叠已被新后缀覆盖的已选非保留子域规则，立即释放预算名额
+                # 动态折叠已被新后缀覆盖的已选非保留子域规则，立即释放预算名额并校准计数
                 covered_selected = [
                     existing for existing in selected
                     if existing is not rule
@@ -235,6 +237,9 @@ def _select(name, grouped, sources, policy, rd_sources=None):
                 ]
                 for existing in covered_selected:
                     selected.discard(existing)
+                    ex_tier = rule_tier_map.pop(existing, None)
+                    if ex_tier is not None:
+                        tier_counts[f"tier{ex_tier}_selected"] = max(0, tier_counts[f"tier{ex_tier}_selected"] - 1)
                     if existing.rule_type == "HOST-SUFFIX":
                         current_suffixes.discard(existing.value)
                     reasons[existing] = "covered_by_active_suffix"
