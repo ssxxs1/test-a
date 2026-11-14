@@ -88,7 +88,7 @@ def _select(name, grouped, sources, policy, rd_sources=None):
         if rule.rule_type == "HOST-KEYWORD":
             rule_kw = rule.value.lower().strip(".")
             if rule_kw in allowed_keywords:
-                if domain_exclusions and any(ex == rule_kw or ex.startswith(rule_kw + ".") or ("." + rule_kw + ".") in ex for ex in domain_exclusions):
+                if domain_exclusions and any(rule_kw in ex for ex in domain_exclusions):
                     reasons[rule] = f"domain_exclusion:{rule_kw}"
                     continue
                 tier = 1
@@ -99,7 +99,7 @@ def _select(name, grouped, sources, policy, rd_sources=None):
             elif (len(rule_kw) >= 5 and "." not in rule_kw
                   and kw_root_patterns
                   and any(pat.fullmatch(rule_kw) for pat in kw_root_patterns)):
-                if domain_exclusions and any(ex == rule_kw or ex.startswith(rule_kw + ".") or ("." + rule_kw + ".") in ex for ex in domain_exclusions):
+                if domain_exclusions and any(rule_kw in ex for ex in domain_exclusions):
                     reasons[rule] = f"domain_exclusion:{rule_kw}"
                     continue
                 tier = 1
@@ -225,6 +225,19 @@ def _select(name, grouped, sources, policy, rd_sources=None):
             selected.add(rule)
             if rule.rule_type == "HOST-SUFFIX":
                 current_suffixes.add(rule.value)
+                # 动态折叠已被新后缀覆盖的已选非保留子域规则，立即释放预算名额
+                covered_selected = [
+                    existing for existing in selected
+                    if existing is not rule
+                    and existing not in reserved
+                    and existing.rule_type in {"HOST", "HOST-SUFFIX"}
+                    and (existing.value == rule.value or existing.value.endswith("." + rule.value))
+                ]
+                for existing in covered_selected:
+                    selected.discard(existing)
+                    if existing.rule_type == "HOST-SUFFIX":
+                        current_suffixes.discard(existing.value)
+                    reasons[existing] = "covered_by_active_suffix"
             tier_counts[f"tier{tier}_selected"] += 1
     selected = _reduce(selected, reserved)
     summary = {"target": limit["target"], "max": limit["max"], "reserved": len(reserved), "eligible": sum(len(items) for items in candidates.values())}
@@ -265,7 +278,8 @@ def _group_and_seed(results, policy):
             _, registrable, _ = normalize_domain(rule.value)
             if registrable:
                 for rec in records:
-                    rd_sources[registrable].add(rec.source)
+                    if rec.source != "domain_catalog_seed":
+                        rd_sources[registrable].add(rec.source)
     return grouped, dict(rd_sources)
 
 

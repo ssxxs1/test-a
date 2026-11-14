@@ -290,5 +290,43 @@ class ProductProfileTests(unittest.TestCase):
             self.assertNotIn(r_jpush, profiles[name])
             self.assertNotIn(r_sis, profiles[name])
 
+    def test_keyword_substring_blocked_by_domain_exclusions(self):
+        # HOST-KEYWORD / DOMAIN-KEYWORD is a substring match in clients; non-dot-delimited substrings must also be blocked
+        r_kw_sub = Rule("HOST-KEYWORD", "alipay")
+        r_kw_partial = Rule("HOST-KEYWORD", "getui")
+        r_kw_non_dot = Rule("HOST-KEYWORD", "getu")
+        custom_policy = dict(POLICY)
+        custom_policy["domain_exclusions"] = ["collect.alipay.com", "getui.com"]
+        custom_policy["keyword_allowlist"] = [
+            {"id": "kw-1", "value": "alipay", "category": "sdk", "note": "x", "evidence": "x"},
+            {"id": "kw-2", "value": "getui", "category": "sdk", "note": "x", "evidence": "x"},
+            {"id": "kw-3", "value": "getu", "category": "sdk", "note": "x", "evidence": "x"},
+        ]
+        profiles, decisions = build_profiles([result("privacy", "tracking", [r_kw_sub, r_kw_partial, r_kw_non_dot])], custom_policy)
+        for kw in (r_kw_sub, r_kw_partial, r_kw_non_dot):
+            self.assertNotIn(kw, profiles["clash_full"])
+            self.assertTrue(decisions[kw][1].startswith("domain_exclusion:"))
+
+    def test_dynamic_suffix_folding_frees_capacity_budget(self):
+        # r_sub (HOST) has 2-source consensus -> admitted before r_parent (HOST-SUFFIX) which has 1-source
+        # Once r_parent is admitted, r_sub is dynamically folded, freeing the slot for r_other within target=2!
+        r_sub = Rule("HOST", "sub.tracker.example.com")
+        r_parent = Rule("HOST-SUFFIX", "tracker.example.com")
+        r_other = Rule("HOST-SUFFIX", "tracker.other.com")
+        custom_policy = dict(POLICY)
+        custom_policy["domain_evidence_catalog"] = []
+        custom_policy["profile_limits"] = {
+            "clash_full": {"target": 10, "max": 20},
+            "qx_universal": {"target": 10, "max": 20},
+            "qx_compact": {"target": 2, "max": 2},
+        }
+        res1 = result("privacy", "tracking", [r_sub, r_parent, r_other], consensus=True)
+        res2 = result("adlite", "advertising", [r_sub], consensus=True)
+        profiles, _ = build_profiles([res1, res2], custom_policy)
+        compact = profiles["qx_compact"]
+        self.assertIn(r_parent, compact)
+        self.assertIn(r_other, compact)
+        self.assertNotIn(r_sub, compact)
+
 
 if __name__ == "__main__": unittest.main()
