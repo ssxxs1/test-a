@@ -1,19 +1,19 @@
 {
   "baseline_exists": true,
-  "built_at": "2026-11-14T05:58:30.021956+00:00",
+  "built_at": "2026-11-14T09:04:45.755354+00:00",
   "files": {
-    "Clash_Unified.yaml": "7f7bb478e8ba93962076fa86a1d485626c54e395c144d20ff97df898de892f16",
-    "QX_Compact.list": "0ac231648f148f54ad48199f4d5a83e98aa98bbe9b7645bdf997f7f73da53e82",
-    "QX_Universal.list": "5c60c2cb985c3b5207a36f3653647531ca74441ea99e28fc933652a7d269c979",
-    "Rule_Report.md": "56c4d21c697b1a1cf0b2fb9d3bc12af9605fc0c1896b9e70cc5932d4e7e5882c",
-    "rule_baseline.json": "14946ca167cb2e5340b9f8f21b9903a53c865dcab5e4269add886fe028c7582e",
-    "rule_decisions.jsonl": "90da0e1bbe564a6bf763ded29027502b55b2a8e4a82935235bf126133102b39e"
+    "Clash_Unified.yaml": "50f64a2c8480c45c739a472836f889aa1cb6ab65dfef2466dd462e602f0ef844",
+    "QX_Compact.list": "7e2c4a54168022e800dc2e48134e9af2fbb7337ed9af7728820fd943207efa33",
+    "QX_Universal.list": "8ff0080ba060d53d9cee54c21addd0c6da6241d84ea5841cd7daade0f99ef6b2",
+    "Rule_Report.md": "e4e2b656c241228c74bf1be5aa6c856a90aa1dba63056cdd560ae53b9ce7fbfd",
+    "rule_baseline.json": "d5ed7495f12cec92bef377da59cdcae6e539ea13214c9d6694641fc011acad5d",
+    "rule_decisions.jsonl": "003e830dc0d080fd1289aa0580365eeef377fb01b58a22114703d61b1e49f592"
   },
   "identity": {
     "dependency_identity": "5ebf270993b4ce173f0d0ef429d51cdc732951cc438f697f1428f5e6cb60e6e1",
-    "policy_hash": "4223f174414cb6f2fc70a9f15af3d0917eeed4eeef88909dadd7697f6577f41f",
+    "policy_hash": "3b73bd1f760b2b99da952f1fc33b2a02f45090df5c4c604f4387368e6f82d6b9",
     "policy_version": 8,
-    "processor_hash": "e7045e4466bc0651422d51ab2f83e998c23b5326e4ebbbf46c2dfd3bfc5636ac",
+    "processor_hash": "c47bc15e88382f7d3b645bd422550a54ca671efbdfa180ea4583cfa83aefa4ee",
     "processor_version": 6,
     "source_canonical_hashes": {
       "BlockDNS": "1b8ab6e4d4fa867761d5ebdf793bb21659c2ef3c25c6b46d1f4edb0c31dd7373",

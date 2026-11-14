@@ -2,9 +2,9 @@
   "approval": null,
   "identity": {
     "dependency_identity": "5ebf270993b4ce173f0d0ef429d51cdc732951cc438f697f1428f5e6cb60e6e1",
-    "policy_hash": "4223f174414cb6f2fc70a9f15af3d0917eeed4eeef88909dadd7697f6577f41f",
+    "policy_hash": "3b73bd1f760b2b99da952f1fc33b2a02f45090df5c4c604f4387368e6f82d6b9",
     "policy_version": 8,
-    "processor_hash": "e7045e4466bc0651422d51ab2f83e998c23b5326e4ebbbf46c2dfd3bfc5636ac",
+    "processor_hash": "c47bc15e88382f7d3b645bd422550a54ca671efbdfa180ea4583cfa83aefa4ee",
     "processor_version": 6,
     "source_canonical_hashes": {
       "BlockDNS": "1b8ab6e4d4fa867761d5ebdf793bb21659c2ef3c25c6b46d1f4edb0c31dd7373",
@@ -22,27 +22,27 @@
   "outputs": {
     "clash_full": {
       "HOST": 240,
-      "HOST-KEYWORD": 21,
+      "HOST-KEYWORD": 23,
       "HOST-SUFFIX": 3699,
       "IP-CIDR": 218,
       "IP6-CIDR": 4,
-      "TOTAL": 4182
+      "TOTAL": 4184
     },
     "qx_compact": {
       "HOST": 83,
-      "HOST-KEYWORD": 21,
+      "HOST-KEYWORD": 23,
       "HOST-SUFFIX": 2147,
       "IP-CIDR": 24,
       "IP6-CIDR": 4,
-      "TOTAL": 2279
+      "TOTAL": 2281
     },
     "qx_universal": {
       "HOST": 235,
-      "HOST-KEYWORD": 21,
+      "HOST-KEYWORD": 23,
       "HOST-SUFFIX": 3458,
       "IP-CIDR": 218,
       "IP6-CIDR": 4,
-      "TOTAL": 3936
+      "TOTAL": 3938
     }
   },
   "root_suffixes": [

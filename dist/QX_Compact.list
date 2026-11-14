@@ -1,11 +1,11 @@
 # NAME: QX_Compact
 # HOST: 83
 # HOST-SUFFIX: 2147
-# HOST-KEYWORD: 21
+# HOST-KEYWORD: 23
 # IP-CIDR: 28
 # GEOIP: 0
 # USER-AGENT: 0
-# TOTAL: 2279
+# TOTAL: 2281
 HOST,aedns.weixin.qq.com,Advertising
 HOST,alimama.com,Advertising
 HOST,analytic.rocks,Advertising
@@ -2247,6 +2247,7 @@ HOST-KEYWORD,adsrvmedia,Advertising
 HOST-KEYWORD,adsystem,Advertising
 HOST-KEYWORD,adwords,Advertising
 HOST-KEYWORD,applovin,Advertising
+HOST-KEYWORD,appsflyer,Advertising
 HOST-KEYWORD,domob,Advertising
 HOST-KEYWORD,dtscout,Advertising
 HOST-KEYWORD,guanggao,Advertising
@@ -2257,6 +2258,7 @@ HOST-KEYWORD,openx,Advertising
 HOST-KEYWORD,pangolin-sdk-toutiao,Advertising
 HOST-KEYWORD,pglstatp-toutiao,Advertising
 HOST-KEYWORD,supersonicads,Advertising
+HOST-KEYWORD,umeng,Advertising
 IP-CIDR,101.124.19.122/32,Advertising
 IP-CIDR,103.224.222.208/32,Advertising
 IP-CIDR,115.236.121.195/32,Advertising
